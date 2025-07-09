@@ -1,0 +1,21 @@
+{
+  "detection_zones": [
+    {
+      "name": "Zone 1",
+      "coords": [
+        100,
+        100,
+        300,
+        300
+      ],
+      "classes": [
+        "person",
+        "head"
+      ]
+    }
+  ],
+  "detection_actions": {},
+  "confidence_threshold": 0.5,
+  "target_classes": "person,head,body,chest,box",
+  "action_delay": 100
+}
