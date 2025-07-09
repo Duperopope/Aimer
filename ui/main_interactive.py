@@ -25,6 +25,8 @@ sys.path.insert(0, str(parent_dir))
 # Configuration pour éviter les erreurs d'importation
 try:
     from ultralytics import YOLO
+    from ui.zone_selector import ZoneManager
+    from utils.multi_screen import TargetSelector
     IMPORTS_OK = True
 except ImportError as e:
     IMPORTS_OK = False
@@ -44,6 +46,13 @@ class InteractiveAimingSystem:
         self.detection_zones = []  # Liste des zones à surveiller
         self.detection_actions = {}  # Actions à déclencher par classe
         self.current_detections = []  # Détections actuelles
+        
+        # Gestionnaire de zones
+        self.zone_manager = None
+        
+        # Sélecteur de cible (écran/fenêtre)
+        self.target_selector = None
+        self.current_target = None
         
         # Configuration des couleurs
         self.colors = {
@@ -130,6 +139,13 @@ class InteractiveAimingSystem:
                  fg='white',
                  command=self.configure_actions).pack(side=tk.LEFT, padx=5)
         
+        tk.Button(control_buttons, 
+                 text="🖥️ SÉLECTIONNER CIBLE", 
+                 font=('Arial', 11),
+                 bg='#6f42c1', 
+                 fg='white',
+                 command=self.select_target).pack(side=tk.LEFT, padx=5)
+        
         # Panneau principal divisé
         main_panel = ttk.Frame(self.root)
         main_panel.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
@@ -212,6 +228,14 @@ class InteractiveAimingSystem:
             self.model = YOLO('yolov8n.pt')
             self.log_message("✅ Modèle YOLO chargé!")
             self.log_message(f"📊 {len(self.model.names)} classes disponibles")
+            
+            # Initialiser le gestionnaire de zones
+            self.zone_manager = ZoneManager(log_callback=self.log_message)
+            self.log_message("🎯 Gestionnaire de zones initialisé")
+            
+            # Initialiser le sélecteur de cible
+            self.target_selector = TargetSelector(log_callback=self.log_message)
+            self.log_message("🖥️ Sélecteur de cible initialisé")
             
             # Afficher les classes pertinentes pour les jeux
             gaming_classes = ['person', 'bottle', 'cup', 'bowl', 'laptop', 'mouse', 'keyboard', 'cell phone', 'book', 'clock', 'scissors', 'chair', 'dining table']
@@ -374,21 +398,15 @@ Instructions:
     
     def add_detection_zone(self):
         """Ajoute une zone de détection"""
-        messagebox.showinfo("Sélection de Zone", 
-                           "Cliquez et glissez pour sélectionner une zone rectangulaire.\n"
-                           "Appuyez sur Échap pour annuler.")
+        if not self.zone_manager:
+            messagebox.showerror("Erreur", "Gestionnaire de zones non initialisé!")
+            return
         
-        # Ici vous pourriez implémenter une sélection de zone interactive
-        # Pour l'instant, on simule avec une zone prédéfinie
-        zone = {
-            'name': f'Zone {len(self.detection_zones) + 1}',
-            'coords': [100, 100, 300, 300],  # x1, y1, x2, y2
-            'classes': ['person', 'head']
-        }
+        # Utiliser le nouveau système de sélection interactive
+        self.zone_manager.add_zone_interactive()
         
-        self.detection_zones.append(zone)
-        self.refresh_zones_list()
-        self.log_message(f"➕ Zone ajoutée: {zone['name']}")
+        # Mettre à jour la liste après sélection
+        self.root.after(1000, self.sync_zones_from_manager)
     
     def remove_detection_zone(self):
         """Supprime une zone de détection"""
@@ -399,13 +417,20 @@ Instructions:
             self.refresh_zones_list()
             self.log_message(f"🗑️ Zone supprimée: {zone['name']}")
     
+    def sync_zones_from_manager(self):
+        """Synchronise les zones depuis le gestionnaire"""
+        if self.zone_manager:
+            self.detection_zones = self.zone_manager.get_zones()
+            self.refresh_zones_list()
+    
     def refresh_zones_list(self):
         """Actualise la liste des zones"""
         if hasattr(self, 'zones_listbox'):
             self.zones_listbox.delete(0, tk.END)
             for zone in self.detection_zones:
+                classes = zone.get('classes', [])
                 self.zones_listbox.insert(tk.END, 
-                    f"{zone['name']} - Classes: {', '.join(zone['classes'])}")
+                    f"{zone['name']} - Classes: {', '.join(classes)}")
     
     def configure_actions(self):
         """Configure les actions à déclencher"""
@@ -646,6 +671,36 @@ Instructions pour Actions Automatiques:
         value = self.confidence_var.get()
         percentage = int(value * 100)
         self.confidence_label.configure(text=f"{percentage}%")
+    
+    def select_target(self):
+        """Sélectionne la cible de détection (écran/fenêtre)"""
+        if not self.target_selector:
+            messagebox.showerror("Erreur", "Sélecteur de cible non initialisé!")
+            return
+        
+        # Afficher le sélecteur de cible
+        self.target_selector.show_target_selector(parent=self.root)
+        
+        # Mettre à jour la cible après sélection
+        self.root.after(1000, self.update_current_target)
+    
+    def update_current_target(self):
+        """Met à jour la cible actuelle"""
+        if self.target_selector:
+            self.current_target = self.target_selector.get_current_target()
+            if self.current_target:
+                target_name = self.current_target.get('name', 'Cible inconnue')
+                self.log_message(f"🎯 Cible sélectionnée: {target_name}")
+                
+                # Mettre à jour le titre de la vue
+                if hasattr(self, 'left_panel'):
+                    # Trouver le LabelFrame et mettre à jour son texte
+                    for child in self.root.winfo_children():
+                        if isinstance(child, ttk.Frame):
+                            for subchild in child.winfo_children():
+                                if isinstance(subchild, ttk.LabelFrame) and "Vue en Temps Réel" in str(subchild.cget('text')):
+                                    subchild.configure(text=f"🖥️ Vue: {target_name}")
+                                    break
     
     def log_message(self, message):
         """Ajoute un message au log"""

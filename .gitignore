@@ -62,6 +62,13 @@ config_local.json
 Thumbs.db
 desktop.ini
 
+# Datasets et gros fichiers
+datasets/installed/
+datasets/cache/
+*.zip
+*.tar.gz
+*.db
+
 # Données sensibles
 api_keys.txt
 passwords.txt

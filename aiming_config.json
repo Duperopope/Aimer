@@ -1,17 +1,23 @@
 {
   "detection_zones": [
     {
-      "name": "Zone 1",
+      "name": "Zone de test",
       "coords": [
-        100,
-        100,
-        300,
-        300
+        12,
+        4,
+        2995,
+        1269
       ],
+      "width": 2983,
+      "height": 1265,
       "classes": [
         "person",
-        "head"
-      ]
+        "head",
+        "body",
+        "chest"
+      ],
+      "active": true,
+      "created_at": 1752071301.2986355
     }
   ],
   "detection_actions": {},
