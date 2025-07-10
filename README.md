@@ -24,6 +24,7 @@ python launch_web.py
 ## Debug & logs
 
 ![Version](https://img.shields.io/badge/version-0.1.1-blue)
+![License](https://img.shields.io/badge/license-Apache%202.0-green)
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Duperopope/Aimer)
 [![Launch Web Interface](https://img.shields.io/badge/🌐%20Launch-Web%20Interface-brightgreen)](https://duperopope.github.io/Aimer)
 
