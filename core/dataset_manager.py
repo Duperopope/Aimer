@@ -706,3 +706,13 @@ class DatasetManager:
 
         except Exception as e:
             self.logger.error(f"Erreur nettoyage cache: {e}")
+
+    def get_all_datasets(self) -> List[DatasetInfo]:
+        """Retourne tous les datasets disponibles"""
+        return self.get_available_datasets()
+
+    def get_popular_datasets(self) -> List[DatasetInfo]:
+        """Retourne les datasets populaires/recommandés"""
+        popular_ids = ["coco_2017", "pascal_voc_2012", "cifar10"]
+        all_datasets = self.get_available_datasets()
+        return [ds for ds in all_datasets if ds.id in popular_ids]

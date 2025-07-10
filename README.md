@@ -1,57 +1,109 @@
-# AIMER PRO v0.1.1 — Détection universelle (Windows / CPU stable)
+# 🎯 AIMER PRO - Détection d'Objets Intelligente
 
-![Version](https://img.shields.io/badge/version-0.1.1-blue)
+![Version](https://img.shields.io/badge/version-3.0.0-blue)
 ![License](https://img.shields.io/badge/license-Apache%202.0-green)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Duperopope/Aimer)
-[![🌐 Test Web App](https://img.shields.io/badge/🌐%20Test-Web%20App-brightgreen)](https://aimer-pro.up.railway.app)
-[![📖 Deploy Guide](https://img.shields.io/badge/📖%20Deploy-Guide-orange)](./DEPLOYMENT.md)
+[![Tests](https://github.com/Duperopope/Aimer/actions/workflows/test.yml/badge.svg)](https://github.com/Duperopope/Aimer/actions/workflows/test.yml)
+[![Deploy](https://github.com/Duperopope/Aimer/actions/workflows/deploy.yml/badge.svg)](https://github.com/Duperopope/Aimer/actions/workflows/deploy.yml)
+[![Documentation](https://img.shields.io/badge/📖-Documentation-blue)](https://duperopope.github.io/Aimer/)
 
-## 🚀 Lancement rapide
+## 🎯 **ARCHITECTURE UNIFIÉE v3.0.0**
 
-### Option 1: Tester en ligne (Nouveau !)
-**[🌐 Cliquez ici pour tester l'application web en direct](https://aimer-pro.up.railway.app)**
-- Interface web complète dans votre navigateur
-- Upload d'images en drag & drop
-- Détection en temps réel avec OpenCV
-- API REST testable
-- Aucune installation requise !
-
-### Option 2: GitHub Codespaces
-Cliquez sur le badge "Open in GitHub Codespaces" ci-dessus pour développer AIMER dans votre navigateur !
-
-**Dans Codespaces :**
-- L'auto-setup se lance automatiquement au démarrage
-- Si ce n'est pas le cas, tapez : `python main.py --auto-fix`
-- Pour l'interface web : `python launch_web.py`
-- L'interface s'ouvrira automatiquement sur le port 5000
-
-### Option 3: Interface Web Locale
+### ✨ **Plug & Play - Une seule commande !**
 ```bash
 git clone https://github.com/Duperopope/Aimer.git
 cd Aimer
-python launch_web.py
+python launch.py
+```
+**🚀 Auto-setup complet :** Venv + Requirements + Detectron2 + Serveur Web
+
+### 🧠 **Détection COCO Intelligente**
+- **80 classes d'objets** reconnues automatiquement (COCO dataset)
+- **Detectron2** (Facebook AI Research) - Apache 2.0 License
+- **Confiance ajustable** et filtrage intelligent
+- **Usage commercial autorisé**
+
+### 🌐 **Interface Web Moderne**
+- **📤 Upload d'images** avec détection instantanée
+- **📹 Webcam temps réel** avec test automatique
+- **🎬 Analyse YouTube** (URLs et vidéos)
+- **📱 Responsive design** - fonctionne sur mobile
+
+### 🔧 **Structure Simplifiée**
+- **Fini les doublons !** Un seul serveur, une seule interface
+- **Tests automatisés** avec validation complète
+- **CI/CD GitHub Actions** pour déploiement automatique
+- **Documentation interactive** avec GitHub Pages
+
+## 🚀 **Démarrage Ultra-Rapide**
+
+### Option 1: Auto-Setup (RECOMMANDÉ ⭐)
+```bash
+python launch.py
+```
+Cette commande va automatiquement :
+- ✅ Créer un environnement virtuel Python
+- ✅ Installer toutes les dépendances (Flask, OpenCV, Detectron2...)
+- ✅ Tester votre webcam
+- ✅ Lancer le serveur sur `http://localhost:5000`
+
+### Option 2: Test Webcam Séparé
+```bash
+python test_webcam.py
 ```
 
-### Option 4: Installation Classique
+### Option 3: Installation Manuelle
 ```bash
-git clone https://github.com/Duperopope/Aimer.git
-cd Aimer
+# Créer l'environnement virtuel
+python -m venv venv
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Linux/Mac
+
+# Installer les dépendances
+pip install -r requirements_web.txt
+
+# Lancer le serveur
+python ui/web_interface/server.py
+```
+
+### Option 4: GitHub Codespaces
+Cliquez sur le badge "Open in GitHub Codespaces" ci-dessus pour développer AIMER dans votre navigateur !
+
+### Option 5: Auto-Setup Complet
+```bash
 python main.py --auto-fix
 ```
 
-### Option 5: Déployer votre propre instance
+### Option 6: Déployer votre propre instance
 Voir le [Guide de Déploiement](./DEPLOYMENT.md) pour Railway, Render, Heroku
 
 ---
 
 **Date de release : 10 juillet 2025**
 
-## Nouveautés de la version 0.1.1
+## 🎯 Nouveautés de la version 2.0.0 "COCO Intelligence"
 
-- Lancement all-in-one : `python main.py --auto-fix` installe automatiquement le venv, toutes les dépendances (requirements + Detectron2), relance et vérifie tout, même pour un utilisateur débutant.
-- Installation automatique de Detectron2 (wheel Windows) si absent.
-- Les logs sont maintenant ignorés par git (`logs/` dans `.gitignore`).
-- Patch de robustesse auto-setup (relance automatique après install, gestion venv, etc).
+### 🧠 **SmartDetector** (Nouvelle classe)
+- **Base COCO complète** : 80 classes d'objets du quotidien
+- **Détection multi-méthodes** :
+  - 👤 Personnes (visages + corps entiers)
+  - 🚗 Véhicules (Haar Cascades spécialisées)
+  - 🎨 Objets colorés (analyse HSV pour fruits, légumes)
+  - 📱 Objets rectangulaires (TV, laptop, livres)
+  - ⚽ Objets circulaires (balles, fruits ronds)
+- **Classification géométrique** intelligente
+- **Filtrage automatique** des doublons
+
+### 📺 **YouTubeLiveExtractor** (Nouvelle classe)
+- **Support YouTube Live** complet
+- **Extraction métadonnées** robuste
+- **Formats multiples** jusqu'à 720p
+- **Gestion d'erreurs** avancée
+
+### 🌐 **AimerAdvancedServer** (Nouveau serveur)
+- **Flask + SocketIO** optimisé
+- **3 onglets spécialisés** : Upload | Webcam Live | YouTube Live
+- **Design ultra-moderne** responsive
+- **API temps réel** avec WebSockets
 - Mise à jour de la doc et du patchnote.
 
 ## Nouveautés de la version 0.1

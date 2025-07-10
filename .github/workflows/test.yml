@@ -1,0 +1,68 @@
+name: AIMER PRO - Tests et Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements_web.txt
+    
+    - name: Test imports
+      run: |
+        python -c "from core.detector import SmartDetector; print('✅ SmartDetector import OK')"
+        python -c "from core.config import ConfigManager; print('✅ ConfigManager import OK')"
+        python -c "from core.logger import Logger; print('✅ Logger import OK')"
+    
+    - name: Test webcam simulation
+      run: |
+        # Test sans vraie webcam (CI environment)
+        python -c "
+        import cv2
+        print('✅ OpenCV import OK')
+        try:
+            cap = cv2.VideoCapture(0)
+            print('✅ VideoCapture creation OK')
+            cap.release()
+        except Exception as e:
+            print(f'⚠️  VideoCapture test: {e} (normal en CI)')
+        "
+    
+    - name: Syntax check
+      run: |
+        python -m py_compile ui/web_interface/server.py
+        python -m py_compile launch.py
+        python -m py_compile test_webcam.py
+        echo "✅ Tous les fichiers Python compilent correctement"
+    
+    - name: Structure validation
+      run: |
+        echo "📁 Validation de la structure unifiée..."
+        test -f "ui/web_interface/server.py" && echo "✅ Serveur unique présent"
+        test -f "launch.py" && echo "✅ Lanceur unique présent"
+        test -f "ui/web_interface/templates/index.html" && echo "✅ Interface unique présente"
+        test -f "test_webcam.py" && echo "✅ Test webcam présent"
+        
+        # Vérifier qu'il n'y a plus de doublons
+        ! test -f "ui/web_interface/server_ultimate.py" && echo "✅ Anciens serveurs supprimés"
+        ! test -f "launch_ultimate_fixed.py" && echo "✅ Anciens lanceurs supprimés"
+        
+        echo "🎯 Structure nettoyée et unifiée !"

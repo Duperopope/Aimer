@@ -381,23 +381,38 @@ Cliquez sur "Test" pour voir une réponse API...
 
         async function startWebcam() {
             try {
+                // D'abord, arrêter toute stream existante pour libérer la caméra
+                if (webcamStream) {
+                    webcamStream.getTracks().forEach(track => track.stop());
+                    webcamStream = null;
+                    await new Promise(resolve => setTimeout(resolve, 100)); // Attendre la libération
+                }
+
                 // Vérifier d'abord si les API sont disponibles
                 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                     throw new Error('API webcam non supportée par ce navigateur');
                 }
 
-                // Demander l'autorisation avec options détaillées
-                const constraints = {
+                console.log('🎥 Demande d\'autorisation webcam...');
+                
+                // Essayer d'abord avec des contraintes strictes, puis relaxer si nécessaire
+                let constraints = {
                     video: {
-                        width: { ideal: 640, max: 1280 },
-                        height: { ideal: 480, max: 720 },
-                        frameRate: { ideal: 30, max: 60 },
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        frameRate: { ideal: 30 },
                         facingMode: 'user'
                     }
                 };
 
-                console.log('🎥 Demande d\'autorisation webcam...');
-                webcamStream = await navigator.mediaDevices.getUserMedia(constraints);
+                try {
+                    webcamStream = await navigator.mediaDevices.getUserMedia(constraints);
+                } catch (strictError) {
+                    console.log('⚠️ Contraintes strictes échouées, essai avec contraintes basiques...');
+                    // Fallback avec contraintes minimales
+                    constraints = { video: true };
+                    webcamStream = await navigator.mediaDevices.getUserMedia(constraints);
+                }
                 
                 const video = document.getElementById('webcamVideo');
                 video.srcObject = webcamStream;
@@ -408,6 +423,9 @@ Cliquez sur "Test" pour voir une réponse API...
                 document.getElementById('stopWebcam').classList.remove('hidden');
                 document.getElementById('webcamStats').classList.remove('hidden');
                 document.getElementById('webcamControls').classList.remove('hidden');
+                
+                // Forcer la lecture pour prendre le contrôle
+                video.play().catch(console.error);
                 
                 // Attendre que la vidéo soit prête
                 video.addEventListener('loadedmetadata', () => {
@@ -432,28 +450,65 @@ Cliquez sur "Test" pour voir une réponse API...
                 } else if (error.name === 'NotFoundError') {
                     errorMessage += 'Aucune caméra détectée sur cet appareil.';
                 } else if (error.name === 'NotReadableError') {
-                    errorMessage += 'Caméra déjà utilisée par une autre application.';
+                    errorMessage += 'Caméra utilisée par une autre application. Fermez les autres onglets/apps utilisant la caméra et réessayez.';
                 } else if (error.name === 'OverconstrainedError') {
                     errorMessage += 'Résolution demandée non supportée.';
                 } else {
                     errorMessage += `Erreur: ${error.message}`;
                 }
                 
-                alert(errorMessage);
+                // Ajouter une option de forçage pour NotReadableError
+                if (error.name === 'NotReadableError') {
+                    const retry = confirm(errorMessage + '\n\nVoulez-vous que AIMER force la prise de contrôle de la caméra ?');
+                    if (retry) {
+                        await forceWebcamAccess();
+                    }
+                } else {
+                    alert(errorMessage);
+                }
+            }
+        }
+
+        async function forceWebcamAccess() {
+            try {
+                console.log('� Tentative de prise de contrôle forcée...');
                 
-                // Proposer de réessayer avec des contraintes plus simples
-                if (error.name === 'OverconstrainedError') {
-                    console.log('🔄 Tentative avec contraintes simplifiées...');
+                // Méthode 1: Essayer de prendre toutes les caméras disponibles
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                
+                for (const device of videoDevices) {
                     try {
-                        webcamStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                        console.log(`🎥 Essai caméra: ${device.label || device.deviceId}`);
+                        webcamStream = await navigator.mediaDevices.getUserMedia({
+                            video: { deviceId: { exact: device.deviceId } }
+                        });
+                        
                         const video = document.getElementById('webcamVideo');
                         video.srcObject = webcamStream;
                         webcamActive = true;
-                        // Continuer avec l'interface...
-                    } catch (simpleError) {
-                        console.error('Échec même avec contraintes simples:', simpleError);
+                        
+                        // Mettre à jour l'interface
+                        document.getElementById('startWebcam').classList.add('hidden');
+                        document.getElementById('stopWebcam').classList.remove('hidden');
+                        document.getElementById('webcamStats').classList.remove('hidden');
+                        document.getElementById('webcamControls').classList.remove('hidden');
+                        
+                        console.log('✅ Prise de contrôle réussie !');
+                        startRealtimeDetection();
+                        return; // Succès !
+                        
+                    } catch (deviceError) {
+                        console.log(`❌ Échec avec ${device.label}: ${deviceError.message}`);
+                        continue;
                     }
                 }
+                
+                throw new Error('Aucune caméra accessible');
+                
+            } catch (error) {
+                console.error('❌ Prise de contrôle échouée:', error);
+                alert('Impossible de prendre le contrôle de la caméra. Fermez manuellement les autres applications utilisant la caméra.');
             }
         }
 
@@ -639,9 +694,23 @@ Cliquez sur "Test" pour voir une réponse API...
                 return;
             }
 
+            // Valider l'URL YouTube
+            if (!url.includes('youtube.com/watch') && !url.includes('youtu.be/')) {
+                alert('Veuillez entrer une URL YouTube valide');
+                return;
+            }
+
             console.log('🔍 Chargement des informations YouTube...');
-            document.getElementById('loadYoutube').disabled = true;
-            document.getElementById('loadYoutube').innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Chargement...';
+            const loadButton = document.getElementById('loadYoutube');
+            loadButton.disabled = true;
+            loadButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Chargement...';
+
+            // Timeout pour éviter les blocages
+            const timeoutId = setTimeout(() => {
+                loadButton.disabled = false;
+                loadButton.innerHTML = '<i class="fas fa-download mr-2"></i>Charger';
+                alert('Timeout: La vidéo met trop de temps à charger. Essayez avec une vidéo plus courte.');
+            }, 15000); // 15 secondes timeout
 
             // Appeler l'API YouTube
             fetch('/api/youtube/info', {
@@ -651,7 +720,10 @@ Cliquez sur "Test" pour voir une réponse API...
                 },
                 body: JSON.stringify({ url: url })
             })
-            .then(response => response.json())
+            .then(response => {
+                clearTimeout(timeoutId);
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     console.log('✅ Informations YouTube récupérées:', data.info);
@@ -660,24 +732,34 @@ Cliquez sur "Test" pour voir une réponse API...
                     displayYouTubeInfo(data.info);
                     document.getElementById('youtubePlayer').classList.remove('hidden');
                     
-                    // Si on a une URL directe, l'utiliser
-                    if (data.info.url) {
+                    // Si on a une URL directe pour les vidéos courtes
+                    if (data.info.direct_url) {
                         const video = document.getElementById('youtubeVideo');
-                        video.src = data.info.url;
+                        video.src = data.info.direct_url;
                         video.load();
+                        console.log('🎥 Vidéo chargée directement');
+                    } else {
+                        console.log('ℹ️ Vidéo trop longue pour lecture directe, analyse frame par frame disponible');
                     }
                 } else {
                     console.error('❌ Erreur YouTube:', data.error);
-                    alert(`Erreur YouTube: ${data.error || data.message}`);
+                    let errorMsg = `Erreur YouTube: ${data.error || data.message}`;
+                    
+                    if (data.error && data.error.includes('yt-dlp')) {
+                        errorMsg += '\n\nSolution: Installez yt-dlp avec "pip install yt-dlp"';
+                    }
+                    
+                    alert(errorMsg);
                 }
             })
             .catch(error => {
+                clearTimeout(timeoutId);
                 console.error('❌ Erreur réseau:', error);
-                alert('Erreur de connexion. Vérifiez votre connexion internet.');
+                alert('Erreur de connexion. Vérifiez votre connexion internet et que le serveur fonctionne.');
             })
             .finally(() => {
-                document.getElementById('loadYoutube').disabled = false;
-                document.getElementById('loadYoutube').innerHTML = '<i class="fas fa-download mr-2"></i>Charger';
+                loadButton.disabled = false;
+                loadButton.innerHTML = '<i class="fas fa-download mr-2"></i>Charger';
             });
         }
 
@@ -712,92 +794,144 @@ Cliquez sur "Test" pour voir une réponse API...
             const video = document.getElementById('youtubeVideo');
             
             if (!video.src) {
-                alert('Veuillez d\'abord charger une vidéo YouTube');
+                alert('Veuillez d\'abord charger une vidéo YouTube avec succès');
+                return;
+            }
+
+            if (video.error) {
+                alert('Erreur de lecture vidéo. Cette vidéo YouTube n\'est peut-être pas accessible directement.\nEssayez avec une vidéo plus courte ou publique.');
                 return;
             }
 
             console.log('🔍 Début de l\'analyse vidéo...');
-            document.getElementById('analyzeYoutube').disabled = true;
-            document.getElementById('analyzeYoutube').innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Analyse...';
+            const analyzeButton = document.getElementById('analyzeYoutube');
+            analyzeButton.disabled = true;
+            analyzeButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Analyse...';
 
-            // Simuler l'analyse frame par frame
-            simulateVideoAnalysis(video);
+            // Réinitialiser les résultats
+            document.getElementById('youtubeTimeline').innerHTML = '';
+            document.getElementById('youtubeObjects').innerHTML = '';
+
+            // Simuler l'analyse frame par frame (version simplifiée)
+            simulateVideoAnalysisSimplified(video, analyzeButton);
         }
 
-        function simulateVideoAnalysis(video) {
+        function simulateVideoAnalysisSimplified(video, analyzeButton) {
             const canvas = document.getElementById('youtubeCanvas');
             const ctx = canvas.getContext('2d');
             const timeline = document.getElementById('youtubeTimeline');
             const objectsList = document.getElementById('youtubeObjects');
             
             let frameCount = 0;
-            const maxFrames = 20; // Analyser 20 frames
+            const maxFrames = 10; // Réduire à 10 frames pour éviter les blocages
             const detectedObjects = new Map();
+            let analysisActive = true;
+            
+            // Timeout de sécurité
+            const safetyTimeout = setTimeout(() => {
+                analysisActive = false;
+                analyzeButton.disabled = false;
+                analyzeButton.innerHTML = '<i class="fas fa-search mr-2"></i>Analyser Vidéo';
+                alert('Analyse interrompue (timeout). Essayez avec une vidéo plus courte.');
+            }, 30000); // 30 secondes max
             
             function analyzeFrame() {
-                if (frameCount >= maxFrames) {
+                if (!analysisActive || frameCount >= maxFrames) {
                     // Analyse terminée
-                    document.getElementById('analyzeYoutube').disabled = false;
-                    document.getElementById('analyzeYoutube').innerHTML = '<i class="fas fa-search mr-2"></i>Analyser Vidéo';
+                    clearTimeout(safetyTimeout);
+                    analyzeButton.disabled = false;
+                    analyzeButton.innerHTML = '<i class="fas fa-search mr-2"></i>Analyser Vidéo';
                     document.getElementById('youtubeResults').classList.remove('hidden');
                     
                     // Afficher les résultats
                     displayAnalysisResults(detectedObjects);
+                    console.log('✅ Analyse terminée');
                     return;
                 }
                 
-                // Aller à une position spécifique
-                const position = (frameCount / maxFrames) * video.duration;
-                video.currentTime = position;
-                
-                setTimeout(() => {
-                    // Capturer la frame
-                    canvas.width = video.videoWidth || 640;
-                    canvas.height = video.videoHeight || 480;
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                try {
+                    // Aller à une position spécifique (plus safe)
+                    const position = (frameCount / maxFrames) * (video.duration || 60);
+                    video.currentTime = Math.min(position, video.duration || 60);
                     
-                    // Convertir et analyser
-                    canvas.toBlob((blob) => {
-                        const formData = new FormData();
-                        formData.append('image', blob);
+                    // Attendre que la vidéo se positionne
+                    setTimeout(() => {
+                        if (!analysisActive) return;
                         
-                        fetch('/api/detect', {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                // Enregistrer les détections
-                                data.detections.forEach(det => {
-                                    const key = det.shape;
-                                    if (detectedObjects.has(key)) {
-                                        detectedObjects.get(key).count++;
-                                    } else {
-                                        detectedObjects.set(key, { count: 1, first_seen: position });
-                                    }
-                                });
-                                
-                                // Ajouter à la timeline
-                                const timeStr = formatTime(position);
-                                timeline.innerHTML += `
-                                    <div class="flex justify-between py-1 border-b border-gray-600">
-                                        <span>${timeStr}</span>
-                                        <span class="text-green-400">${data.detections.length} objets</span>
-                                    </div>
-                                `;
-                            }
+                        try {
+                            // Capturer la frame
+                            canvas.width = video.videoWidth || 640;
+                            canvas.height = video.videoHeight || 480;
+                            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                             
+                            // Convertir et analyser (avec timeout)
+                            canvas.toBlob((blob) => {
+                                if (!analysisActive) return;
+                                
+                                const formData = new FormData();
+                                formData.append('image', blob);
+                                
+                                const fetchTimeout = setTimeout(() => {
+                                    console.log('⚠️ Timeout détection, passage à la frame suivante');
+                                    frameCount++;
+                                    setTimeout(analyzeFrame, 100);
+                                }, 5000); // 5 secondes max par frame
+                                
+                                fetch('/api/detect', {
+                                    method: 'POST',
+                                    body: formData
+                                })
+                                .then(response => {
+                                    clearTimeout(fetchTimeout);
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    if (data.success && analysisActive) {
+                                        // Enregistrer les détections
+                                        data.detections.forEach(det => {
+                                            const key = det.shape;
+                                            if (detectedObjects.has(key)) {
+                                                detectedObjects.get(key).count++;
+                                            } else {
+                                                detectedObjects.set(key, { count: 1, first_seen: position });
+                                            }
+                                        });
+                                        
+                                        // Ajouter à la timeline
+                                        const timeStr = formatTime(position);
+                                        timeline.innerHTML += `
+                                            <div class="flex justify-between py-1 border-b border-gray-600">
+                                                <span>${timeStr}</span>
+                                                <span class="text-green-400">${data.detections.length} objets</span>
+                                            </div>
+                                        `;
+                                        
+                                        console.log(`📊 Frame ${frameCount + 1}/${maxFrames}: ${data.detections.length} objets à ${timeStr}`);
+                                    }
+                                    
+                                    frameCount++;
+                                    setTimeout(analyzeFrame, 200); // Attendre entre les frames
+                                })
+                                .catch(error => {
+                                    clearTimeout(fetchTimeout);
+                                    console.error('Erreur analyse frame:', error);
+                                    frameCount++;
+                                    setTimeout(analyzeFrame, 200);
+                                });
+                            }, 'image/jpeg', 0.7); // Qualité réduite pour la vitesse
+                            
+                        } catch (canvasError) {
+                            console.error('Erreur canvas:', canvasError);
                             frameCount++;
-                            setTimeout(analyzeFrame, 100); // Continuer l'analyse
-                        })
-                        .catch(error => {
-                            console.error('Erreur analyse frame:', error);
-                            frameCount++;
-                            setTimeout(analyzeFrame, 100);
-                        });
-                    });
-                }, 200); // Attendre que la vidéo se positionne
+                            setTimeout(analyzeFrame, 200);
+                        }
+                    }, 500); // Attendre que la vidéo se positionne
+                    
+                } catch (videoError) {
+                    console.error('Erreur positionnement vidéo:', videoError);
+                    frameCount++;
+                    setTimeout(analyzeFrame, 200);
+                }
             }
             
             analyzeFrame();

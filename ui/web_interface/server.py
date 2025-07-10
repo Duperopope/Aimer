@@ -27,7 +27,7 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 
 from core.logger import Logger
 from core.config import ConfigManager as Config
-from core.detector import Detector
+from core.detector import SmartDetector
 from core.hardware_monitor import HardwareMonitor
 from core.gamification import GamificationSystem
 from core.dataset_manager import DatasetManager
@@ -174,7 +174,7 @@ class AimerWebServer:
             """Démarre la détection"""
             try:
                 if not self.detector:
-                    self.detector = Detector()
+                    self.detector = SmartDetector()
 
                 self.detection_active = True
 
