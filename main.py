@@ -12,6 +12,7 @@ import os
 import argparse
 import logging
 from pathlib import Path
+import subprocess
 
 # Configuration du chemin
 sys.path.insert(0, str(Path(__file__).parent))
@@ -184,6 +185,115 @@ def run_gui_mode():
         print(f"[ERREUR] Interface graphique: {e}")
         print("[CONSEIL] Utilisez le mode CLI: python main.py --cli --check")
         return False
+
+
+# --- AUTO-SETUP POUR TEST FACILE ---
+def is_venv_active():
+    # Vérifie si le venv est actif
+    return (
+        hasattr(sys, 'real_prefix') or
+        (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix) or
+        'VIRTUAL_ENV' in os.environ
+    )
+
+
+def get_venv_python():
+    # Retourne le chemin du python du venv s'il existe
+    venv_path = Path(__file__).parent / '.venv' / 'Scripts' / 'python.exe'
+    return str(venv_path) if venv_path.exists() else None
+
+
+def auto_setup(auto_fix=False):
+    logger = setup_logging()
+    # 1. Vérifie le venv
+    if not is_venv_active():
+        venv_python = get_venv_python()
+        if venv_python:
+            logger.warning("Le venv n'est pas activé. Relance automatique dans le venv...")
+            print(f"[AUTO-SETUP] Le venv n'est pas activé. Relance automatique dans le venv...")
+            os.execv(venv_python, [venv_python] + sys.argv)
+        else:
+            logger.error("Aucun venv détecté (.venv). Veuillez créer un venv Python 3.10 dans le dossier du projet.")
+            print("[AUTO-SETUP] Aucun venv détecté (.venv). Veuillez créer un venv Python 3.10 dans le dossier du projet.")
+            print("Commande : python -m venv .venv")
+            sys.exit(1)
+
+    # 2. Vérifie Detectron2 en priorité
+    try:
+        import detectron2
+        detectron2_ok = True
+    except ImportError:
+        detectron2_ok = False
+    if not detectron2_ok:
+        url = "https://cdn.jsdelivr.net/gh/myhloli/wheels@main/assets/whl/detectron2/detectron2-0.6-cp310-cp310-win_amd64.whl"
+        logger.warning("Detectron2 non installé. Installation depuis %s", url)
+        print(f"[AUTO-SETUP] Detectron2 non installé. Installation depuis {url}")
+        subprocess.run([sys.executable, '-m', 'pip', 'install', url], check=True)
+        logger.info("Detectron2 installé. Relance automatique...")
+        print("[AUTO-SETUP] Relance automatique après installation de Detectron2...")
+        os.execv(sys.executable, [sys.executable] + sys.argv)
+
+    # 3. Vérifie les requirements critiques restants
+    missing = []
+    try:
+        import torch, torchvision
+    except ImportError:
+        missing.append('torch')
+    try:
+        import cv2
+    except ImportError:
+        missing.append('opencv-python')
+    try:
+        from PyQt6.QtWidgets import QApplication
+    except ImportError:
+        missing.append('PyQt6')
+
+    # 4. Vérifie toutes les dépendances du requirements (hors detectron2)
+    req_file = Path(__file__).parent / 'requirements_stable.txt'
+    if req_file.exists():
+        with open(req_file, encoding='utf-8') as f:
+            pkgs = []
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith('#'):
+                    continue
+                if 'detectron2' in line:
+                    continue  # déjà géré
+                pkg = line.split()[0]
+                pkgs.append(pkg)
+        # Vérifie si tout est installé
+        import pkg_resources
+        installed = {pkg.key for pkg in pkg_resources.working_set}
+        to_install = [p for p in pkgs if p.lower().split('==')[0] not in installed]
+        if to_install:
+            logger.warning("Installation des dépendances requirements_stable.txt : %s", ', '.join(to_install))
+            print(f"[AUTO-SETUP] Installation des dépendances requirements_stable.txt : {', '.join(to_install)}")
+            if auto_fix or (input("Installer toutes les dépendances du projet ? [O/n] ").strip().lower() in ('', 'o', 'y', 'yes')):
+                subprocess.run([sys.executable, '-m', 'pip', 'install', '-r', str(req_file)], check=True)
+                logger.info("requirements_stable.txt installé. Relance automatique...")
+                print("[AUTO-SETUP] Relance automatique après installation...")
+                os.execv(sys.executable, [sys.executable] + sys.argv)
+            else:
+                logger.error("Installation requirements_stable.txt refusée par l'utilisateur.")
+                print("[AUTO-SETUP] Veuillez installer les dépendances puis relancer.")
+                sys.exit(1)
+
+    if missing:
+        logger.warning("Dépendances critiques manquantes : %s", ', '.join(missing))
+        print(f"[AUTO-SETUP] Dépendances critiques manquantes : {', '.join(missing)}")
+        if auto_fix or (input("Installer automatiquement les dépendances critiques manquantes ? [O/n] ").strip().lower() in ('', 'o', 'y', 'yes')):
+            for pkg in missing:
+                logger.info("Installation de la dépendance critique : %s", pkg)
+                print(f"[AUTO-SETUP] pip install {pkg}")
+                subprocess.run([sys.executable, '-m', 'pip', 'install', pkg], check=True)
+            logger.info("Dépendances critiques installées. Relance automatique...")
+            print("[AUTO-SETUP] Relance automatique après installation...")
+            os.execv(sys.executable, [sys.executable] + sys.argv)
+        else:
+            logger.error("Installation des dépendances critiques refusée par l'utilisateur.")
+            print("[AUTO-SETUP] Veuillez installer les dépendances critiques puis relancer.")
+            sys.exit(1)
+# --- FIN AUTO-SETUP ---
 
 
 def main():

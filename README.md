@@ -1,10 +1,18 @@
-# AIMER PRO v0.1 — Détection universelle (Windows / CPU stable)
+# AIMER PRO v0.1.1 — Détection universelle (Windows / CPU stable)
 
-![Version](https://img.shields.io/badge/version-0.1-blue)
+![Version](https://img.shields.io/badge/version-0.1.1-blue)
 
 ---
 
 **Date de release : 10 juillet 2025**
+
+## Nouveautés de la version 0.1.1
+
+- Lancement all-in-one : `python main.py --auto-fix` installe automatiquement le venv, toutes les dépendances (requirements + Detectron2), relance et vérifie tout, même pour un utilisateur débutant.
+- Installation automatique de Detectron2 (wheel Windows) si absent.
+- Les logs sont maintenant ignorés par git (`logs/` dans `.gitignore`).
+- Patch de robustesse auto-setup (relance automatique après install, gestion venv, etc).
+- Mise à jour de la doc et du patchnote.
 
 ## Nouveautés de la version 0.1
 
@@ -27,12 +35,30 @@
   ```bash
   python main.py --cli --detect chemin/vers/image.jpg
   ```
+- Lancer le mode all-in-one (auto-install, auto-fix, auto-venv) :
+  ```bash
+  python main.py --auto-fix
+  ```
 - Activer la webcam depuis l’onglet Détection (bouton Webcam, bouton Arrêter Webcam pour stopper)
 
 ## Debug & logs
 
 - Tous les événements importants sont tracés dans `logs/aimer.log`.
+- Les logs ne sont pas versionnés (voir `.gitignore`).
 - En cas de bug, consultez ce fichier et communiquez-le pour support.
+
+## Gestion des fichiers et du versionnement (Git)
+
+- Le projet utilise un fichier `.gitignore` pour éviter de versionner les fichiers temporaires, logs, bases de données locales, environnements virtuels, etc.
+- Les logs d’exécution (`logs/` et `logs/aimer.log`) ne sont jamais envoyés sur le dépôt.
+- Les datasets, fichiers .db, et tout ce qui est généré localement sont aussi ignorés.
+- Pour contribuer, ne modifiez pas le .gitignore sans raison valable.
+- Pour cloner et démarrer le projet :
+  ```bash
+  git clone <url-du-repo>
+  cd Aimer
+  python main.py --auto-fix
+  ```
 
 ---
 
@@ -153,6 +179,9 @@ python main.py --cli --detect path\to\image.jpg
 
 # Interface graphique PyQt
 python main.py
+
+# Lancement all-in-one (auto-install, auto-fix, auto-venv)
+python main.py --auto-fix
 
 📚 Versions alternatives
 
