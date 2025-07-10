@@ -1,3 +1,7 @@
+[project]
+name = "aimer"
+version = "0.1"
+
 [tool.pylance]
 typeCheckingMode = "basic"
 reportMissingImports = "none"

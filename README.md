@@ -1,6 +1,40 @@
-AIMER PRO — Détection universelle (Windows / CPU stable)
+# AIMER PRO v0.1 — Détection universelle (Windows / CPU stable)
 
-      
+![Version](https://img.shields.io/badge/version-0.1-blue)
+
+---
+
+**Date de release : 10 juillet 2025**
+
+## Nouveautés de la version 0.1
+
+- Interface graphique PyQt6 moderne et stable
+- Détection d’objets, instance & panoptic segmentation (Detectron2)
+- Webcam temps réel avec détection et affichage live (threadé, logs détaillés)
+- Capture d’écran intégrée
+- Gestionnaire de datasets (COCO, VOC, Open Images…)
+- Tableaux de bord et métriques temps réel
+- Système de logs unifié (fichier `logs/aimer.log`)
+- Correction de nombreux warnings Pylance et stabilité accrue
+
+## Utilisation
+
+- Lancer l’interface graphique :
+  ```bash
+  python main.py
+  ```
+- Lancer la détection sur une image en ligne de commande :
+  ```bash
+  python main.py --cli --detect chemin/vers/image.jpg
+  ```
+- Activer la webcam depuis l’onglet Détection (bouton Webcam, bouton Arrêter Webcam pour stopper)
+
+## Debug & logs
+
+- Tous les événements importants sont tracés dans `logs/aimer.log`.
+- En cas de bug, consultez ce fichier et communiquez-le pour support.
+
+---
 
 Important : ce README décrit l’environnement stable Windows sans GPU validé le 10 juillet 2025 (Torch 2.0.1 CPU + Detectron 0.6 + NumPy 1.26).
 
