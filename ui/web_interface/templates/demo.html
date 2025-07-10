@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMER PRO - Démo Codespaces</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        .cyber-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .cyber-dark {
+            background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460);
+        }
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+<body class="cyber-dark min-h-screen text-white">
+    <!-- Header -->
+    <header class="cyber-gradient py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-eye text-3xl text-white"></i>
+                    <h1 class="text-3xl font-bold">AIMER PRO</h1>
+                    <span class="bg-green-500 text-xs px-2 py-1 rounded-full">v0.1.1 - Démo</span>
+                </div>
+                <div class="flex space-x-4">
+                    <span class="bg-blue-600 px-3 py-1 rounded-full text-sm">
+                        <i class="fas fa-cloud"></i> GitHub Codespaces
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-12">
+        <!-- Success Message -->
+        <div class="text-center mb-12">
+            <div class="bg-green-800 border border-green-600 rounded-lg p-6 mb-8 inline-block">
+                <i class="fas fa-check-circle text-4xl text-green-400 mb-4"></i>
+                <h2 class="text-2xl font-bold text-green-300 mb-2">🎉 Félicitations !</h2>
+                <p class="text-green-200">AIMER PRO fonctionne parfaitement dans GitHub Codespaces !</p>
+            </div>
+        </div>
+
+        <!-- Status Grid -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div class="bg-gray-800 p-6 rounded-xl text-center border-l-4 border-green-500">
+                <i class="fas fa-flask text-3xl text-green-400 mb-3"></i>
+                <h4 class="font-bold mb-2">Flask</h4>
+                <p class="text-green-400 text-sm">✅ Installé</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-xl text-center border-l-4 border-green-500">
+                <i class="fas fa-image text-3xl text-green-400 mb-3"></i>
+                <h4 class="font-bold mb-2">OpenCV</h4>
+                <p class="text-green-400 text-sm">✅ Headless</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-xl text-center border-l-4 border-green-500">
+                <i class="fas fa-brain text-3xl text-green-400 mb-3"></i>
+                <h4 class="font-bold mb-2">PyTorch</h4>
+                <p class="text-green-400 text-sm">✅ CPU</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-xl text-center border-l-4 border-yellow-500">
+                <i class="fas fa-robot text-3xl text-yellow-400 mb-3"></i>
+                <h4 class="font-bold mb-2">Detectron2</h4>
+                <p class="text-yellow-400 text-sm">⏳ Optionnel</p>
+            </div>
+        </div>
+
+        <!-- Demo Info -->
+        <div class="bg-gray-800 p-8 rounded-xl mb-8">
+            <h3 class="text-2xl font-bold mb-6 text-center">🌐 Interface Web Fonctionnelle</h3>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h4 class="font-bold text-blue-400 mb-4">✅ Ce qui fonctionne :</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li>• 🌐 Serveur web Flask</li>
+                        <li>• 🎨 Interface moderne TailwindCSS</li>
+                        <li>• 📊 API REST fonctionnelle</li>
+                        <li>• 🖼️ Traitement d'images OpenCV</li>
+                        <li>• 🔗 Intégration GitHub Codespaces</li>
+                        <li>• 📱 Interface responsive</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-yellow-400 mb-4">⏳ Prochaines étapes :</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li>• 🤖 Installation Detectron2</li>
+                        <li>• 🎯 Détection d'objets temps réel</li>
+                        <li>• 📊 Monitoring hardware</li>
+                        <li>• 🎮 Système de gamification</li>
+                        <li>• 📸 Upload d'images</li>
+                        <li>• 📈 Métriques avancées</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Test -->
+        <div class="bg-gray-800 p-6 rounded-xl">
+            <h3 class="text-xl font-bold mb-4">🔧 Test API</h3>
+            <div class="flex space-x-4 mb-4">
+                <button onclick="testAPI()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition-colors">
+                    <i class="fas fa-play"></i> Tester l'API
+                </button>
+                <button onclick="checkStatus()" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors">
+                    <i class="fas fa-heartbeat"></i> Statut Système
+                </button>
+            </div>
+            <div id="api-result" class="bg-gray-900 p-4 rounded text-sm font-mono min-h-[100px]">
+                <span class="text-gray-500">Résultats des tests API s'afficheront ici...</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 py-8 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-400">
+                © 2025 AIMER PRO - Version Démo Codespaces - 
+                <a href="https://github.com/Duperopope/Aimer" class="text-blue-400 hover:text-blue-300">
+                    Voir sur GitHub
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.innerHTML = '<span class="text-yellow-400">⏳ Test en cours...</span>';
+            
+            try {
+                const response = await fetch('/api/demo');
+                const data = await response.json();
+                resultDiv.innerHTML = `<span class="text-green-400">✅ API Demo:</span><br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="text-red-400">❌ Erreur:</span><br>${error.message}`;
+            }
+        }
+
+        async function checkStatus() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.innerHTML = '<span class="text-yellow-400">⏳ Vérification statut...</span>';
+            
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                resultDiv.innerHTML = `<span class="text-green-400">✅ Statut Système:</span><br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="text-red-400">❌ Erreur:</span><br>${error.message}`;
+            }
+        }
+
+        // Test automatique au chargement
+        window.onload = function() {
+            setTimeout(() => {
+                checkStatus();
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

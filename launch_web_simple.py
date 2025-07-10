@@ -24,11 +24,11 @@ def launch_web_simple():
     
     try:
         print("🌐 Démarrage du serveur web...")
-        from ui.web_interface.server import AimerWebServer
+        from ui.web_interface.server_simple import AimerWebServerSimple
         
         # Configuration pour Codespaces ou local
         host = "0.0.0.0" if is_codespaces() else "localhost"
-        server = AimerWebServer(host=host, port=5000)
+        server = AimerWebServerSimple(host=host, port=5000)
         
         if not is_codespaces():
             import webbrowser
@@ -39,8 +39,6 @@ def launch_web_simple():
             print("   GitHub Codespaces ouvrira automatiquement l'onglet")
         
         # Démarrer le serveur
-        print("✅ Serveur web démarré !")
-        print("🔗 URL: http://localhost:5000" if not is_codespaces() else "🔗 Interface accessible via Codespaces")
         server.run()
         
     except ImportError as e:

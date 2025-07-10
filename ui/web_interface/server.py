@@ -26,7 +26,7 @@ import numpy as np
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
 from core.logger import Logger
-from core.config import Config
+from core.config import ConfigManager as Config
 from core.detector import Detector
 from core.hardware_monitor import HardwareMonitor
 from core.gamification import GamificationSystem
