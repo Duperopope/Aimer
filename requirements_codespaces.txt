@@ -6,8 +6,8 @@ torch>=2.0.0
 torchvision>=0.15.0
 torchaudio>=2.0.0
 
-# --- Vision par ordinateur ---------------------------------------
-opencv-python>=4.8.0
+# --- Vision par ordinateur (version headless pour Codespaces) --
+opencv-python-headless>=4.8.0  # Version sans GUI pour serveurs
 Pillow>=10.0.0
 numpy>=1.24.0
 
@@ -29,7 +29,7 @@ click>=8.1.7
 rich>=13.6.0
 
 # --- Base de données ---------------------------------------------
-sqlite3; python_version >= "3.7"
+# sqlite3 est inclus avec Python par défaut
 
 # --- Packaging ---------------------------------------------------
 wheel>=0.41.0
