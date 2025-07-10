@@ -8,24 +8,25 @@ Point d'entrée principal pour le déploiement web
 """
 
 import os
-from ui.web_interface.server_simple import AimerWebServerSimple
+from ui.web_interface.server_full import AimerWebServerFull
 
 # Configuration pour le déploiement
 host = "0.0.0.0"  # Accepter toutes les connexions
 port = int(os.environ.get("PORT", 5000))  # Port dynamique pour Render/Railway
 
-# Créer le serveur
-server = AimerWebServerSimple(host=host, port=port)
+# Créer le serveur complet
+server = AimerWebServerFull(host=host, port=port)
 
 # Instance Flask pour gunicorn
 app = server.get_app()
 
 def main():
     """Point d'entrée principal pour le test local"""
-    print("🚀 AIMER PRO - Déploiement Web")
+    print("🚀 AIMER PRO - Déploiement Web Complet")
     print(f"🌐 Host: {host}")
     print(f"📡 Port: {port}")
     print("🎯 Mode: Production Web")
+    print("✨ Features: Upload + Webcam + YouTube + API")
     
     # Lancement du serveur en mode développement
     server.run()

@@ -3,12 +3,21 @@
 ![Version](https://img.shields.io/badge/version-0.1.1-blue)
 ![License](https://img.shields.io/badge/license-Apache%202.0-green)
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Duperopope/Aimer)
-[![Launch Web Interface](https://img.shields.io/badge/🌐%20Launch-Web%20Interface-brightgreen)](https://duperopope.github.io/Aimer)
+[![🌐 Test Web App](https://img.shields.io/badge/🌐%20Test-Web%20App-brightgreen)](https://aimer-pro.up.railway.app)
+[![📖 Deploy Guide](https://img.shields.io/badge/📖%20Deploy-Guide-orange)](./DEPLOYMENT.md)
 
 ## 🚀 Lancement rapide
 
-### Option 1: GitHub Codespaces (Recommandé)
-Cliquez sur le badge "Open in GitHub Codespaces" ci-dessus pour lancer AIMER dans votre navigateur en un clic !
+### Option 1: Tester en ligne (Nouveau !)
+**[🌐 Cliquez ici pour tester l'application web en direct](https://aimer-pro.up.railway.app)**
+- Interface web complète dans votre navigateur
+- Upload d'images en drag & drop
+- Détection en temps réel avec OpenCV
+- API REST testable
+- Aucune installation requise !
+
+### Option 2: GitHub Codespaces
+Cliquez sur le badge "Open in GitHub Codespaces" ci-dessus pour développer AIMER dans votre navigateur !
 
 **Dans Codespaces :**
 - L'auto-setup se lance automatiquement au démarrage
@@ -16,19 +25,22 @@ Cliquez sur le badge "Open in GitHub Codespaces" ci-dessus pour lancer AIMER dan
 - Pour l'interface web : `python launch_web.py`
 - L'interface s'ouvrira automatiquement sur le port 5000
 
-### Option 2: Interface Web Locale
+### Option 3: Interface Web Locale
 ```bash
 git clone https://github.com/Duperopope/Aimer.git
 cd Aimer
 python launch_web.py
 ```
 
-### Option 3: Installation Classique
+### Option 4: Installation Classique
 ```bash
 git clone https://github.com/Duperopope/Aimer.git
 cd Aimer
 python main.py --auto-fix
 ```
+
+### Option 5: Déployer votre propre instance
+Voir le [Guide de Déploiement](./DEPLOYMENT.md) pour Railway, Render, Heroku
 
 ---
 

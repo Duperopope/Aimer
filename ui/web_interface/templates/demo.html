@@ -74,7 +74,59 @@
 
         <!-- Demo Info -->
         <div class="bg-gray-800 p-8 rounded-xl mb-8">
-            <h3 class="text-2xl font-bold mb-6 text-center">🌐 Interface Web Fonctionnelle</h3>
+            <h3 class="text-2xl font-bold mb-6 text-center">� Test de Détection d'Objets</h3>
+            
+            <!-- Upload d'image -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium mb-2">📸 Uploadez une image pour tester la détection :</label>
+                <div class="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center">
+                    <input type="file" id="imageInput" accept="image/*" class="hidden">
+                    <button onclick="document.getElementById('imageInput').click()" 
+                            class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg transition-colors">
+                        <i class="fas fa-upload"></i> Choisir une image
+                    </button>
+                    <p class="text-gray-400 mt-2 text-sm">Formats supportés: JPG, PNG, GIF</p>
+                </div>
+            </div>
+
+            <!-- Zone d'affichage des résultats -->
+            <div id="detection-results" class="hidden">
+                <h4 class="font-bold text-green-400 mb-4">📊 Résultats de détection :</h4>
+                
+                <!-- Images côte à côte -->
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <h5 class="font-semibold mb-2">Image originale :</h5>
+                        <img id="original-image" class="w-full rounded-lg border" alt="Image originale">
+                    </div>
+                    <div>
+                        <h5 class="font-semibold mb-2">Détections trouvées :</h5>
+                        <img id="processed-image" class="w-full rounded-lg border" alt="Image traitée">
+                    </div>
+                </div>
+
+                <!-- Stats et détections -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h5 class="font-semibold mb-2">📈 Statistiques :</h5>
+                        <div id="detection-stats" class="bg-gray-900 p-4 rounded text-sm"></div>
+                    </div>
+                    <div>
+                        <h5 class="font-semibold mb-2">🎯 Objets détectés :</h5>
+                        <div id="detection-list" class="bg-gray-900 p-4 rounded text-sm max-h-40 overflow-y-auto"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status de traitement -->
+            <div id="processing-status" class="hidden bg-blue-900 border border-blue-600 rounded-lg p-4 mt-4">
+                <i class="fas fa-spinner fa-spin"></i> <span>Traitement en cours...</span>
+            </div>
+        </div>
+
+        <!-- Fonctionnalités disponibles -->
+        <div class="bg-gray-800 p-8 rounded-xl mb-8">
+            <h3 class="text-2xl font-bold mb-6 text-center">�🌐 Interface Web Fonctionnelle</h3>
             <div class="grid md:grid-cols-2 gap-8">
                 <div>
                     <h4 class="font-bold text-blue-400 mb-4">✅ Ce qui fonctionne :</h4>
@@ -131,6 +183,83 @@
     </footer>
 
     <script>
+        // Gestion de l'upload d'image
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Afficher l'image originale
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('original-image').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                
+                // Lancer la détection
+                detectObjects(file);
+            }
+        });
+
+        async function detectObjects(file) {
+            const statusDiv = document.getElementById('processing-status');
+            const resultsDiv = document.getElementById('detection-results');
+            
+            // Afficher le statut de traitement
+            statusDiv.classList.remove('hidden');
+            resultsDiv.classList.add('hidden');
+            
+            try {
+                const formData = new FormData();
+                formData.append('image', file);
+                
+                const response = await fetch('/api/detect', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Afficher l'image traitée
+                    document.getElementById('processed-image').src = data.processed_image;
+                    
+                    // Afficher les statistiques
+                    document.getElementById('detection-stats').innerHTML = `
+                        <strong>Taille:</strong> ${data.stats.image_size}<br>
+                        <strong>Objets trouvés:</strong> ${data.stats.objects_found}<br>
+                        <strong>Méthode:</strong> ${data.stats.processing_method}
+                    `;
+                    
+                    // Afficher la liste des détections
+                    let detectionHtml = '';
+                    if (data.detections.length > 0) {
+                        data.detections.forEach(det => {
+                            detectionHtml += `
+                                <div class="mb-2 p-2 bg-gray-800 rounded">
+                                    <strong>${det.shape}</strong> (ID: ${det.id})<br>
+                                    <small>Position: ${det.bbox[0]},${det.bbox[1]} | Taille: ${det.bbox[2]}x${det.bbox[3]}</small><br>
+                                    <small>Aire: ${det.area} | Confiance: ${(det.confidence * 100).toFixed(1)}%</small>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        detectionHtml = '<div class="text-gray-400">Aucun objet détecté</div>';
+                    }
+                    document.getElementById('detection-list').innerHTML = detectionHtml;
+                    
+                    // Afficher les résultats
+                    resultsDiv.classList.remove('hidden');
+                } else {
+                    alert('Erreur: ' + data.error);
+                }
+                
+            } catch (error) {
+                alert('Erreur lors du traitement: ' + error.message);
+            } finally {
+                // Cacher le statut de traitement
+                statusDiv.classList.add('hidden');
+            }
+        }
+
         async function testAPI() {
             const resultDiv = document.getElementById('api-result');
             resultDiv.innerHTML = '<span class="text-yellow-400">⏳ Test en cours...</span>';

@@ -7,3 +7,4 @@ numpy==1.24.3
 Pillow==10.1.0
 Werkzeug==3.0.1
 gunicorn==21.2.0
+yt-dlp==2023.12.30

@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMER PRO - Détection Universelle</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        .cyber-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .cyber-dark {
+            background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460);
+        }
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+        .video-container {
+            position: relative;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .canvas-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        .detection-box {
+            position: absolute;
+            border: 2px solid #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+            pointer-events: none;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-button.active {
+            background: #3b82f6;
+            color: white;
+        }
+    </style>
+</head>
+<body class="cyber-dark min-h-screen text-white">
+    <!-- Header -->
+    <header class="cyber-gradient py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-eye text-3xl text-white"></i>
+                    <h1 class="text-3xl font-bold">AIMER PRO</h1>
+                    <span class="bg-green-500 text-xs px-2 py-1 rounded-full">v0.2.0 - Webcam + YouTube</span>
+                </div>
+                <div class="flex space-x-4">
+                    <span class="bg-blue-600 px-3 py-1 rounded-full text-sm">
+                        <i class="fas fa-video"></i> Temps Réel
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="container mx-auto px-4 py-4">
+        <div class="flex space-x-1 bg-gray-800 rounded-lg p-1">
+            <button class="tab-button active flex-1 py-3 px-4 rounded-md font-medium transition-all" data-tab="upload">
+                <i class="fas fa-upload mr-2"></i>Upload Image
+            </button>
+            <button class="tab-button flex-1 py-3 px-4 rounded-md font-medium transition-all" data-tab="webcam">
+                <i class="fas fa-camera mr-2"></i>Webcam Live
+            </button>
+            <button class="tab-button flex-1 py-3 px-4 rounded-md font-medium transition-all" data-tab="youtube">
+                <i class="fab fa-youtube mr-2"></i>YouTube Video
+            </button>
+            <button class="tab-button flex-1 py-3 px-4 rounded-md font-medium transition-all" data-tab="api">
+                <i class="fas fa-code mr-2"></i>API Test
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 pb-12">
+        <!-- Upload Tab -->
+        <div id="upload" class="tab-content active">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-2xl font-bold mb-6 text-center">
+                    <i class="fas fa-upload text-blue-400 mr-2"></i>
+                    Détection d'Images
+                </h2>
+                
+                <!-- Upload Zone -->
+                <div id="uploadZone" class="border-2 border-dashed border-gray-600 rounded-lg p-12 text-center hover:border-blue-500 transition-colors cursor-pointer">
+                    <i class="fas fa-cloud-upload-alt text-6xl text-gray-400 mb-4"></i>
+                    <p class="text-xl mb-2">Glissez-déposez une image ici</p>
+                    <p class="text-gray-400">ou cliquez pour sélectionner</p>
+                    <input type="file" id="imageInput" accept="image/*" class="hidden">
+                </div>
+
+                <!-- Results -->
+                <div id="uploadResults" class="mt-8 hidden">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4">Image Originale</h3>
+                            <img id="originalImage" class="w-full rounded-lg border border-gray-600">
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4">Détections</h3>
+                            <img id="processedImage" class="w-full rounded-lg border border-gray-600">
+                        </div>
+                    </div>
+                    <div id="uploadStats" class="mt-6 p-4 bg-gray-800 rounded-lg">
+                        <h4 class="font-semibold mb-2">Statistiques</h4>
+                        <div id="uploadStatsContent"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Webcam Tab -->
+        <div id="webcam" class="tab-content">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-2xl font-bold mb-6 text-center">
+                    <i class="fas fa-camera text-green-400 mr-2"></i>
+                    Détection Webcam Temps Réel
+                </h2>
+                
+                <div class="text-center mb-6">
+                    <button id="startWebcam" class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-semibold transition-colors">
+                        <i class="fas fa-play mr-2"></i>Démarrer la Webcam
+                    </button>
+                    <button id="stopWebcam" class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg font-semibold transition-colors ml-4 hidden">
+                        <i class="fas fa-stop mr-2"></i>Arrêter
+                    </button>
+                </div>
+
+                <!-- Contrôles de la webcam -->
+                <div id="webcamControls" class="mb-6 hidden">
+                    <div class="bg-gray-800 p-4 rounded-lg max-w-md mx-auto">
+                        <h4 class="text-lg font-semibold mb-3 text-center">Paramètres</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Qualité de détection</label>
+                                <select id="detectionQuality" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white">
+                                    <option value="300">Rapide (3.3 FPS)</option>
+                                    <option value="200">Normal (5 FPS)</option>
+                                    <option value="100">Haute (10 FPS)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Affichage détections</label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="showDetections" checked class="mr-2">
+                                    <span>Afficher les boîtes de détection</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="video-container mx-auto max-w-2xl">
+                    <video id="webcamVideo" width="640" height="480" autoplay muted class="w-full rounded-lg"></video>
+                    <canvas id="webcamCanvas" width="640" height="480" class="canvas-overlay w-full"></canvas>
+                </div>
+
+                <div id="webcamStats" class="mt-6 p-4 bg-gray-800 rounded-lg hidden">
+                    <h4 class="font-semibold mb-2">Statistiques Temps Réel</h4>
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <div class="text-2xl font-bold text-blue-400" id="webcamFPS">0</div>
+                            <div class="text-sm text-gray-400">FPS</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-green-400" id="webcamObjects">0</div>
+                            <div class="text-sm text-gray-400">Objets</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-purple-400" id="webcamLatency">0</div>
+                            <div class="text-sm text-gray-400">ms</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- YouTube Tab -->
+        <div id="youtube" class="tab-content">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-2xl font-bold mb-6 text-center">
+                    <i class="fab fa-youtube text-red-400 mr-2"></i>
+                    Analyse Vidéo YouTube
+                </h2>
+                
+                <div class="mb-6">
+                    <label class="block text-lg font-semibold mb-2">URL YouTube</label>
+                    <div class="flex space-x-4">
+                        <input type="url" id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=..." 
+                               class="flex-1 px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400">
+                        <button id="loadYoutube" class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg font-semibold transition-colors">
+                            <i class="fas fa-download mr-2"></i>Charger
+                        </button>
+                    </div>
+                </div>
+
+                <div id="youtubePlayer" class="hidden mb-6">
+                    <div class="video-container mx-auto max-w-2xl">
+                        <video id="youtubeVideo" controls class="w-full rounded-lg">
+                            Votre navigateur ne supporte pas la vidéo HTML5.
+                        </video>
+                        <canvas id="youtubeCanvas" class="canvas-overlay w-full"></canvas>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button id="analyzeYoutube" class="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-semibold transition-colors">
+                            <i class="fas fa-search mr-2"></i>Analyser Vidéo
+                        </button>
+                    </div>
+                </div>
+
+                <div id="youtubeResults" class="hidden mt-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-4">Timeline Détections</h3>
+                            <div id="youtubeTimeline" class="space-y-2"></div>
+                        </div>
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-4">Objets Détectés</h3>
+                            <div id="youtubeObjects" class="space-y-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Tab -->
+        <div id="api" class="tab-content">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-2xl font-bold mb-6 text-center">
+                    <i class="fas fa-code text-yellow-400 mr-2"></i>
+                    Test API REST
+                </h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-4">Endpoints Disponibles</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-gray-700 rounded">
+                                <span class="font-mono">/api/status</span>
+                                <button onclick="testAPI('/api/status')" class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm">
+                                    Test
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-gray-700 rounded">
+                                <span class="font-mono">/api/demo</span>
+                                <button onclick="testAPI('/api/demo')" class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm">
+                                    Test
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-gray-700 rounded">
+                                <span class="font-mono">/api/detect</span>
+                                <span class="text-sm text-gray-400">POST (form)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-4">Réponse API</h3>
+                        <pre id="apiResponse" class="bg-gray-900 p-4 rounded font-mono text-sm overflow-auto max-h-64">
+Cliquez sur "Test" pour voir une réponse API...
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Variables globales
+        let webcamStream = null;
+        let webcamActive = false;
+        let detectionInterval = null;
+        let fpsCounter = 0;
+        let lastFpsTime = Date.now();
+
+        // Navigation entre onglets
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.dataset.tab;
+                
+                // Désactiver tous les onglets
+                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Activer l'onglet sélectionné
+                button.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+                
+                // Arrêter la webcam si on quitte l'onglet webcam
+                if (targetTab !== 'webcam' && webcamActive) {
+                    stopWebcam();
+                }
+            });
+        });
+
+        // === UPLOAD D'IMAGES ===
+        const uploadZone = document.getElementById('uploadZone');
+        const imageInput = document.getElementById('imageInput');
+
+        uploadZone.addEventListener('click', () => imageInput.click());
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('border-blue-500');
+        });
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('border-blue-500');
+        });
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('border-blue-500');
+            if (e.dataTransfer.files.length > 0) {
+                handleImageUpload(e.dataTransfer.files[0]);
+            }
+        });
+
+        imageInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleImageUpload(e.target.files[0]);
+            }
+        });
+
+        function handleImageUpload(file) {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            // Afficher l'image originale
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('originalImage').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+
+            // Envoyer à l'API
+            fetch('/api/detect', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('processedImage').src = data.processed_image;
+                    document.getElementById('uploadStatsContent').innerHTML = `
+                        <div class="grid grid-cols-3 gap-4">
+                            <div><strong>Taille:</strong> ${data.stats.image_size}</div>
+                            <div><strong>Objets:</strong> ${data.stats.objects_found}</div>
+                            <div><strong>Méthode:</strong> ${data.stats.processing_method}</div>
+                        </div>
+                        <div class="mt-2">
+                            <strong>Détections:</strong>
+                            ${data.detections.map(d => `<span class="inline-block bg-blue-600 px-2 py-1 rounded text-xs mr-1">${d.shape}</span>`).join('')}
+                        </div>
+                    `;
+                    document.getElementById('uploadResults').classList.remove('hidden');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la détection');
+            });
+        }
+
+        // === WEBCAM ===
+        document.getElementById('startWebcam').addEventListener('click', startWebcam);
+        document.getElementById('stopWebcam').addEventListener('click', stopWebcam);
+        
+        // Gestion des contrôles
+        document.getElementById('detectionQuality').addEventListener('change', updateDetectionInterval);
+
+        async function startWebcam() {
+            try {
+                // Vérifier d'abord si les API sont disponibles
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    throw new Error('API webcam non supportée par ce navigateur');
+                }
+
+                // Demander l'autorisation avec options détaillées
+                const constraints = {
+                    video: {
+                        width: { ideal: 640, max: 1280 },
+                        height: { ideal: 480, max: 720 },
+                        frameRate: { ideal: 30, max: 60 },
+                        facingMode: 'user'
+                    }
+                };
+
+                console.log('🎥 Demande d\'autorisation webcam...');
+                webcamStream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                const video = document.getElementById('webcamVideo');
+                video.srcObject = webcamStream;
+                
+                console.log('✅ Webcam connectée');
+                webcamActive = true;
+                document.getElementById('startWebcam').classList.add('hidden');
+                document.getElementById('stopWebcam').classList.remove('hidden');
+                document.getElementById('webcamStats').classList.remove('hidden');
+                document.getElementById('webcamControls').classList.remove('hidden');
+                
+                // Attendre que la vidéo soit prête
+                video.addEventListener('loadedmetadata', () => {
+                    console.log(`📹 Résolution: ${video.videoWidth}x${video.videoHeight}`);
+                    startRealtimeDetection();
+                });
+                
+                // Gestion des erreurs de lecture
+                video.addEventListener('error', (e) => {
+                    console.error('Erreur vidéo:', e);
+                    stopWebcam();
+                    alert('Erreur lors de la lecture de la webcam');
+                });
+                
+            } catch (error) {
+                console.error('Erreur webcam complète:', error);
+                
+                let errorMessage = 'Impossible d\'accéder à la webcam. ';
+                
+                if (error.name === 'NotAllowedError') {
+                    errorMessage += 'Autorisation refusée. Cliquez sur l\'icône caméra dans la barre d\'adresse pour autoriser.';
+                } else if (error.name === 'NotFoundError') {
+                    errorMessage += 'Aucune caméra détectée sur cet appareil.';
+                } else if (error.name === 'NotReadableError') {
+                    errorMessage += 'Caméra déjà utilisée par une autre application.';
+                } else if (error.name === 'OverconstrainedError') {
+                    errorMessage += 'Résolution demandée non supportée.';
+                } else {
+                    errorMessage += `Erreur: ${error.message}`;
+                }
+                
+                alert(errorMessage);
+                
+                // Proposer de réessayer avec des contraintes plus simples
+                if (error.name === 'OverconstrainedError') {
+                    console.log('🔄 Tentative avec contraintes simplifiées...');
+                    try {
+                        webcamStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                        const video = document.getElementById('webcamVideo');
+                        video.srcObject = webcamStream;
+                        webcamActive = true;
+                        // Continuer avec l'interface...
+                    } catch (simpleError) {
+                        console.error('Échec même avec contraintes simples:', simpleError);
+                    }
+                }
+            }
+        }
+
+        function stopWebcam() {
+            if (webcamStream) {
+                webcamStream.getTracks().forEach(track => track.stop());
+                webcamStream = null;
+            }
+            
+            if (detectionInterval) {
+                clearInterval(detectionInterval);
+                detectionInterval = null;
+            }
+            
+            webcamActive = false;
+            document.getElementById('startWebcam').classList.remove('hidden');
+            document.getElementById('stopWebcam').classList.add('hidden');
+            document.getElementById('webcamStats').classList.add('hidden');
+            document.getElementById('webcamControls').classList.add('hidden');
+            
+            // Nettoyer le canvas
+            const canvas = document.getElementById('webcamCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function updateDetectionInterval() {
+            if (detectionInterval && webcamActive) {
+                clearInterval(detectionInterval);
+                startRealtimeDetection();
+            }
+        }
+
+        function startRealtimeDetection() {
+            const video = document.getElementById('webcamVideo');
+            const canvas = document.getElementById('webcamCanvas');
+            const ctx = canvas.getContext('2d');
+            const qualitySelect = document.getElementById('detectionQuality');
+            const showDetectionsCheckbox = document.getElementById('showDetections');
+            
+            let isProcessing = false;
+            let lastDetections = [];
+            
+            // Canvas temporaire pour capturer les frames
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = 640;
+            tempCanvas.height = 480;
+            
+            // Obtenir l'intervalle de détection basé sur la qualité
+            const detectionIntervalMs = parseInt(qualitySelect.value);
+            
+            detectionInterval = setInterval(() => {
+                if (!webcamActive || isProcessing) return;
+                
+                isProcessing = true;
+                
+                // Capturer frame dans le canvas temporaire (évite les tremblements)
+                tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+                
+                // Convertir en blob et envoyer à l'API
+                tempCanvas.toBlob((blob) => {
+                    const formData = new FormData();
+                    formData.append('image', blob);
+                    
+                    const startTime = Date.now();
+                    fetch('/api/detect', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Mettre à jour les stats
+                            const latency = Date.now() - startTime;
+                            updateWebcamStats(data.detections.length, latency);
+                            
+                            // Sauvegarder les nouvelles détections
+                            lastDetections = data.detections;
+                        }
+                    })
+                    .catch(console.error)
+                    .finally(() => {
+                        isProcessing = false;
+                    });
+                });
+                
+            }, detectionIntervalMs);
+            
+            // Animation loop séparée pour dessiner les détections (plus fluide)
+            function animateDetections() {
+                if (!webcamActive) return;
+                
+                // Effacer le canvas overlay
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Dessiner les dernières détections connues (si activé)
+                if (showDetectionsCheckbox.checked && lastDetections.length > 0) {
+                    drawDetections(ctx, lastDetections, canvas.width, canvas.height);
+                }
+                
+                // Continuer l'animation
+                requestAnimationFrame(animateDetections);
+            }
+            
+            // Démarrer l'animation
+            animateDetections();
+        }
+
+        function updateWebcamStats(objectCount, latency) {
+            fpsCounter++;
+            const now = Date.now();
+            if (now - lastFpsTime >= 1000) {
+                document.getElementById('webcamFPS').textContent = fpsCounter;
+                fpsCounter = 0;
+                lastFpsTime = now;
+            }
+            
+            document.getElementById('webcamObjects').textContent = objectCount;
+            document.getElementById('webcamLatency').textContent = latency;
+        }
+
+        function drawDetections(ctx, detections, canvasWidth, canvasHeight) {
+            // Sauvegarder l'état du contexte
+            ctx.save();
+            
+            // Style global pour les détections
+            ctx.lineWidth = 2;
+            ctx.font = '14px Arial';
+            ctx.textBaseline = 'top';
+            
+            detections.forEach((detection, index) => {
+                const [x, y, w, h] = detection.bbox;
+                
+                // Utiliser la couleur de la détection ou une couleur par défaut
+                const color = detection.color ? 
+                    `rgb(${detection.color[0]}, ${detection.color[1]}, ${detection.color[2]})` : 
+                    '#00ff00';
+                
+                // Dessiner le rectangle principal
+                ctx.strokeStyle = color;
+                ctx.strokeRect(x, y, w, h);
+                
+                // Dessiner un rectangle de fond semi-transparent pour le texte
+                const text = `${detection.shape} (${Math.round(detection.confidence * 100)}%)`;
+                const textMetrics = ctx.measureText(text);
+                const textWidth = textMetrics.width;
+                const textHeight = 16;
+                
+                // Fond du texte
+                ctx.fillStyle = color + '40'; // Semi-transparent
+                ctx.fillRect(x, y - textHeight - 4, textWidth + 8, textHeight + 4);
+                
+                // Texte
+                ctx.fillStyle = color;
+                ctx.fillText(text, x + 4, y - textHeight);
+                
+                // Petite croix au centre pour marquer l'objet
+                const centerX = x + w / 2;
+                const centerY = y + h / 2;
+                const crossSize = 5;
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX - crossSize, centerY);
+                ctx.lineTo(centerX + crossSize, centerY);
+                ctx.moveTo(centerX, centerY - crossSize);
+                ctx.lineTo(centerX, centerY + crossSize);
+                ctx.stroke();
+            });
+            
+            // Restaurer l'état du contexte
+            ctx.restore();
+        }
+
+        // === YOUTUBE ===
+        document.getElementById('loadYoutube').addEventListener('click', loadYouTubeVideo);
+        document.getElementById('analyzeYoutube').addEventListener('click', analyzeYouTubeVideo);
+
+        function loadYouTubeVideo() {
+            const url = document.getElementById('youtubeUrl').value;
+            if (!url) {
+                alert('Veuillez entrer une URL YouTube');
+                return;
+            }
+
+            console.log('🔍 Chargement des informations YouTube...');
+            document.getElementById('loadYoutube').disabled = true;
+            document.getElementById('loadYoutube').innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Chargement...';
+
+            // Appeler l'API YouTube
+            fetch('/api/youtube/info', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url: url })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('✅ Informations YouTube récupérées:', data.info);
+                    
+                    // Afficher les informations
+                    displayYouTubeInfo(data.info);
+                    document.getElementById('youtubePlayer').classList.remove('hidden');
+                    
+                    // Si on a une URL directe, l'utiliser
+                    if (data.info.url) {
+                        const video = document.getElementById('youtubeVideo');
+                        video.src = data.info.url;
+                        video.load();
+                    }
+                } else {
+                    console.error('❌ Erreur YouTube:', data.error);
+                    alert(`Erreur YouTube: ${data.error || data.message}`);
+                }
+            })
+            .catch(error => {
+                console.error('❌ Erreur réseau:', error);
+                alert('Erreur de connexion. Vérifiez votre connexion internet.');
+            })
+            .finally(() => {
+                document.getElementById('loadYoutube').disabled = false;
+                document.getElementById('loadYoutube').innerHTML = '<i class="fas fa-download mr-2"></i>Charger';
+            });
+        }
+
+        function displayYouTubeInfo(info) {
+            // Créer un affichage des informations
+            const infoHtml = `
+                <div class="bg-gray-800 p-4 rounded-lg mb-4">
+                    <h3 class="text-lg font-semibold mb-2">${info.title}</h3>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div><strong>Durée:</strong> ${info.duration}</div>
+                        <div><strong>Résolution:</strong> ${info.resolution}</div>
+                        <div><strong>Auteur:</strong> ${info.uploader || 'Inconnu'}</div>
+                        <div><strong>Vues:</strong> ${info.view_count?.toLocaleString() || 'N/A'}</div>
+                    </div>
+                </div>
+            `;
+            
+            // Insérer avant le player
+            const player = document.getElementById('youtubePlayer');
+            const existingInfo = player.querySelector('.youtube-info');
+            if (existingInfo) {
+                existingInfo.remove();
+            }
+            
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'youtube-info';
+            infoDiv.innerHTML = infoHtml;
+            player.insertBefore(infoDiv, player.firstChild);
+        }
+
+        function analyzeYouTubeVideo() {
+            const video = document.getElementById('youtubeVideo');
+            
+            if (!video.src) {
+                alert('Veuillez d\'abord charger une vidéo YouTube');
+                return;
+            }
+
+            console.log('🔍 Début de l\'analyse vidéo...');
+            document.getElementById('analyzeYoutube').disabled = true;
+            document.getElementById('analyzeYoutube').innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Analyse...';
+
+            // Simuler l'analyse frame par frame
+            simulateVideoAnalysis(video);
+        }
+
+        function simulateVideoAnalysis(video) {
+            const canvas = document.getElementById('youtubeCanvas');
+            const ctx = canvas.getContext('2d');
+            const timeline = document.getElementById('youtubeTimeline');
+            const objectsList = document.getElementById('youtubeObjects');
+            
+            let frameCount = 0;
+            const maxFrames = 20; // Analyser 20 frames
+            const detectedObjects = new Map();
+            
+            function analyzeFrame() {
+                if (frameCount >= maxFrames) {
+                    // Analyse terminée
+                    document.getElementById('analyzeYoutube').disabled = false;
+                    document.getElementById('analyzeYoutube').innerHTML = '<i class="fas fa-search mr-2"></i>Analyser Vidéo';
+                    document.getElementById('youtubeResults').classList.remove('hidden');
+                    
+                    // Afficher les résultats
+                    displayAnalysisResults(detectedObjects);
+                    return;
+                }
+                
+                // Aller à une position spécifique
+                const position = (frameCount / maxFrames) * video.duration;
+                video.currentTime = position;
+                
+                setTimeout(() => {
+                    // Capturer la frame
+                    canvas.width = video.videoWidth || 640;
+                    canvas.height = video.videoHeight || 480;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    
+                    // Convertir et analyser
+                    canvas.toBlob((blob) => {
+                        const formData = new FormData();
+                        formData.append('image', blob);
+                        
+                        fetch('/api/detect', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Enregistrer les détections
+                                data.detections.forEach(det => {
+                                    const key = det.shape;
+                                    if (detectedObjects.has(key)) {
+                                        detectedObjects.get(key).count++;
+                                    } else {
+                                        detectedObjects.set(key, { count: 1, first_seen: position });
+                                    }
+                                });
+                                
+                                // Ajouter à la timeline
+                                const timeStr = formatTime(position);
+                                timeline.innerHTML += `
+                                    <div class="flex justify-between py-1 border-b border-gray-600">
+                                        <span>${timeStr}</span>
+                                        <span class="text-green-400">${data.detections.length} objets</span>
+                                    </div>
+                                `;
+                            }
+                            
+                            frameCount++;
+                            setTimeout(analyzeFrame, 100); // Continuer l'analyse
+                        })
+                        .catch(error => {
+                            console.error('Erreur analyse frame:', error);
+                            frameCount++;
+                            setTimeout(analyzeFrame, 100);
+                        });
+                    });
+                }, 200); // Attendre que la vidéo se positionne
+            }
+            
+            analyzeFrame();
+        }
+
+        function displayAnalysisResults(detectedObjects) {
+            const objectsList = document.getElementById('youtubeObjects');
+            objectsList.innerHTML = '';
+            
+            for (const [shape, data] of detectedObjects) {
+                objectsList.innerHTML += `
+                    <div class="flex justify-between py-2 border-b border-gray-600">
+                        <span class="font-medium">${shape}</span>
+                        <div class="text-right">
+                            <div class="text-blue-400">${data.count} détections</div>
+                            <div class="text-xs text-gray-400">Première: ${formatTime(data.first_seen)}</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // === API TEST ===
+        function testAPI(endpoint) {
+            fetch(endpoint)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('apiResponse').textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById('apiResponse').textContent = `Erreur: ${error.message}`;
+                });
+        }
+
+        // === INITIALISATION ===
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 AIMER PRO Interface Web chargée');
+            
+            // Test de connectivité API
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('✅ API connectée:', data);
+                })
+                .catch(error => {
+                    console.error('❌ Erreur API:', error);
+                });
+        });
+    </script>
+</body>
+</html>
