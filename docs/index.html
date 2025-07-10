@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMER PRO - Computer Vision AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        .cyber-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .cyber-dark {
+            background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460);
+        }
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+<body class="cyber-dark min-h-screen text-white">
+    <!-- Header -->
+    <header class="cyber-gradient py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-eye text-3xl text-white"></i>
+                    <h1 class="text-3xl font-bold">AIMER PRO</h1>
+                    <span class="bg-green-500 text-xs px-2 py-1 rounded-full">v0.1.1</span>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="https://github.com/Duperopope/Aimer" class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                        <i class="fab fa-github"></i>
+                        <span>GitHub</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main class="container mx-auto px-4 py-12">
+        <div class="text-center mb-12">
+            <h2 class="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                Intelligence Artificielle de Vision
+            </h2>
+            <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                Détection d'objets, segmentation et analyse temps réel avec Detectron2. 
+                Interface moderne, monitoring hardware et système de gamification intégré.
+            </p>
+        </div>
+
+        <!-- Launch Options -->
+        <div class="grid md:grid-cols-3 gap-8 mb-12">
+            <!-- GitHub Codespaces -->
+            <div class="bg-gray-800 p-6 rounded-xl border border-blue-500/30 hover:border-blue-500/60 transition-all glow-effect">
+                <div class="text-center">
+                    <i class="fas fa-cloud text-4xl text-blue-400 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-3">GitHub Codespaces</h3>
+                    <p class="text-gray-400 mb-6">Lancez AIMER directement dans votre navigateur</p>
+                    <a href="https://codespaces.new/Duperopope/Aimer" 
+                       class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg inline-flex items-center space-x-2 transition-colors">
+                        <i class="fas fa-rocket"></i>
+                        <span>Lancer maintenant</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Local Installation -->
+            <div class="bg-gray-800 p-6 rounded-xl border border-green-500/30 hover:border-green-500/60 transition-all">
+                <div class="text-center">
+                    <i class="fas fa-download text-4xl text-green-400 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-3">Installation Locale</h3>
+                    <p class="text-gray-400 mb-6">Clonez et lancez sur votre machine</p>
+                    <div class="bg-gray-900 p-3 rounded text-sm font-mono text-left mb-4">
+                        git clone https://github.com/Duperopope/Aimer.git<br>
+                        cd Aimer<br>
+                        python main.py --auto-fix
+                    </div>
+                </div>
+            </div>
+
+            <!-- Web Interface -->
+            <div class="bg-gray-800 p-6 rounded-xl border border-purple-500/30 hover:border-purple-500/60 transition-all">
+                <div class="text-center">
+                    <i class="fas fa-globe text-4xl text-purple-400 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-3">Interface Web</h3>
+                    <p class="text-gray-400 mb-6">Interface moderne dans le navigateur</p>
+                    <div class="bg-gray-900 p-3 rounded text-sm font-mono text-left mb-4">
+                        python launch_web.py
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div class="bg-gray-800 p-6 rounded-xl text-center">
+                <i class="fas fa-eye text-3xl text-blue-400 mb-3"></i>
+                <h4 class="font-bold mb-2">Détection d'Objets</h4>
+                <p class="text-gray-400 text-sm">Detectron2 avec segmentation instance et panoptique</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-xl text-center">
+                <i class="fas fa-video text-3xl text-green-400 mb-3"></i>
+                <h4 class="font-bold mb-2">Temps Réel</h4>
+                <p class="text-gray-400 text-sm">Webcam et capture d'écran en direct</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-xl text-center">
+                <i class="fas fa-chart-bar text-3xl text-yellow-400 mb-3"></i>
+                <h4 class="font-bold mb-2">Monitoring</h4>
+                <p class="text-gray-400 text-sm">Hardware et métriques en temps réel</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-xl text-center">
+                <i class="fas fa-gamepad text-3xl text-purple-400 mb-3"></i>
+                <h4 class="font-bold mb-2">Gamification</h4>
+                <p class="text-gray-400 text-sm">Système de niveaux et achievements</p>
+            </div>
+        </div>
+
+        <!-- Tech Stack -->
+        <div class="bg-gray-800 p-8 rounded-xl">
+            <h3 class="text-2xl font-bold mb-6 text-center">Stack Technologique</h3>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div>
+                    <h4 class="font-bold text-blue-400 mb-3">IA & Vision</h4>
+                    <ul class="space-y-1 text-gray-300">
+                        <li>• Detectron2 (Meta)</li>
+                        <li>• PyTorch</li>
+                        <li>• OpenCV</li>
+                        <li>• NumPy</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-green-400 mb-3">Interface</h4>
+                    <ul class="space-y-1 text-gray-300">
+                        <li>• PyQt6 (Desktop)</li>
+                        <li>• Flask (Web)</li>
+                        <li>• SocketIO</li>
+                        <li>• TailwindCSS</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-purple-400 mb-3">Deployment</h4>
+                    <ul class="space-y-1 text-gray-300">
+                        <li>• GitHub Codespaces</li>
+                        <li>• Docker Ready</li>
+                        <li>• Auto-Setup</li>
+                        <li>• Cross-Platform</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 py-8 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-400">
+                © 2025 AIMER PRO - Licence Apache 2.0 - 
+                <a href="https://github.com/Duperopope/Aimer" class="text-blue-400 hover:text-blue-300">
+                    Voir sur GitHub
+                </a>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

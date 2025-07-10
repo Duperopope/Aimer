@@ -1,4 +1,66 @@
-# AIMER PRO v0.1.1 — Détection universelle (Windows / CPU stab- Activer la webcam depuis l'onglet Détection (bouton Webcam, bouton Arrêter Webcam pour stopper)
+# AIMER PRO v0.1.1 — Détection universelle (Windows / CPU stable)
+
+![Version](https://img.shields.io/badge/version-0.1.1-blue)
+![License](https://img.shields.io/badge/license-Apache%202.0-green)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Duperopope/Aimer)
+[![Launch Web Interface](https://img.shields.io/badge/🌐%20Launch-Web%20Interface-brightgreen)](https://duperopope.github.io/Aimer)
+
+## 🚀 Lancement rapide
+
+### Option 1: GitHub Codespaces (Recommandé)
+Cliquez sur le badge "Open in GitHub Codespaces" ci-dessus pour lancer AIMER dans votre navigateur en un clic !
+
+### Option 2: Interface Web Locale
+```bash
+git clone https://github.com/Duperopope/Aimer.git
+cd Aimer
+python launch_web.py
+```
+
+### Option 3: Installation Classique
+```bash
+git clone https://github.com/Duperopope/Aimer.git
+cd Aimer
+python main.py --auto-fix
+```
+
+---
+
+**Date de release : 10 juillet 2025**
+
+## Nouveautés de la version 0.1.1
+
+- Lancement all-in-one : `python main.py --auto-fix` installe automatiquement le venv, toutes les dépendances (requirements + Detectron2), relance et vérifie tout, même pour un utilisateur débutant.
+- Installation automatique de Detectron2 (wheel Windows) si absent.
+- Les logs sont maintenant ignorés par git (`logs/` dans `.gitignore`).
+- Patch de robustesse auto-setup (relance automatique après install, gestion venv, etc).
+- Mise à jour de la doc et du patchnote.
+
+## Nouveautés de la version 0.1
+
+- Interface graphique PyQt6 moderne et stable
+- Détection d'objets, instance & panoptic segmentation (Detectron2)
+- Webcam temps réel avec détection et affichage live (threadé, logs détaillés)
+- Capture d'écran intégrée
+- Gestionnaire de datasets (COCO, VOC, Open Images…)
+- Tableaux de bord et métriques temps réel
+- Système de logs unifié (fichier `logs/aimer.log`)
+- Correction de nombreux warnings Pylance et stabilité accrue
+
+## Utilisation
+
+- Lancer l'interface graphique :
+  ```bash
+  python main.py
+  ```
+- Lancer la détection sur une image en ligne de commande :
+  ```bash
+  python main.py --cli --detect chemin/vers/image.jpg
+  ```
+- Lancer le mode all-in-one (auto-install, auto-fix, auto-venv) :
+  ```bash
+  python main.py --auto-fix
+  ```
 
 ## 🌐 Interface Web
 

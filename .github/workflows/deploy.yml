@@ -22,12 +22,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements_stable.txt
     
-    - name: Build static version
+    - name: Prepare static files
       run: |
-        # Créer une version statique de l'interface web
-        mkdir -p docs
-        cp -r ui/web_interface/templates/* docs/
-        cp -r ui/web_interface/static/* docs/ 2>/dev/null || true
+        # Le dossier docs contient déjà la page statique
+        echo "Static page ready in docs/"
     
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
