@@ -12,12 +12,29 @@ import cv2
 import numpy as np
 from pathlib import Path
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QPushButton, QTextEdit, QComboBox, QSpinBox,
-    QGroupBox, QTabWidget, QFileDialog, QMessageBox,
-    QCheckBox, QSlider, QProgressBar, QLineEdit,
-    QTableWidget, QTableWidgetItem, QSplitter,
-    QScrollArea, QFrame, QApplication
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QGridLayout,
+    QLabel,
+    QPushButton,
+    QTextEdit,
+    QComboBox,
+    QSpinBox,
+    QGroupBox,
+    QTabWidget,
+    QFileDialog,
+    QMessageBox,
+    QCheckBox,
+    QSlider,
+    QProgressBar,
+    QLineEdit,
+    QTableWidget,
+    QTableWidgetItem,
+    QSplitter,
+    QScrollArea,
+    QFrame,
+    QApplication,
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal, QTimer
 from PyQt6.QtGui import QFont, QPixmap, QImage, QPainter, QPen
@@ -26,6 +43,7 @@ from PyQt6.QtGui import QFont, QPixmap, QImage, QPainter, QPen
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from core.detector import UniversalDetector
 from core.logger import Logger
+
 
 class DetectionWidget(QWidget):
     """Widget principal de détection"""
@@ -93,12 +111,14 @@ class DetectionWidget(QWidget):
         # Tâche de détection
         config_layout.addWidget(QLabel("Tâche:"), 0, 0)
         self.task_combo = QComboBox()
-        self.task_combo.addItems([
-            "detection",
-            "instance_segmentation",
-            "panoptic_segmentation",
-            "keypoint_detection"
-        ])
+        self.task_combo.addItems(
+            [
+                "detection",
+                "instance_segmentation",
+                "panoptic_segmentation",
+                "keypoint_detection",
+            ]
+        )
         config_layout.addWidget(self.task_combo, 0, 1)
 
         # Seuil de confiance
@@ -123,7 +143,8 @@ class DetectionWidget(QWidget):
         # Bouton de détection
         self.detect_btn = QPushButton("🎯 DÉTECTER")
         self.detect_btn.clicked.connect(self.run_detection)
-        self.detect_btn.setStyleSheet("""
+        self.detect_btn.setStyleSheet(
+            """
             QPushButton {
                 background-color: #28a745;
                 color: white;
@@ -135,7 +156,8 @@ class DetectionWidget(QWidget):
             QPushButton:hover {
                 background-color: #218838;
             }
-        """)
+        """
+        )
         layout.addWidget(self.detect_btn)
 
         # Filtres de classes
@@ -197,7 +219,8 @@ class DetectionWidget(QWidget):
         # En-tête
         header = QLabel("Zone d'Affichage")
         header.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        header.setStyleSheet("""
+        header.setStyleSheet(
+            """
             QLabel {
                 font-size: 18px;
                 font-weight: bold;
@@ -205,21 +228,26 @@ class DetectionWidget(QWidget):
                 background-color: #f0f0f0;
                 border-radius: 5px;
             }
-        """)
+        """
+        )
         layout.addWidget(header)
 
         # Zone d'image
         self.image_label = QLabel()
         self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.image_label.setMinimumSize(600, 400)
-        self.image_label.setStyleSheet("""
+        self.image_label.setStyleSheet(
+            """
             QLabel {
                 border: 2px dashed #ccc;
                 border-radius: 10px;
                 background-color: #fafafa;
             }
-        """)
-        self.image_label.setText("Aucune image chargée\n\nCliquez sur 'Charger Image' pour commencer")
+        """
+        )
+        self.image_label.setText(
+            "Aucune image chargée\n\nCliquez sur 'Charger Image' pour commencer"
+        )
 
         # Scroll area pour les grandes images
         scroll_area = QScrollArea()
@@ -256,24 +284,93 @@ class DetectionWidget(QWidget):
             self.logger.info("Détecteur initialisé")
         except Exception as e:
             self.logger.error(f"Erreur initialisation détecteur: {e}")
-            QMessageBox.critical(self, "Erreur",
-                               f"Impossible d'initialiser le détecteur:\n{e}")
+            QMessageBox.critical(
+                self, "Erreur", f"Impossible d'initialiser le détecteur:\n{e}"
+            )
 
     def populate_class_list(self):
         """Remplit la liste des classes COCO"""
         coco_classes = [
-            "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck",
-            "boat", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench",
-            "bird", "cat", "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra",
-            "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee",
-            "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove",
-            "skateboard", "surfboard", "tennis racket", "bottle", "wine glass", "cup",
-            "fork", "knife", "spoon", "bowl", "banana", "apple", "sandwich", "orange",
-            "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair", "couch",
-            "potted plant", "bed", "dining table", "toilet", "tv", "laptop", "mouse",
-            "remote", "keyboard", "cell phone", "microwave", "oven", "toaster", "sink",
-            "refrigerator", "book", "clock", "vase", "scissors", "teddy bear", "hair drier",
-            "toothbrush"
+            "person",
+            "bicycle",
+            "car",
+            "motorcycle",
+            "airplane",
+            "bus",
+            "train",
+            "truck",
+            "boat",
+            "traffic light",
+            "fire hydrant",
+            "stop sign",
+            "parking meter",
+            "bench",
+            "bird",
+            "cat",
+            "dog",
+            "horse",
+            "sheep",
+            "cow",
+            "elephant",
+            "bear",
+            "zebra",
+            "giraffe",
+            "backpack",
+            "umbrella",
+            "handbag",
+            "tie",
+            "suitcase",
+            "frisbee",
+            "skis",
+            "snowboard",
+            "sports ball",
+            "kite",
+            "baseball bat",
+            "baseball glove",
+            "skateboard",
+            "surfboard",
+            "tennis racket",
+            "bottle",
+            "wine glass",
+            "cup",
+            "fork",
+            "knife",
+            "spoon",
+            "bowl",
+            "banana",
+            "apple",
+            "sandwich",
+            "orange",
+            "broccoli",
+            "carrot",
+            "hot dog",
+            "pizza",
+            "donut",
+            "cake",
+            "chair",
+            "couch",
+            "potted plant",
+            "bed",
+            "dining table",
+            "toilet",
+            "tv",
+            "laptop",
+            "mouse",
+            "remote",
+            "keyboard",
+            "cell phone",
+            "microwave",
+            "oven",
+            "toaster",
+            "sink",
+            "refrigerator",
+            "book",
+            "clock",
+            "vase",
+            "scissors",
+            "teddy bear",
+            "hair drier",
+            "toothbrush",
         ]
 
         self.class_list.setRowCount(len(coco_classes))
@@ -300,8 +397,7 @@ class DetectionWidget(QWidget):
     def load_image(self):
         """Charge une image depuis le disque"""
         file_path, _ = QFileDialog.getOpenFileName(
-            self, "Charger Image",
-            "", "Images (*.png *.jpg *.jpeg *.bmp *.tiff)"
+            self, "Charger Image", "", "Images (*.png *.jpg *.jpeg *.bmp *.tiff)"
         )
 
         if file_path:
@@ -321,12 +417,20 @@ class DetectionWidget(QWidget):
             bytes_per_line = 3 * width
             rgb_image = cv2.cvtColor(self.current_image, cv2.COLOR_BGR2RGB)
 
-            q_image = QImage(rgb_image.tobytes(), width, height, bytes_per_line, QImage.Format.Format_RGB888)
+            q_image = QImage(
+                rgb_image.tobytes(),
+                width,
+                height,
+                bytes_per_line,
+                QImage.Format.Format_RGB888,
+            )
 
             # Redimensionner si nécessaire
             max_size = 800
             if width > max_size or height > max_size:
-                q_image = q_image.scaled(max_size, max_size, Qt.AspectRatioMode.KeepAspectRatio)
+                q_image = q_image.scaled(
+                    max_size, max_size, Qt.AspectRatioMode.KeepAspectRatio
+                )
 
             pixmap = QPixmap.fromImage(q_image)
             self.image_label.setPixmap(pixmap)
@@ -345,7 +449,9 @@ class DetectionWidget(QWidget):
 
     def start_webcam(self):
         """Démarre la capture webcam"""
-        QMessageBox.information(self, "Webcam", "Fonctionnalité webcam en développement")
+        QMessageBox.information(
+            self, "Webcam", "Fonctionnalité webcam en développement"
+        )
 
     def capture_screen(self):
         """Capture l'écran"""
@@ -391,12 +497,13 @@ class DetectionWidget(QWidget):
             device = self.device_combo.currentText()
 
             # Reconfigurer le détecteur si nécessaire
-            if (self.detector.task_type != task or
-                self.detector.confidence_threshold != confidence):
+            if (
+                self.detector.task_type != task
+                or self.detector.confidence_threshold != confidence
+            ):
 
                 self.detector = UniversalDetector(
-                    task_type=task,
-                    confidence_threshold=confidence
+                    task_type=task, confidence_threshold=confidence
                 )
 
             # Lancer la détection
@@ -404,6 +511,7 @@ class DetectionWidget(QWidget):
             self.detect_btn.setEnabled(False)
 
             import time
+
             start_time = time.time()
 
             result = self.detector.detect(self.current_image)
@@ -428,7 +536,7 @@ class DetectionWidget(QWidget):
     def display_results(self, result, processing_time):
         """Affiche les résultats de détection"""
         try:
-            if hasattr(result, 'instances') and result.instances:
+            if hasattr(result, "instances") and result.instances:
                 detections = result.to_dict()
 
                 results_text = f"=== RÉSULTATS DE DÉTECTION ===\n\n"
@@ -436,15 +544,15 @@ class DetectionWidget(QWidget):
                 results_text += f"Temps de traitement: {processing_time:.2f}s\n\n"
 
                 results_text += "DÉTECTIONS:\n"
-                for i, detection in enumerate(detections['detections'], 1):
+                for i, detection in enumerate(detections["detections"], 1):
                     results_text += f"{i}. {detection['class_name']}: {detection['confidence']:.1%}\n"
-                    bbox = detection['bbox']
+                    bbox = detection["bbox"]
                     results_text += f"   Position: ({bbox['x1']:.0f}, {bbox['y1']:.0f}) - ({bbox['x2']:.0f}, {bbox['y2']:.0f})\n"
 
                 self.results_text.setText(results_text)
 
                 # Mettre à jour les infos
-                self.info_objects.setText(str(detections['count']))
+                self.info_objects.setText(str(detections["count"]))
                 self.info_processing_time.setText(f"{processing_time:.2f}s")
 
             else:
@@ -459,7 +567,7 @@ class DetectionWidget(QWidget):
     def draw_annotations(self, result):
         """Dessine les annotations sur l'image"""
         try:
-            if not hasattr(result, 'instances') or not result.instances:
+            if not hasattr(result, "instances") or not result.instances:
                 return
 
             # Copier l'image originale
@@ -469,15 +577,24 @@ class DetectionWidget(QWidget):
 
             # Couleurs pour les classes
             colors = [
-                (255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0),
-                (255, 0, 255), (0, 255, 255), (128, 0, 0), (0, 128, 0),
-                (0, 0, 128), (128, 128, 0), (128, 0, 128), (0, 128, 128)
+                (255, 0, 0),
+                (0, 255, 0),
+                (0, 0, 255),
+                (255, 255, 0),
+                (255, 0, 255),
+                (0, 255, 255),
+                (128, 0, 0),
+                (0, 128, 0),
+                (0, 0, 128),
+                (128, 128, 0),
+                (128, 0, 128),
+                (0, 128, 128),
             ]
 
-            for i, detection in enumerate(detections['detections']):
-                bbox = detection['bbox']
-                class_name = detection['class_name']
-                confidence = detection['confidence']
+            for i, detection in enumerate(detections["detections"]):
+                bbox = detection["bbox"]
+                class_name = detection["class_name"]
+                confidence = detection["confidence"]
 
                 # Couleur pour cette détection
                 color = colors[i % len(colors)]
@@ -485,9 +602,10 @@ class DetectionWidget(QWidget):
                 # Dessiner le rectangle
                 cv2.rectangle(
                     annotated_image,
-                    (int(bbox['x1']), int(bbox['y1'])),
-                    (int(bbox['x2']), int(bbox['y2'])),
-                    color, 2
+                    (int(bbox["x1"]), int(bbox["y1"])),
+                    (int(bbox["x2"]), int(bbox["y2"])),
+                    color,
+                    2,
                 )
 
                 # Texte de label
@@ -500,18 +618,21 @@ class DetectionWidget(QWidget):
 
                 cv2.rectangle(
                     annotated_image,
-                    (int(bbox['x1']), int(bbox['y1']) - text_height - 10),
-                    (int(bbox['x1']) + text_width, int(bbox['y1'])),
-                    color, -1
+                    (int(bbox["x1"]), int(bbox["y1"]) - text_height - 10),
+                    (int(bbox["x1"]) + text_width, int(bbox["y1"])),
+                    color,
+                    -1,
                 )
 
                 # Texte
                 cv2.putText(
                     annotated_image,
                     label,
-                    (int(bbox['x1']), int(bbox['y1']) - 5),
+                    (int(bbox["x1"]), int(bbox["y1"]) - 5),
                     cv2.FONT_HERSHEY_SIMPLEX,
-                    0.6, (255, 255, 255), 2
+                    0.6,
+                    (255, 255, 255),
+                    2,
                 )
 
             # Afficher l'image annotée
@@ -519,12 +640,20 @@ class DetectionWidget(QWidget):
             bytes_per_line = 3 * width
             rgb_image = cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB)
 
-            q_image = QImage(rgb_image.tobytes(), width, height, bytes_per_line, QImage.Format.Format_RGB888)
+            q_image = QImage(
+                rgb_image.tobytes(),
+                width,
+                height,
+                bytes_per_line,
+                QImage.Format.Format_RGB888,
+            )
 
             # Redimensionner si nécessaire
             max_size = 800
             if width > max_size or height > max_size:
-                q_image = q_image.scaled(max_size, max_size, Qt.AspectRatioMode.KeepAspectRatio)
+                q_image = q_image.scaled(
+                    max_size, max_size, Qt.AspectRatioMode.KeepAspectRatio
+                )
 
             pixmap = QPixmap.fromImage(q_image)
             self.image_label.setPixmap(pixmap)
@@ -542,9 +671,7 @@ class DetectionWidget(QWidget):
             return
 
         file_path, _ = QFileDialog.getSaveFileName(
-            self, "Exporter JSON",
-            "detection_results.json",
-            "JSON (*.json)"
+            self, "Exporter JSON", "detection_results.json", "JSON (*.json)"
         )
 
         if file_path:
@@ -553,10 +680,12 @@ class DetectionWidget(QWidget):
 
                 detections = self.detection_results.to_dict()
 
-                with open(file_path, 'w', encoding='utf-8') as f:
+                with open(file_path, "w", encoding="utf-8") as f:
                     json.dump(detections, f, indent=2, ensure_ascii=False)
 
-                QMessageBox.information(self, "Export", f"Résultats exportés: {file_path}")
+                QMessageBox.information(
+                    self, "Export", f"Résultats exportés: {file_path}"
+                )
 
             except Exception as e:
                 QMessageBox.critical(self, "Erreur", f"Erreur export JSON: {e}")
@@ -568,9 +697,7 @@ class DetectionWidget(QWidget):
             return
 
         file_path, _ = QFileDialog.getSaveFileName(
-            self, "Exporter CSV",
-            "detection_results.csv",
-            "CSV (*.csv)"
+            self, "Exporter CSV", "detection_results.csv", "CSV (*.csv)"
         )
 
         if file_path:
@@ -579,50 +706,69 @@ class DetectionWidget(QWidget):
 
                 detections = self.detection_results.to_dict()
 
-                with open(file_path, 'w', newline='', encoding='utf-8') as f:
+                with open(file_path, "w", newline="", encoding="utf-8") as f:
                     writer = csv.writer(f)
 
                     # En-têtes
-                    writer.writerow(['Classe', 'Confiance', 'X1', 'Y1', 'X2', 'Y2', 'Largeur', 'Hauteur'])
+                    writer.writerow(
+                        [
+                            "Classe",
+                            "Confiance",
+                            "X1",
+                            "Y1",
+                            "X2",
+                            "Y2",
+                            "Largeur",
+                            "Hauteur",
+                        ]
+                    )
 
                     # Données
-                    for detection in detections['detections']:
-                        bbox = detection['bbox']
-                        writer.writerow([
-                            detection['class_name'],
-                            f"{detection['confidence']:.3f}",
-                            f"{bbox['x1']:.0f}",
-                            f"{bbox['y1']:.0f}",
-                            f"{bbox['x2']:.0f}",
-                            f"{bbox['y2']:.0f}",
-                            f"{bbox['width']:.0f}",
-                            f"{bbox['height']:.0f}"
-                        ])
+                    for detection in detections["detections"]:
+                        bbox = detection["bbox"]
+                        writer.writerow(
+                            [
+                                detection["class_name"],
+                                f"{detection['confidence']:.3f}",
+                                f"{bbox['x1']:.0f}",
+                                f"{bbox['y1']:.0f}",
+                                f"{bbox['x2']:.0f}",
+                                f"{bbox['y2']:.0f}",
+                                f"{bbox['width']:.0f}",
+                                f"{bbox['height']:.0f}",
+                            ]
+                        )
 
-                QMessageBox.information(self, "Export", f"Résultats exportés: {file_path}")
+                QMessageBox.information(
+                    self, "Export", f"Résultats exportés: {file_path}"
+                )
 
             except Exception as e:
                 QMessageBox.critical(self, "Erreur", f"Erreur export CSV: {e}")
 
     def save_annotated_image(self):
         """Sauvegarde l'image annotée"""
-        if not hasattr(self, 'annotated_image'):
+        if not hasattr(self, "annotated_image"):
             QMessageBox.warning(self, "Erreur", "Aucune image annotée à sauvegarder")
             return
 
         file_path, _ = QFileDialog.getSaveFileName(
-            self, "Sauvegarder Image Annotée",
+            self,
+            "Sauvegarder Image Annotée",
             "image_annotee.png",
-            "Images (*.png *.jpg *.jpeg)"
+            "Images (*.png *.jpg *.jpeg)",
         )
 
         if file_path:
             try:
                 cv2.imwrite(file_path, self.annotated_image)
-                QMessageBox.information(self, "Sauvegarde", f"Image sauvegardée: {file_path}")
+                QMessageBox.information(
+                    self, "Sauvegarde", f"Image sauvegardée: {file_path}"
+                )
 
             except Exception as e:
                 QMessageBox.critical(self, "Erreur", f"Erreur sauvegarde: {e}")
+
 
 def main():
     """Fonction principale pour tester l'interface"""
@@ -634,6 +780,7 @@ def main():
     window.show()
 
     sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     main()

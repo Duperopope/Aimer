@@ -10,12 +10,28 @@ Interface complète pour toutes les fonctionnalités de computer vision
 import sys
 from pathlib import Path
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QPushButton, QTextEdit, QComboBox, QSpinBox,
-    QGroupBox, QTabWidget, QFileDialog, QMessageBox,
-    QCheckBox, QSlider, QProgressBar, QLineEdit,
-    QTableWidget, QTableWidgetItem, QSplitter,
-    QScrollArea, QFrame
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QGridLayout,
+    QLabel,
+    QPushButton,
+    QTextEdit,
+    QComboBox,
+    QSpinBox,
+    QGroupBox,
+    QTabWidget,
+    QFileDialog,
+    QMessageBox,
+    QCheckBox,
+    QSlider,
+    QProgressBar,
+    QLineEdit,
+    QTableWidget,
+    QTableWidgetItem,
+    QSplitter,
+    QScrollArea,
+    QFrame,
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal, QTimer
 from PyQt6.QtGui import QFont, QPixmap, QImage
@@ -24,6 +40,7 @@ from PyQt6.QtGui import QFont, QPixmap, QImage
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from core.vision_engine import UltimateVisionEngine
 from core.logger import Logger
+
 
 class GameBotWidget(QWidget):
     """Interface pour le bot de jeu"""
@@ -79,7 +96,8 @@ class GameBotWidget(QWidget):
 
         self.start_bot_btn = QPushButton("Démarrer Bot")
         self.start_bot_btn.clicked.connect(self.start_bot)
-        self.start_bot_btn.setStyleSheet("""
+        self.start_bot_btn.setStyleSheet(
+            """
             QPushButton {
                 background-color: #28a745;
                 color: white;
@@ -90,12 +108,14 @@ class GameBotWidget(QWidget):
             QPushButton:hover {
                 background-color: #218838;
             }
-        """)
+        """
+        )
 
         self.stop_bot_btn = QPushButton("Arrêter Bot")
         self.stop_bot_btn.clicked.connect(self.stop_bot)
         self.stop_bot_btn.setEnabled(False)
-        self.stop_bot_btn.setStyleSheet("""
+        self.stop_bot_btn.setStyleSheet(
+            """
             QPushButton {
                 background-color: #dc3545;
                 color: white;
@@ -106,7 +126,8 @@ class GameBotWidget(QWidget):
             QPushButton:hover {
                 background-color: #c82333;
             }
-        """)
+        """
+        )
 
         controls_layout.addWidget(self.start_bot_btn)
         controls_layout.addWidget(self.stop_bot_btn)
@@ -176,8 +197,9 @@ class GameBotWidget(QWidget):
 
             # Afficher les fenêtres dans une boîte de dialogue
             window_list = "\n".join(windows[:20])  # Limiter à 20 fenêtres
-            QMessageBox.information(self, "Fenêtres Détectées",
-                                  f"Fenêtres ouvertes:\n\n{window_list}")
+            QMessageBox.information(
+                self, "Fenêtres Détectées", f"Fenêtres ouvertes:\n\n{window_list}"
+            )
 
         except Exception as e:
             QMessageBox.critical(self, "Erreur", f"Erreur détection fenêtres: {e}")
@@ -189,7 +211,9 @@ class GameBotWidget(QWidget):
             window_title = self.window_title_edit.text().strip()
 
             if not window_title:
-                QMessageBox.warning(self, "Erreur", "Veuillez spécifier le titre de la fenêtre")
+                QMessageBox.warning(
+                    self, "Erreur", "Veuillez spécifier le titre de la fenêtre"
+                )
                 return
 
             success = self.vision_engine.start_game_automation(game_type, window_title)
@@ -234,6 +258,7 @@ class GameBotWidget(QWidget):
         """Met à jour le log du bot"""
         # Récupérer les derniers logs du bot
         pass
+
 
 class MedicalAnalysisWidget(QWidget):
     """Interface pour l'analyse médicale"""
@@ -291,7 +316,8 @@ class MedicalAnalysisWidget(QWidget):
         # Bouton d'analyse
         analyze_btn = QPushButton("Analyser Image Médicale")
         analyze_btn.clicked.connect(self.analyze_medical_image)
-        analyze_btn.setStyleSheet("""
+        analyze_btn.setStyleSheet(
+            """
             QPushButton {
                 background-color: #007acc;
                 color: white;
@@ -303,7 +329,8 @@ class MedicalAnalysisWidget(QWidget):
             QPushButton:hover {
                 background-color: #005a9e;
             }
-        """)
+        """
+        )
         layout.addWidget(analyze_btn)
 
         # Résultats de l'analyse
@@ -341,8 +368,10 @@ class MedicalAnalysisWidget(QWidget):
     def browse_image(self):
         """Ouvre un dialogue pour sélectionner une image"""
         file_path, _ = QFileDialog.getOpenFileName(
-            self, "Sélectionner Image Médicale",
-            "", "Images (*.png *.jpg *.jpeg *.bmp *.tiff *.dcm)"
+            self,
+            "Sélectionner Image Médicale",
+            "",
+            "Images (*.png *.jpg *.jpeg *.bmp *.tiff *.dcm)",
         )
 
         if file_path:
@@ -369,7 +398,9 @@ class MedicalAnalysisWidget(QWidget):
             result = self.vision_engine.analyze_medical_image(image_path, modality)
 
             if "error" in result:
-                QMessageBox.critical(self, "Erreur", f"Erreur d'analyse: {result['error']}")
+                QMessageBox.critical(
+                    self, "Erreur", f"Erreur d'analyse: {result['error']}"
+                )
                 return
 
             # Afficher les résultats
@@ -422,6 +453,7 @@ Généré le: {self._get_current_datetime()}
     def _get_current_datetime(self) -> str:
         """Retourne la date et heure actuelles"""
         from datetime import datetime
+
         return datetime.now().strftime("%d/%m/%Y à %H:%M:%S")
 
     def export_pdf_report(self):
@@ -431,9 +463,10 @@ Généré le: {self._get_current_datetime()}
             return
 
         file_path, _ = QFileDialog.getSaveFileName(
-            self, "Exporter Rapport PDF",
+            self,
+            "Exporter Rapport PDF",
             f"rapport_medical_{self._get_current_datetime().replace('/', '_').replace(':', '_')}.pdf",
-            "PDF (*.pdf)"
+            "PDF (*.pdf)",
         )
 
         if file_path:
@@ -447,17 +480,20 @@ Généré le: {self._get_current_datetime()}
             return
 
         file_path, _ = QFileDialog.getSaveFileName(
-            self, "Exporter Données JSON",
+            self,
+            "Exporter Données JSON",
             f"analyse_medicale_{self._get_current_datetime().replace('/', '_').replace(':', '_')}.json",
-            "JSON (*.json)"
+            "JSON (*.json)",
         )
 
         if file_path:
             import json
-            with open(file_path, 'w', encoding='utf-8') as f:
+
+            with open(file_path, "w", encoding="utf-8") as f:
                 json.dump(self.last_analysis, f, indent=2, ensure_ascii=False)
 
             QMessageBox.information(self, "Export", f"Données exportées: {file_path}")
+
 
 class InteractiveControlWidget(QWidget):
     """Interface pour le contrôle interactif"""
@@ -531,7 +567,9 @@ class InteractiveControlWidget(QWidget):
         # Table des règles
         self.rules_table = QTableWidget()
         self.rules_table.setColumnCount(4)
-        self.rules_table.setHorizontalHeaderLabels(["Objet", "Action", "Paramètres", "Actif"])
+        self.rules_table.setHorizontalHeaderLabels(
+            ["Objet", "Action", "Paramètres", "Actif"]
+        )
         rules_layout.addWidget(self.rules_table)
 
         # Boutons de gestion des règles
@@ -564,7 +602,7 @@ class InteractiveControlWidget(QWidget):
             ("link", "click", "{}"),
             ("textbox", "type_text", '{"text": "Hello World"}'),
             ("checkbox", "click", "{}"),
-            ("dropdown", "click", "{}")
+            ("dropdown", "click", "{}"),
         ]
 
         for obj, action, params in predefined_rules:
@@ -592,9 +630,13 @@ class InteractiveControlWidget(QWidget):
             if success:
                 self.start_control_btn.setEnabled(False)
                 self.stop_control_btn.setEnabled(True)
-                QMessageBox.information(self, "Contrôle", "Contrôle interactif démarré!")
+                QMessageBox.information(
+                    self, "Contrôle", "Contrôle interactif démarré!"
+                )
             else:
-                QMessageBox.critical(self, "Erreur", "Impossible de démarrer le contrôle")
+                QMessageBox.critical(
+                    self, "Erreur", "Impossible de démarrer le contrôle"
+                )
 
         except Exception as e:
             QMessageBox.critical(self, "Erreur", f"Erreur démarrage contrôle: {e}")
@@ -624,6 +666,7 @@ class InteractiveControlWidget(QWidget):
 
                 try:
                     import json
+
                     params = json.loads(params_str)
                     self.vision_engine.add_interaction_rule(obj, action, params)
                 except json.JSONDecodeError:
@@ -644,6 +687,7 @@ class InteractiveControlWidget(QWidget):
         current_row = self.rules_table.currentRow()
         if current_row >= 0:
             self.rules_table.removeRow(current_row)
+
 
 class UltimateInterface(QWidget):
     """Interface ultime combinant toutes les fonctionnalités"""
@@ -706,34 +750,39 @@ class UltimateInterface(QWidget):
         """Crée l'en-tête de l'interface"""
         header = QFrame()
         header.setFrameStyle(QFrame.Shape.Box)
-        header.setStyleSheet("""
+        header.setStyleSheet(
+            """
             QFrame {
                 background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
                     stop:0 #007acc, stop:1 #005a9e);
                 border-radius: 10px;
                 margin: 5px;
             }
-        """)
+        """
+        )
 
         layout = QHBoxLayout(header)
 
         # Titre
         title = QLabel("AIMER PRO - Computer Vision Ultime")
-        title.setStyleSheet("""
+        title.setStyleSheet(
+            """
             QLabel {
                 color: white;
                 font-size: 24px;
                 font-weight: bold;
                 padding: 15px;
             }
-        """)
+        """
+        )
 
         # Boutons d'urgence
         emergency_layout = QVBoxLayout()
 
         stop_all_btn = QPushButton("ARRÊT D'URGENCE")
         stop_all_btn.clicked.connect(self.emergency_stop)
-        stop_all_btn.setStyleSheet("""
+        stop_all_btn.setStyleSheet(
+            """
             QPushButton {
                 background-color: #dc3545;
                 color: white;
@@ -744,7 +793,8 @@ class UltimateInterface(QWidget):
             QPushButton:hover {
                 background-color: #c82333;
             }
-        """)
+        """
+        )
 
         emergency_layout.addWidget(stop_all_btn)
 
@@ -762,7 +812,8 @@ class UltimateInterface(QWidget):
         # Message temporaire
         message = QLabel("Création de datasets personnalisés")
         message.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        message.setStyleSheet("""
+        message.setStyleSheet(
+            """
             QLabel {
                 font-size: 16px;
                 color: #666;
@@ -770,7 +821,8 @@ class UltimateInterface(QWidget):
                 border: 2px dashed #ccc;
                 border-radius: 10px;
             }
-        """)
+        """
+        )
 
         layout.addWidget(message)
         return widget
@@ -802,13 +854,15 @@ class UltimateInterface(QWidget):
         """Crée la barre de statut"""
         status_bar = QFrame()
         status_bar.setFrameStyle(QFrame.Shape.Box)
-        status_bar.setStyleSheet("""
+        status_bar.setStyleSheet(
+            """
             QFrame {
                 background-color: #f0f0f0;
                 border-top: 1px solid #ccc;
                 padding: 5px;
             }
-        """)
+        """
+        )
 
         layout = QHBoxLayout(status_bar)
 
@@ -826,7 +880,8 @@ class UltimateInterface(QWidget):
 
     def apply_ultimate_style(self):
         """Applique le style ultime"""
-        self.setStyleSheet("""
+        self.setStyleSheet(
+            """
             QWidget {
                 background-color: #f5f5f5;
                 font-family: 'Segoe UI', Arial, sans-serif;
@@ -887,7 +942,8 @@ class UltimateInterface(QWidget):
                 background-color: #cccccc;
                 color: #666666;
             }
-        """)
+        """
+        )
 
     def emergency_stop(self):
         """Arrêt d'urgence de tous les modules"""
@@ -896,8 +952,11 @@ class UltimateInterface(QWidget):
             self.status_label.setText("ARRÊT D'URGENCE ACTIVÉ")
             self.status_indicator.setStyleSheet("color: red; font-size: 16px;")
 
-            QMessageBox.warning(self, "Arrêt d'Urgence",
-                              "Tous les modules ont été arrêtés immédiatement!")
+            QMessageBox.warning(
+                self,
+                "Arrêt d'Urgence",
+                "Tous les modules ont été arrêtés immédiatement!",
+            )
 
         except Exception as e:
             QMessageBox.critical(self, "Erreur", f"Erreur arrêt d'urgence: {e}")
@@ -926,11 +985,11 @@ class UltimateInterface(QWidget):
 
             status_text += f"\nModules actifs: {len(status['active_modules'])}\n"
 
-            if hasattr(self, 'status_text'):
+            if hasattr(self, "status_text"):
                 self.status_text.setText(status_text)
 
             # Mettre à jour l'indicateur
-            if status['active_modules']:
+            if status["active_modules"]:
                 self.status_indicator.setStyleSheet("color: orange; font-size: 16px;")
                 self.status_label.setText("Modules actifs")
             else:
@@ -938,5 +997,5 @@ class UltimateInterface(QWidget):
                 self.status_label.setText("Prêt")
 
         except Exception as e:
-            if hasattr(self, 'status_text'):
+            if hasattr(self, "status_text"):
                 self.status_text.setText(f"Erreur mise à jour statut: {e}")

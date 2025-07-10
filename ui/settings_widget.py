@@ -11,11 +11,26 @@ import sys
 import json
 from pathlib import Path
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QPushButton, QTextEdit, QComboBox, QSpinBox,
-    QGroupBox, QTabWidget, QFileDialog, QMessageBox,
-    QCheckBox, QSlider, QProgressBar, QLineEdit,
-    QScrollArea, QFrame, QDoubleSpinBox
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QGridLayout,
+    QLabel,
+    QPushButton,
+    QTextEdit,
+    QComboBox,
+    QSpinBox,
+    QGroupBox,
+    QTabWidget,
+    QFileDialog,
+    QMessageBox,
+    QCheckBox,
+    QSlider,
+    QProgressBar,
+    QLineEdit,
+    QScrollArea,
+    QFrame,
+    QDoubleSpinBox,
 )
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QFont
@@ -23,6 +38,7 @@ from PyQt6.QtGui import QFont
 # Import des modules core
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from core.logger import Logger
+
 
 class SettingsWidget(QWidget):
     """Widget de paramètres complet"""
@@ -39,13 +55,13 @@ class SettingsWidget(QWidget):
                 "language": "Français",
                 "theme": "Clair",
                 "auto_start": False,
-                "auto_update": True
+                "auto_update": True,
             },
             "detectron2": {
                 "default_model": "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml",
                 "confidence_threshold": 0.5,
-                "device": "auto"
-            }
+                "device": "auto",
+            },
         }
 
         self.create_ui()
@@ -124,13 +140,15 @@ class SettingsWidget(QWidget):
         # Modèle par défaut
         model_layout.addWidget(QLabel("Modèle par défaut:"), 0, 0)
         self.default_model_combo = QComboBox()
-        self.default_model_combo.addItems([
-            "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml",
-            "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml",
-            "COCO-Detection/retinanet_R_50_FPN_3x.yaml",
-            "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml",
-            "COCO-PanopticSegmentation/panoptic_fpn_R_50_3x.yaml"
-        ])
+        self.default_model_combo.addItems(
+            [
+                "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml",
+                "COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml",
+                "COCO-Detection/retinanet_R_50_FPN_3x.yaml",
+                "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml",
+                "COCO-PanopticSegmentation/panoptic_fpn_R_50_3x.yaml",
+            ]
+        )
         model_layout.addWidget(self.default_model_combo, 0, 1)
 
         # Seuil de confiance par défaut
@@ -159,7 +177,8 @@ class SettingsWidget(QWidget):
         # Bouton réinitialiser
         reset_btn = QPushButton("Réinitialiser")
         reset_btn.clicked.connect(self.reset_settings)
-        reset_btn.setStyleSheet("""
+        reset_btn.setStyleSheet(
+            """
             QPushButton {
                 background-color: #ffc107;
                 color: black;
@@ -170,12 +189,14 @@ class SettingsWidget(QWidget):
             QPushButton:hover {
                 background-color: #e0a800;
             }
-        """)
+        """
+        )
 
         # Bouton appliquer
         apply_btn = QPushButton("Appliquer")
         apply_btn.clicked.connect(self.apply_settings)
-        apply_btn.setStyleSheet("""
+        apply_btn.setStyleSheet(
+            """
             QPushButton {
                 background-color: #28a745;
                 color: white;
@@ -186,7 +207,8 @@ class SettingsWidget(QWidget):
             QPushButton:hover {
                 background-color: #218838;
             }
-        """)
+        """
+        )
 
         layout.addWidget(reset_btn)
         layout.addStretch()
@@ -200,7 +222,7 @@ class SettingsWidget(QWidget):
             # Charger depuis le fichier config.json s'il existe
             config_file = Path("config.json")
             if config_file.exists():
-                with open(config_file, 'r', encoding='utf-8') as f:
+                with open(config_file, "r", encoding="utf-8") as f:
                     saved_settings = json.load(f)
                     self.settings.update(saved_settings)
 
@@ -210,15 +232,21 @@ class SettingsWidget(QWidget):
             self.auto_start_check.setChecked(self.settings["general"]["auto_start"])
             self.auto_update_check.setChecked(self.settings["general"]["auto_update"])
 
-            self.default_model_combo.setCurrentText(self.settings["detectron2"]["default_model"])
-            self.confidence_spin.setValue(self.settings["detectron2"]["confidence_threshold"])
+            self.default_model_combo.setCurrentText(
+                self.settings["detectron2"]["default_model"]
+            )
+            self.confidence_spin.setValue(
+                self.settings["detectron2"]["confidence_threshold"]
+            )
             self.device_combo.setCurrentText(self.settings["detectron2"]["device"])
 
             self.logger.info("Paramètres chargés")
 
         except Exception as e:
             self.logger.error(f"Erreur chargement paramètres: {e}")
-            QMessageBox.critical(self, "Erreur", f"Erreur lors du chargement des paramètres:\n{e}")
+            QMessageBox.critical(
+                self, "Erreur", f"Erreur lors du chargement des paramètres:\n{e}"
+            )
 
     def apply_settings(self):
         """Applique les paramètres"""
@@ -229,30 +257,39 @@ class SettingsWidget(QWidget):
             self.settings["general"]["auto_start"] = self.auto_start_check.isChecked()
             self.settings["general"]["auto_update"] = self.auto_update_check.isChecked()
 
-            self.settings["detectron2"]["default_model"] = self.default_model_combo.currentText()
-            self.settings["detectron2"]["confidence_threshold"] = self.confidence_spin.value()
+            self.settings["detectron2"][
+                "default_model"
+            ] = self.default_model_combo.currentText()
+            self.settings["detectron2"][
+                "confidence_threshold"
+            ] = self.confidence_spin.value()
             self.settings["detectron2"]["device"] = self.device_combo.currentText()
 
             # Sauvegarder dans le fichier
-            with open("config.json", 'w', encoding='utf-8') as f:
+            with open("config.json", "w", encoding="utf-8") as f:
                 json.dump(self.settings, f, indent=2, ensure_ascii=False)
 
             # Émettre le signal de changement
             self.settings_changed.emit()
 
-            QMessageBox.information(self, "Paramètres", "Paramètres appliqués avec succès!")
+            QMessageBox.information(
+                self, "Paramètres", "Paramètres appliqués avec succès!"
+            )
             self.logger.info("Paramètres appliqués")
 
         except Exception as e:
             self.logger.error(f"Erreur application paramètres: {e}")
-            QMessageBox.critical(self, "Erreur", f"Erreur lors de l'application des paramètres:\n{e}")
+            QMessageBox.critical(
+                self, "Erreur", f"Erreur lors de l'application des paramètres:\n{e}"
+            )
 
     def reset_settings(self):
         """Remet les paramètres par défaut"""
         reply = QMessageBox.question(
-            self, "Réinitialiser",
+            self,
+            "Réinitialiser",
             "Êtes-vous sûr de vouloir remettre tous les paramètres par défaut?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
         )
 
         if reply == QMessageBox.StandardButton.Yes:
@@ -263,18 +300,22 @@ class SettingsWidget(QWidget):
                         "language": "Français",
                         "theme": "Clair",
                         "auto_start": False,
-                        "auto_update": True
+                        "auto_update": True,
                     },
                     "detectron2": {
                         "default_model": "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml",
                         "confidence_threshold": 0.5,
-                        "device": "auto"
-                    }
+                        "device": "auto",
+                    },
                 }
 
                 self.load_settings()
-                QMessageBox.information(self, "Réinitialisation", "Paramètres réinitialisés!")
+                QMessageBox.information(
+                    self, "Réinitialisation", "Paramètres réinitialisés!"
+                )
 
             except Exception as e:
                 self.logger.error(f"Erreur réinitialisation: {e}")
-                QMessageBox.critical(self, "Erreur", f"Erreur lors de la réinitialisation:\n{e}")
+                QMessageBox.critical(
+                    self, "Erreur", f"Erreur lors de la réinitialisation:\n{e}"
+                )

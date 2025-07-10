@@ -131,4 +131,3 @@ Linux / macOS : la même table de versions fonctionne ; supprimez simplement le
 Merci de tester les wheels plus récentes (Detectron 0.8, Torch 2.2, NumPy 2) et d’ouvrir un issue si vous trouvez une combinaison stable !
 
 © 2025 Duperopope – Licence Apache 2.0
-

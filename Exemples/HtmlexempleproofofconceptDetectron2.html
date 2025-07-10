@@ -223,7 +223,7 @@
                     <i class="fas fa-video mr-2 text-purple-400"></i>
                     Sources Vidéo
                 </h3>
-                
+
                 <!-- Source Selection -->
                 <div class="mb-4">
                     <select id="videoSource" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2">
@@ -256,7 +256,7 @@
 
                 <!-- YouTube Section -->
                 <div id="youtubeSection" class="mb-4 hidden">
-                    <input type="text" id="youtubeUrl" placeholder="URL YouTube ou ID vidéo" 
+                    <input type="text" id="youtubeUrl" placeholder="URL YouTube ou ID vidéo"
                            class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 mb-2">
                     <button id="loadYoutube" class="w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm">
                         <i class="fab fa-youtube mr-2"></i>Charger Vidéo
@@ -298,7 +298,7 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium mb-2">Seuil de Confiance</label>
-                        <input type="range" id="confidenceSlider" min="0.1" max="1" step="0.1" value="0.5" 
+                        <input type="range" id="confidenceSlider" min="0.1" max="1" step="0.1" value="0.5"
                                class="w-full">
                         <div class="flex justify-between text-xs text-gray-400">
                             <span>10%</span>
@@ -309,7 +309,7 @@
 
                     <div>
                         <label class="block text-sm font-medium mb-2">Max Détections</label>
-                        <input type="range" id="maxDetections" min="1" max="20" value="10" 
+                        <input type="range" id="maxDetections" min="1" max="20" value="10"
                                class="w-full">
                         <div class="flex justify-between text-xs text-gray-400">
                             <span>1</span>
@@ -337,9 +337,9 @@
                 <div class="mt-6">
                     <h4 class="text-md font-semibold mb-3">Étiquettes Personnalisées</h4>
                     <div class="flex space-x-2 mb-2">
-                        <input type="text" id="customLabelInput" placeholder="Nom de l'étiquette" 
+                        <input type="text" id="customLabelInput" placeholder="Nom de l'étiquette"
                                class="flex-1 bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm">
-                        <input type="color" id="customLabelColor" value="#8b5cf6" 
+                        <input type="color" id="customLabelColor" value="#8b5cf6"
                                class="w-12 h-10 rounded border border-gray-600">
                         <button id="addCustomLabel" class="bg-purple-600 hover:bg-purple-700 px-3 py-2 rounded text-sm">
                             <i class="fas fa-plus"></i>
@@ -432,30 +432,30 @@
             try {
                 // Initialize database
                 await initDatabase();
-                
+
                 // Load TensorFlow.js model
                 document.getElementById('modelName').textContent = 'Chargement...';
                 model = await cocoSsd.load();
                 document.getElementById('modelName').textContent = 'COCO-SSD';
-                
+
                 // Detect hardware
                 detectHardware();
-                
+
                 // Initialize webcam devices
                 await initWebcamDevices();
-                
+
                 // Load custom labels
                 await loadCustomLabels();
-                
+
                 // Load user progress
                 await loadUserProgress();
-                
+
                 // Initialize achievements
                 initAchievements();
-                
+
                 console.log('Application initialized successfully');
                 addXP(10, 'Application démarrée');
-                
+
             } catch (error) {
                 console.error('Initialization error:', error);
                 document.getElementById('modelName').textContent = 'Erreur de chargement';
@@ -466,17 +466,17 @@
         async function initDatabase() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open('GameVisionDB', 1);
-                
+
                 request.onerror = () => reject(request.error);
                 request.onsuccess = () => {
                     db = request.result;
                     updateDatabaseInfo();
                     resolve(db);
                 };
-                
+
                 request.onupgradeneeded = (event) => {
                     const db = event.target.result;
-                    
+
                     // Create object stores
                     if (!db.objectStoreNames.contains('models')) {
                         db.createObjectStore('models', { keyPath: 'id' });
@@ -497,24 +497,24 @@
         // Update database info
         function updateDatabaseInfo() {
             if (!db) return;
-            
+
             document.getElementById('dbStatus').textContent = 'Connecté';
             document.getElementById('dbStatus').className = 'text-green-400';
-            
+
             // Count items in stores
             const transaction = db.transaction(['models', 'datasets'], 'readonly');
-            
+
             const modelsStore = transaction.objectStore('models');
             const datasetsStore = transaction.objectStore('datasets');
-            
+
             modelsStore.count().onsuccess = (event) => {
                 document.getElementById('modelCount').textContent = event.target.result;
             };
-            
+
             datasetsStore.count().onsuccess = (event) => {
                 document.getElementById('datasetCount').textContent = event.target.result;
             };
-            
+
             // Simulate database size calculation
             document.getElementById('dbSize').textContent = '2.8 MB';
         }
@@ -525,7 +525,7 @@
             const userAgent = navigator.userAgent;
             const platform = navigator.platform;
             const cores = navigator.hardwareConcurrency || 'Non disponible';
-            
+
             // Detect OS
             let os = 'Inconnu';
             if (userAgent.includes('Windows')) os = 'Windows';
@@ -533,25 +533,25 @@
             else if (userAgent.includes('Linux')) os = 'Linux';
             else if (userAgent.includes('Android')) os = 'Android';
             else if (userAgent.includes('iOS')) os = 'iOS';
-            
+
             // Detect memory (approximation)
             const memory = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : 'Non disponible';
-            
+
             // Detect GPU
             const canvas = document.createElement('canvas');
             const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
             let gpu = 'Non disponible';
-            
+
             if (gl) {
                 const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
                 if (debugInfo) {
                     gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
                 }
             }
-            
+
             // Get screen resolution
             const screenRes = `${screen.width}x${screen.height}`;
-            
+
             // Update UI
             document.getElementById('systemOS').textContent = os;
             document.getElementById('cpuCores').textContent = `${cores} cores`;
@@ -565,26 +565,26 @@
             try {
                 const devices = await navigator.mediaDevices.enumerateDevices();
                 const videoDevices = devices.filter(device => device.kind === 'videoinput');
-                
+
                 const webcamSelect = document.getElementById('webcamSelect');
                 webcamSelect.innerHTML = '<option value="">Sélectionner une webcam</option>';
-                
+
                 if (videoDevices.length === 0) {
                     document.getElementById('webcamStatus').textContent = 'Aucune webcam détectée';
                     document.getElementById('webcamStatus').className = 'text-red-400';
                     return;
                 }
-                
+
                 videoDevices.forEach((device, index) => {
                     const option = document.createElement('option');
                     option.value = device.deviceId;
                     option.textContent = device.label || `Webcam ${index + 1}`;
                     webcamSelect.appendChild(option);
                 });
-                
+
                 document.getElementById('webcamStatus').textContent = `${videoDevices.length} webcam(s) détectée(s)`;
                 document.getElementById('webcamStatus').className = 'text-green-400';
-                
+
             } catch (error) {
                 console.error('Error enumerating devices:', error);
                 document.getElementById('webcamStatus').textContent = 'Erreur de détection';
@@ -600,7 +600,7 @@
                     alert('Veuillez sélectionner une webcam');
                     return;
                 }
-                
+
                 const constraints = {
                     video: {
                         deviceId: { exact: deviceId },
@@ -608,18 +608,18 @@
                         height: { ideal: 480 }
                     }
                 };
-                
+
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
                 const video = document.getElementById('videoElement');
                 video.srcObject = stream;
-                
+
                 document.getElementById('webcamStatus').textContent = 'Webcam active';
                 document.getElementById('webcamStatus').className = 'text-green-400';
-                
+
                 // Start detection
                 startDetection();
                 addXP(20, 'Webcam démarrée');
-                
+
             } catch (error) {
                 console.error('Error starting webcam:', error);
                 document.getElementById('webcamStatus').textContent = 'Erreur de connexion';
@@ -632,13 +632,13 @@
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
                 stream = null;
-                
+
                 const video = document.getElementById('videoElement');
                 video.srcObject = null;
-                
+
                 document.getElementById('webcamStatus').textContent = 'Webcam arrêtée';
                 document.getElementById('webcamStatus').className = 'text-yellow-400';
-                
+
                 stopDetection();
             }
         }
@@ -650,7 +650,7 @@
                 alert('Veuillez entrer une URL YouTube');
                 return;
             }
-            
+
             // Extract video ID
             let videoId = '';
             if (url.includes('youtube.com/watch?v=')) {
@@ -660,16 +660,16 @@
             } else if (url.length === 11) {
                 videoId = url; // Assume it's already a video ID
             }
-            
+
             if (!videoId) {
                 alert('URL YouTube invalide');
                 return;
             }
-            
+
             // Load YouTube video
             const iframe = document.getElementById('youtubeFrame');
             iframe.src = `https://www.youtube.com/embed/${videoId}`;
-            
+
             document.getElementById('youtubePlayer').classList.remove('hidden');
             addXP(15, 'Vidéo YouTube chargée');
         }
@@ -683,15 +683,15 @@
                     },
                     audio: false
                 };
-                
+
                 stream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
                 const video = document.getElementById('videoElement');
                 video.srcObject = stream;
-                
+
                 // Start detection
                 startDetection();
                 addXP(25, 'Capture d\'écran démarrée');
-                
+
             } catch (error) {
                 console.error('Error starting screen capture:', error);
                 alert('Erreur lors de la capture d\'écran');
@@ -701,59 +701,59 @@
         // Start detection
         function startDetection() {
             if (!model || isDetecting) return;
-            
+
             isDetecting = true;
             const video = document.getElementById('videoElement');
             const canvas = document.getElementById('overlayCanvas');
             const ctx = canvas.getContext('2d');
-            
+
             // Set canvas size to match video
             canvas.width = video.videoWidth || 640;
             canvas.height = video.videoHeight || 480;
-            
+
             async function detect() {
                 if (!isDetecting) return;
-                
+
                 const currentTime = performance.now();
                 const deltaTime = currentTime - lastFrameTime;
-                
+
                 if (deltaTime >= 100) { // Limit to 10 FPS for performance
                     const startTime = performance.now();
-                    
+
                     try {
                         // Perform detection
                         const predictions = await model.detect(video);
-                        
+
                         // Clear canvas
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        
+
                         // Filter predictions by confidence
                         const confidence = parseFloat(document.getElementById('confidenceSlider').value);
                         const maxDetections = parseInt(document.getElementById('maxDetections').value);
-                        
+
                         const filteredPredictions = predictions
                             .filter(pred => pred.score >= confidence)
                             .slice(0, maxDetections);
-                        
+
                         // Draw predictions
                         drawPredictions(ctx, filteredPredictions);
-                        
+
                         // Update stats
                         updateStats(filteredPredictions, performance.now() - startTime);
-                        
+
                         // Update detection results
                         updateDetectionResults(filteredPredictions);
-                        
+
                         lastFrameTime = currentTime;
-                        
+
                     } catch (error) {
                         console.error('Detection error:', error);
                     }
                 }
-                
+
                 animationId = requestAnimationFrame(detect);
             }
-            
+
             detect();
         }
 
@@ -764,7 +764,7 @@
                 cancelAnimationFrame(animationId);
                 animationId = null;
             }
-            
+
             // Clear canvas
             const canvas = document.getElementById('overlayCanvas');
             const ctx = canvas.getContext('2d');
@@ -775,30 +775,30 @@
         function drawPredictions(ctx, predictions) {
             const showLabels = document.getElementById('showLabels').checked;
             const showConfidence = document.getElementById('showConfidence').checked;
-            
+
             const colors = [
                 '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
                 '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'
             ];
-            
+
             predictions.forEach((prediction, index) => {
                 const [x, y, width, height] = prediction.bbox;
                 const color = colors[index % colors.length];
-                
+
                 // Draw bounding box
                 ctx.strokeStyle = color;
                 ctx.lineWidth = 2;
                 ctx.strokeRect(x, y, width, height);
-                
+
                 // Draw label background
                 if (showLabels) {
                     const label = `${prediction.class}${showConfidence ? ` (${(prediction.score * 100).toFixed(1)}%)` : ''}`;
                     ctx.font = '12px Arial';
                     const textWidth = ctx.measureText(label).width;
-                    
+
                     ctx.fillStyle = color;
                     ctx.fillRect(x, y - 20, textWidth + 10, 20);
-                    
+
                     // Draw label text
                     ctx.fillStyle = 'white';
                     ctx.fillText(label, x + 5, y - 5);
@@ -810,7 +810,7 @@
         function updateStats(predictions, processTime) {
             document.getElementById('detectionCount').textContent = predictions.length;
             document.getElementById('processTime').textContent = `${processTime.toFixed(1)}ms`;
-            
+
             // Calculate FPS
             const currentTime = performance.now();
             fps = 1000 / (currentTime - lastFrameTime);
@@ -821,7 +821,7 @@
         function updateDetectionResults(predictions) {
             const resultsContainer = document.getElementById('detectionResults');
             resultsContainer.innerHTML = '';
-            
+
             predictions.forEach((prediction, index) => {
                 const resultDiv = document.createElement('div');
                 resultDiv.className = 'bg-gray-800 p-3 rounded border border-gray-600';
@@ -843,36 +843,36 @@
         function addCustomLabel() {
             const name = document.getElementById('customLabelInput').value.trim();
             const color = document.getElementById('customLabelColor').value;
-            
+
             if (!name) {
                 alert('Veuillez entrer un nom pour l\'étiquette');
                 return;
             }
-            
+
             const customLabel = {
                 id: Date.now(),
                 name: name,
                 color: color,
                 created: new Date().toISOString()
             };
-            
+
             customLabels.push(customLabel);
             saveCustomLabels();
             renderCustomLabels();
-            
+
             // Clear input
             document.getElementById('customLabelInput').value = '';
-            
+
             addXP(5, 'Étiquette personnalisée créée');
         }
 
         // Save custom labels to database
         async function saveCustomLabels() {
             if (!db) return;
-            
+
             const transaction = db.transaction(['customLabels'], 'readwrite');
             const store = transaction.objectStore('customLabels');
-            
+
             customLabels.forEach(label => {
                 store.put(label);
             });
@@ -881,10 +881,10 @@
         // Load custom labels from database
         async function loadCustomLabels() {
             if (!db) return;
-            
+
             const transaction = db.transaction(['customLabels'], 'readonly');
             const store = transaction.objectStore('customLabels');
-            
+
             const request = store.getAll();
             request.onsuccess = () => {
                 customLabels = request.result || [];
@@ -896,7 +896,7 @@
         function renderCustomLabels() {
             const container = document.getElementById('customLabels');
             container.innerHTML = '';
-            
+
             customLabels.forEach(label => {
                 const labelDiv = document.createElement('div');
                 labelDiv.className = 'custom-label flex items-center';
@@ -922,23 +922,23 @@
         // Add XP and level up
         function addXP(amount, reason) {
             userXP += amount;
-            
+
             // Check for level up
             const xpNeeded = userLevel * 100;
             if (userXP >= xpNeeded) {
                 userLevel++;
                 userXP -= xpNeeded;
-                
+
                 // Show level up notification
                 showNotification(`Niveau ${userLevel} atteint !`, 'success');
-                
+
                 // Unlock new features
                 unlockFeatures();
             }
-            
+
             updateUserProgress();
             saveUserProgress();
-            
+
             // Show XP gain
             showNotification(`+${amount} XP - ${reason}`, 'info');
         }
@@ -947,7 +947,7 @@
         function updateUserProgress() {
             document.getElementById('userLevel').textContent = userLevel;
             document.getElementById('userXP').textContent = userXP;
-            
+
             const xpNeeded = userLevel * 100;
             const progress = (userXP / xpNeeded) * 100;
             document.getElementById('levelProgress').style.width = `${progress}%`;
@@ -956,10 +956,10 @@
         // Save user progress
         async function saveUserProgress() {
             if (!db) return;
-            
+
             const transaction = db.transaction(['userProgress'], 'readwrite');
             const store = transaction.objectStore('userProgress');
-            
+
             const progress = {
                 id: 'user',
                 level: userLevel,
@@ -967,17 +967,17 @@
                 achievements: achievements,
                 updated: new Date().toISOString()
             };
-            
+
             store.put(progress);
         }
 
         // Load user progress
         async function loadUserProgress() {
             if (!db) return;
-            
+
             const transaction = db.transaction(['userProgress'], 'readonly');
             const store = transaction.objectStore('userProgress');
-            
+
             const request = store.get('user');
             request.onsuccess = () => {
                 const progress = request.result;
@@ -1000,7 +1000,7 @@
                 { id: 'speed_demon', name: 'Démon de Vitesse', description: 'Atteindre 30 FPS', icon: 'fas fa-tachometer-alt' },
                 { id: 'level_5', name: 'Niveau 5', description: 'Atteindre le niveau 5', icon: 'fas fa-trophy' }
             ];
-            
+
             renderAchievements(achievementsList);
         }
 
@@ -1008,7 +1008,7 @@
         function renderAchievements(achievementsList) {
             const container = document.getElementById('achievements');
             container.innerHTML = '';
-            
+
             achievementsList.forEach(achievement => {
                 const isUnlocked = achievements.includes(achievement.id);
                 const achDiv = document.createElement('div');
@@ -1030,14 +1030,14 @@
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
             notification.className = `fixed top-4 right-4 p-4 rounded shadow-lg z-50 ${
-                type === 'success' ? 'bg-green-600' : 
-                type === 'error' ? 'bg-red-600' : 
+                type === 'success' ? 'bg-green-600' :
+                type === 'error' ? 'bg-red-600' :
                 'bg-blue-600'
             } text-white`;
             notification.textContent = message;
-            
+
             document.body.appendChild(notification);
-            
+
             setTimeout(() => {
                 notification.remove();
             }, 3000);
@@ -1046,13 +1046,13 @@
         // Event listeners
         document.getElementById('videoSource').addEventListener('change', (e) => {
             const value = e.target.value;
-            
+
             // Hide all sections
             document.getElementById('webcamSection').classList.add('hidden');
             document.getElementById('youtubeSection').classList.add('hidden');
             document.getElementById('screenSection').classList.add('hidden');
             document.getElementById('fileSection').classList.add('hidden');
-            
+
             // Show selected section
             if (value === 'webcam') {
                 document.getElementById('webcamSection').classList.remove('hidden');
@@ -1091,7 +1091,7 @@
             if (fileItem) {
                 const path = fileItem.dataset.path;
                 const type = fileItem.dataset.type;
-                
+
                 if (type === 'folder') {
                     showNotification(`Ouverture du dossier: ${path}`, 'info');
                 } else {
@@ -1122,7 +1122,7 @@
                     clearInterval(interval);
                     addXP(50, 'Entraînement terminé');
                 }
-                
+
                 document.getElementById('trainingProgress').style.width = `${progress}%`;
                 document.getElementById('currentEpoch').textContent = Math.floor(progress);
                 document.getElementById('accuracy').textContent = `${(Math.random() * 100).toFixed(1)}%`;

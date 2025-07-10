@@ -32,19 +32,18 @@ from core.hardware_monitor import HardwareMonitor
 from core.gamification import GamificationSystem
 from core.dataset_manager import DatasetManager
 
+
 class AimerWebServer:
     """Serveur web AIMER avec interface moderne"""
 
-    def __init__(self, host='localhost', port=5000):
+    def __init__(self, host="localhost", port=5000):
         self.logger = Logger("WebServer")
         self.host = host
         self.port = port
 
         # Initialiser Flask
-        self.app = Flask(__name__,
-                        template_folder='templates',
-                        static_folder='static')
-        self.app.config['SECRET_KEY'] = 'aimer_pro_secret_key_2025'
+        self.app = Flask(__name__, template_folder="templates", static_folder="static")
+        self.app.config["SECRET_KEY"] = "aimer_pro_secret_key_2025"
 
         # Initialiser SocketIO
         self.socketio = SocketIO(self.app, cors_allowed_origins="*")
@@ -72,12 +71,12 @@ class AimerWebServer:
     def setup_routes(self):
         """Configure les routes Flask"""
 
-        @self.app.route('/')
+        @self.app.route("/")
         def index():
             """Page principale"""
-            return render_template('index.html')
+            return render_template("index.html")
 
-        @self.app.route('/api/hardware')
+        @self.app.route("/api/hardware")
         def get_hardware():
             """API hardware info"""
             try:
@@ -89,9 +88,9 @@ class AimerWebServer:
                     return jsonify(self.hardware_monitor.get_complete_info())
             except Exception as e:
                 self.logger.error(f"Erreur API hardware: {e}")
-                return jsonify({'error': str(e)}), 500
+                return jsonify({"error": str(e)}), 500
 
-        @self.app.route('/api/performance')
+        @self.app.route("/api/performance")
         def get_performance():
             """API score de performance IA"""
             try:
@@ -99,48 +98,48 @@ class AimerWebServer:
                 return jsonify(score)
             except Exception as e:
                 self.logger.error(f"Erreur API performance: {e}")
-                return jsonify({'error': str(e)}), 500
+                return jsonify({"error": str(e)}), 500
 
-        @self.app.route('/api/user/login', methods=['POST'])
+        @self.app.route("/api/user/login", methods=["POST"])
         def user_login():
             """Connexion utilisateur"""
             try:
                 data = request.json
-                username = data.get('username', 'Player1')
+                username = data.get("username", "Player1")
 
                 user_id = self.gamification.get_or_create_user(username)
                 self.current_user_id = user_id
 
                 # Enregistrer la connexion
                 if user_id:
-                    self.gamification.record_activity(user_id, 'login', f'Connexion de {username}')
+                    self.gamification.record_activity(
+                        user_id, "login", f"Connexion de {username}"
+                    )
 
                 profile = self.gamification.get_user_profile(user_id)
-                return jsonify({
-                    'success': True,
-                    'user_id': user_id,
-                    'profile': profile
-                })
+                return jsonify(
+                    {"success": True, "user_id": user_id, "profile": profile}
+                )
 
             except Exception as e:
                 self.logger.error(f"Erreur connexion utilisateur: {e}")
-                return jsonify({'error': str(e)}), 500
+                return jsonify({"error": str(e)}), 500
 
-        @self.app.route('/api/user/profile')
+        @self.app.route("/api/user/profile")
         def get_user_profile():
             """Profil utilisateur actuel"""
             try:
                 if not self.current_user_id:
-                    return jsonify({'error': 'Aucun utilisateur connecté'}), 401
+                    return jsonify({"error": "Aucun utilisateur connecté"}), 401
 
                 profile = self.gamification.get_user_profile(self.current_user_id)
                 return jsonify(profile)
 
             except Exception as e:
                 self.logger.error(f"Erreur profil utilisateur: {e}")
-                return jsonify({'error': str(e)}), 500
+                return jsonify({"error": str(e)}), 500
 
-        @self.app.route('/api/leaderboard')
+        @self.app.route("/api/leaderboard")
         def get_leaderboard():
             """Classement des joueurs"""
             try:
@@ -148,9 +147,9 @@ class AimerWebServer:
                 return jsonify(leaderboard)
             except Exception as e:
                 self.logger.error(f"Erreur leaderboard: {e}")
-                return jsonify({'error': str(e)}), 500
+                return jsonify({"error": str(e)}), 500
 
-        @self.app.route('/api/datasets')
+        @self.app.route("/api/datasets")
         def get_datasets():
             """Liste des datasets"""
             try:
@@ -158,9 +157,9 @@ class AimerWebServer:
                 return jsonify(datasets)
             except Exception as e:
                 self.logger.error(f"Erreur datasets: {e}")
-                return jsonify({'error': str(e)}), 500
+                return jsonify({"error": str(e)}), 500
 
-        @self.app.route('/api/datasets/popular')
+        @self.app.route("/api/datasets/popular")
         def get_popular_datasets():
             """Datasets populaires"""
             try:
@@ -168,9 +167,9 @@ class AimerWebServer:
                 return jsonify(datasets)
             except Exception as e:
                 self.logger.error(f"Erreur datasets populaires: {e}")
-                return jsonify({'error': str(e)}), 500
+                return jsonify({"error": str(e)}), 500
 
-        @self.app.route('/api/detection/start', methods=['POST'])
+        @self.app.route("/api/detection/start", methods=["POST"])
         def start_detection():
             """Démarre la détection"""
             try:
@@ -183,44 +182,46 @@ class AimerWebServer:
                 if self.current_user_id:
                     self.gamification.record_activity(
                         self.current_user_id,
-                        'detection',
-                        'Démarrage détection',
-                        detections_count=1
+                        "detection",
+                        "Démarrage détection",
+                        detections_count=1,
                     )
 
-                return jsonify({'success': True, 'message': 'Détection démarrée'})
+                return jsonify({"success": True, "message": "Détection démarrée"})
 
             except Exception as e:
                 self.logger.error(f"Erreur démarrage détection: {e}")
-                return jsonify({'error': str(e)}), 500
+                return jsonify({"error": str(e)}), 500
 
-        @self.app.route('/api/detection/stop', methods=['POST'])
+        @self.app.route("/api/detection/stop", methods=["POST"])
         def stop_detection():
             """Arrête la détection"""
             try:
                 self.detection_active = False
-                return jsonify({'success': True, 'message': 'Détection arrêtée'})
+                return jsonify({"success": True, "message": "Détection arrêtée"})
             except Exception as e:
                 self.logger.error(f"Erreur arrêt détection: {e}")
-                return jsonify({'error': str(e)}), 500
+                return jsonify({"error": str(e)}), 500
 
-        @self.app.route('/api/detection/process', methods=['POST'])
+        @self.app.route("/api/detection/process", methods=["POST"])
         def process_detection():
             """Traite une image pour détection"""
             try:
                 if not self.detector:
-                    return jsonify({'error': 'Détecteur non initialisé'}), 400
+                    return jsonify({"error": "Détecteur non initialisé"}), 400
 
                 # Récupérer l'image depuis la requête
                 data = request.json
-                image_data = data.get('image')
+                image_data = data.get("image")
 
                 if not image_data:
-                    return jsonify({'error': 'Aucune image fournie'}), 400
+                    return jsonify({"error": "Aucune image fournie"}), 400
 
                 # Décoder l'image base64
-                image_bytes = base64.b64decode(image_data.split(',')[1])
-                image = cv2.imdecode(np.frombuffer(image_bytes, np.uint8), cv2.IMREAD_COLOR)
+                image_bytes = base64.b64decode(image_data.split(",")[1])
+                image = cv2.imdecode(
+                    np.frombuffer(image_bytes, np.uint8), cv2.IMREAD_COLOR
+                )
 
                 # Effectuer la détection
                 start_time = time.time()
@@ -231,52 +232,54 @@ class AimerWebServer:
                 if self.current_user_id and results:
                     self.gamification.record_activity(
                         self.current_user_id,
-                        'detection',
-                        f'{len(results)} objets détectés',
-                        detections_count=len(results)
+                        "detection",
+                        f"{len(results)} objets détectés",
+                        detections_count=len(results),
                     )
 
-                return jsonify({
-                    'success': True,
-                    'results': results,
-                    'processing_time': processing_time,
-                    'count': len(results)
-                })
+                return jsonify(
+                    {
+                        "success": True,
+                        "results": results,
+                        "processing_time": processing_time,
+                        "count": len(results),
+                    }
+                )
 
             except Exception as e:
                 self.logger.error(f"Erreur traitement détection: {e}")
-                return jsonify({'error': str(e)}), 500
+                return jsonify({"error": str(e)}), 500
 
     def setup_socketio_events(self):
         """Configure les événements SocketIO"""
 
-        @self.socketio.on('connect')
+        @self.socketio.on("connect")
         def handle_connect():
             """Connexion client"""
-            self.logger.info('Client connecté via WebSocket')
-            emit('status', {'message': 'Connecté au serveur AIMER PRO'})
+            self.logger.info("Client connecté via WebSocket")
+            emit("status", {"message": "Connecté au serveur AIMER PRO"})
 
-        @self.socketio.on('disconnect')
+        @self.socketio.on("disconnect")
         def handle_disconnect():
             """Déconnexion client"""
-            self.logger.info('Client déconnecté')
+            self.logger.info("Client déconnecté")
 
-        @self.socketio.on('request_hardware_update')
+        @self.socketio.on("request_hardware_update")
         def handle_hardware_update():
             """Demande de mise à jour hardware"""
             try:
                 data = self.hardware_monitor.get_latest_data()
                 if data:
-                    emit('hardware_update', data)
+                    emit("hardware_update", data)
             except Exception as e:
                 self.logger.error(f"Erreur mise à jour hardware: {e}")
 
-        @self.socketio.on('start_detection_stream')
+        @self.socketio.on("start_detection_stream")
         def handle_start_detection_stream():
             """Démarre le stream de détection"""
             try:
                 self.detection_active = True
-                emit('detection_stream_started', {'status': 'success'})
+                emit("detection_stream_started", {"status": "success"})
 
                 # Démarrer le thread de détection en continu
                 def detection_loop():
@@ -285,24 +288,27 @@ class AimerWebServer:
                             # Simuler des détections (remplacer par vraie capture)
                             fake_results = [
                                 {
-                                    'class': 'person',
-                                    'confidence': 0.95,
-                                    'bbox': [100, 100, 200, 300],
-                                    'mask': None
+                                    "class": "person",
+                                    "confidence": 0.95,
+                                    "bbox": [100, 100, 200, 300],
+                                    "mask": None,
                                 },
                                 {
-                                    'class': 'car',
-                                    'confidence': 0.88,
-                                    'bbox': [300, 150, 450, 250],
-                                    'mask': None
-                                }
+                                    "class": "car",
+                                    "confidence": 0.88,
+                                    "bbox": [300, 150, 450, 250],
+                                    "mask": None,
+                                },
                             ]
 
-                            self.socketio.emit('detection_results', {
-                                'results': fake_results,
-                                'timestamp': datetime.now().isoformat(),
-                                'fps': 30
-                            })
+                            self.socketio.emit(
+                                "detection_results",
+                                {
+                                    "results": fake_results,
+                                    "timestamp": datetime.now().isoformat(),
+                                    "fps": 30,
+                                },
+                            )
 
                             time.sleep(0.1)  # 10 FPS
 
@@ -315,24 +321,26 @@ class AimerWebServer:
 
             except Exception as e:
                 self.logger.error(f"Erreur démarrage stream: {e}")
-                emit('error', {'message': str(e)})
+                emit("error", {"message": str(e)})
 
-        @self.socketio.on('stop_detection_stream')
+        @self.socketio.on("stop_detection_stream")
         def handle_stop_detection_stream():
             """Arrête le stream de détection"""
             self.detection_active = False
-            emit('detection_stream_stopped', {'status': 'success'})
+            emit("detection_stream_stopped", {"status": "success"})
 
     def run(self, debug=False):
         """Démarre le serveur"""
         try:
-            self.logger.info(f"Démarrage serveur web sur http://{self.host}:{self.port}")
+            self.logger.info(
+                f"Démarrage serveur web sur http://{self.host}:{self.port}"
+            )
             self.socketio.run(
                 self.app,
                 host=self.host,
                 port=self.port,
                 debug=debug,
-                allow_unsafe_werkzeug=True
+                allow_unsafe_werkzeug=True,
             )
         except Exception as e:
             self.logger.error(f"Erreur démarrage serveur: {e}")
@@ -347,7 +355,8 @@ class AimerWebServer:
         except Exception as e:
             self.logger.error(f"Erreur arrêt serveur: {e}")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     server = AimerWebServer()
     try:
         server.run(debug=True)

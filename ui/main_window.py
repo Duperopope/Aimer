@@ -10,9 +10,18 @@ Interface principale avec gestion des datasets
 import sys
 from pathlib import Path
 from PyQt6.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QTabWidget, QLabel, QStatusBar, QPushButton,
-    QSplitter, QTextEdit, QProgressBar, QMessageBox
+    QMainWindow,
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QTabWidget,
+    QLabel,
+    QStatusBar,
+    QPushButton,
+    QSplitter,
+    QTextEdit,
+    QProgressBar,
+    QMessageBox,
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal, QTimer
 from PyQt6.QtGui import QFont, QIcon
@@ -26,6 +35,7 @@ from .dataset_widget import DatasetWidget
 from .progress_dialog import ProgressDialog
 from .detection_interface import DetectionWidget
 from .settings_widget import SettingsWidget
+
 
 class MainWindow(QMainWindow):
     """
@@ -200,7 +210,8 @@ class MainWindow(QMainWindow):
 
     def apply_style(self):
         """Applique le style à l'interface"""
-        self.setStyleSheet("""
+        self.setStyleSheet(
+            """
             QMainWindow {
                 background-color: #f5f5f5;
             }
@@ -244,7 +255,8 @@ class MainWindow(QMainWindow):
                 background-color: #e0e0e0;
                 border-top: 1px solid #ccc;
             }
-        """)
+        """
+        )
 
     def check_system(self):
         """Vérifie l'état du système"""
@@ -255,18 +267,21 @@ class MainWindow(QMainWindow):
 
             try:
                 import torch
+
                 available.append("PyTorch")
             except ImportError:
                 missing.append("PyTorch")
 
             try:
                 import detectron2
+
                 available.append("Detectron2")
             except ImportError:
                 missing.append("Detectron2")
 
             try:
                 import cv2
+
                 available.append("OpenCV")
             except ImportError:
                 missing.append("OpenCV")

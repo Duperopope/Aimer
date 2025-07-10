@@ -1,0 +1,89 @@
+2025-07-10 13:17:57,078 | INFO | AIMER | Démarrage AIMER PRO - Mode GUI
+2025-07-10 13:18:07,984 | WARNING | root | Detectron2 non disponible - installation requise
+2025-07-10 13:18:08 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 13:18:08,494 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 13:18:08 | ERROR | UniversalDetector | Detectron2 non installé - installation requise
+2025-07-10 13:18:08,969 | ERROR | UniversalDetector | Detectron2 non installé - installation requise
+2025-07-10 13:18:08 | ERROR | UniversalDetector | Erreur initialisation détecteur: Detectron2 non installé - installation requise
+2025-07-10 13:18:08,969 | ERROR | UniversalDetector | Erreur initialisation détecteur: Detectron2 non installé - installation requise
+2025-07-10 13:18:08 | ERROR | DetectionWidget | Erreur initialisation détecteur: Detectron2 non installé - installation requise
+2025-07-10 13:18:08,969 | ERROR | DetectionWidget | Erreur initialisation détecteur: Detectron2 non installé - installation requise
+2025-07-10 13:18:14 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 13:18:14,618 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 13:18:14 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 13:18:14,660 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 13:18:20 | INFO | MainWindow | Fermeture de l'application
+2025-07-10 13:18:20,493 | INFO | MainWindow | Fermeture de l'application
+2025-07-10 13:23:48,850 | INFO | AIMER | Démarrage AIMER PRO - Mode GUI
+2025-07-10 13:23:52,500 | WARNING | root | Detectron2 non disponible - installation requise
+2025-07-10 13:23:52 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 13:23:52,871 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 13:23:52 | ERROR | UniversalDetector | Detectron2 non installé - installation requise
+2025-07-10 13:23:52,953 | ERROR | UniversalDetector | Detectron2 non installé - installation requise
+2025-07-10 13:23:52 | ERROR | UniversalDetector | Erreur initialisation détecteur: Detectron2 non installé - installation requise
+2025-07-10 13:23:52,953 | ERROR | UniversalDetector | Erreur initialisation détecteur: Detectron2 non installé - installation requise
+2025-07-10 13:23:52 | ERROR | DetectionWidget | Erreur initialisation détecteur: Detectron2 non installé - installation requise
+2025-07-10 13:23:52,953 | ERROR | DetectionWidget | Erreur initialisation détecteur: Detectron2 non installé - installation requise
+2025-07-10 13:28:43 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 13:28:43,116 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 13:28:43 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 13:28:43,155 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 13:29:00 | INFO | MainWindow | Fermeture de l'application
+2025-07-10 13:29:00,151 | INFO | MainWindow | Fermeture de l'application
+2025-07-10 13:29:11,335 | INFO | AIMER | Démarrage AIMER PRO - Mode GUI
+2025-07-10 13:29:14,954 | WARNING | root | Detectron2 non disponible - installation requise
+2025-07-10 13:29:15 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 13:29:15,318 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 13:29:15 | ERROR | UniversalDetector | Detectron2 non installé - installation requise
+2025-07-10 13:29:15,403 | ERROR | UniversalDetector | Detectron2 non installé - installation requise
+2025-07-10 13:29:15 | ERROR | UniversalDetector | Erreur initialisation détecteur: Detectron2 non installé - installation requise
+2025-07-10 13:29:15,403 | ERROR | UniversalDetector | Erreur initialisation détecteur: Detectron2 non installé - installation requise
+2025-07-10 13:29:15 | ERROR | DetectionWidget | Erreur initialisation détecteur: Detectron2 non installé - installation requise
+2025-07-10 13:29:15,403 | ERROR | DetectionWidget | Erreur initialisation détecteur: Detectron2 non installé - installation requise
+2025-07-10 13:29:16 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 13:29:16,686 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 13:29:16 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 13:29:16,730 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 14:17:50,217 | INFO | AIMER | Démarrage AIMER PRO - Mode CLI
+2025-07-10 14:18:14,346 | INFO | AIMER | Démarrage AIMER PRO - Mode CLI
+2025-07-10 14:18:16,452 | ERROR | AIMER | Erreur: No module named 'cv2'
+2025-07-10 14:21:54,119 | INFO | AIMER | Démarrage AIMER PRO - Mode CLI
+2025-07-10 14:26:04,497 | INFO | AIMER | Démarrage AIMER PRO - Mode CLI
+2025-07-10 14:26:07,080 | INFO | AIMER | Démarrage AIMER PRO - Mode CLI
+2025-07-10 14:26:11,227 | INFO | matplotlib.font_manager | generated new fontManager
+2025-07-10 14:26:11 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 14:26:11,433 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 14:26:11,772 | INFO | detectron2.checkpoint.detection_checkpoint | [DetectionCheckpointer] Loading from https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl ...
+2025-07-10 14:26:11,774 | INFO | iopath.common.file_io | Downloading https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl ...
+2025-07-10 14:26:11,776 | INFO | iopath.common.download | Downloading from https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl ...
+2025-07-10 14:26:13,406 | INFO | iopath.common.download | Successfully downloaded C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl. 167266879 bytes.
+2025-07-10 14:26:13,406 | INFO | iopath.common.file_io | URL https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl cached in C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl
+2025-07-10 14:26:13,406 | INFO | fvcore.common.checkpoint | [Checkpointer] Loading from C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl ...
+2025-07-10 14:26:13,449 | INFO | fvcore.common.checkpoint | Reading a file from 'Detectron2 Model Zoo'
+2025-07-10 14:26:13 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 14:26:13,476 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 14:26:13,476 | INFO | AIMER | Détection sur: image.jpg
+2025-07-10 14:26:13,950 | INFO | AIMER | Démarrage AIMER PRO - Mode GUI
+2025-07-10 14:26:16 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 14:26:16,980 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 14:26:17 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 14:26:17,079 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 14:26:17,416 | INFO | detectron2.checkpoint.detection_checkpoint | [DetectionCheckpointer] Loading from https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl ...
+2025-07-10 14:26:17,417 | INFO | iopath.common.file_io | URL https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl cached in C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl
+2025-07-10 14:26:17,417 | INFO | fvcore.common.checkpoint | [Checkpointer] Loading from C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl ...
+2025-07-10 14:26:17,455 | INFO | fvcore.common.checkpoint | Reading a file from 'Detectron2 Model Zoo'
+2025-07-10 14:26:17 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 14:26:17,481 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 14:26:17 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 14:26:17,482 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 14:26:17 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 14:26:17,490 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 14:26:17 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 14:26:17,533 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 14:26:47 | ERROR | DetectionWidget | Erreur chargement image: Impossible de charger l'image
+2025-07-10 14:26:47,345 | ERROR | DetectionWidget | Erreur chargement image: Impossible de charger l'image
+2025-07-10 14:28:23 | ERROR | DetectionWidget | Erreur capture écran: No module named 'mss'
+2025-07-10 14:28:23,011 | ERROR | DetectionWidget | Erreur capture écran: No module named 'mss'
+2025-07-10 14:28:31 | INFO | MainWindow | Fermeture de l'application
+2025-07-10 14:28:31,234 | INFO | MainWindow | Fermeture de l'application
+2025-07-10 14:29:12,317 | INFO | AIMER | Démarrage AIMER PRO - Mode CLI

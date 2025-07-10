@@ -260,7 +260,7 @@
 <body class="bg-gray-900 text-white font-sans">
     <!-- Notifications -->
     <div id="notification" class="notification"></div>
-    
+
     <!-- Tutorial Overlay -->
     <div id="tutorialOverlay" class="tutorial-overlay">
         <div id="tutorialContent" class="tutorial-content">
@@ -353,7 +353,7 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <!-- Video Display -->
                     <div id="videoContainer" class="mt-6 text-center">
                         <div class="webcam-container">
@@ -1028,51 +1028,51 @@
 
         async function initializeApp() {
             console.log('Initializing GameVision AI...');
-            
+
             // Initialize tabs
             initializeTabs();
-            
+
             // Initialize hardware detection
             await detectHardware();
-            
+
             // Initialize TensorFlow.js
             await initializeTensorFlow();
-            
+
             // Initialize datasets
             initializeDatasets();
-            
+
             // Initialize gamification
             initializeGamification();
-            
+
             // Initialize achievements
             initializeAchievements();
-            
+
             // Initialize storage management
             initializeStorage();
-            
+
             // Initialize cheats
             initializeCheats();
-            
+
             // Initialize event listeners
             initializeEventListeners();
-            
+
             // Initialize tutorial
             initializeTutorial();
-            
+
             // Load user data
             loadUserData();
-            
+
             showNotification('GameVision AI initialisé avec succès!', 'success');
         }
 
         function initializeTabs() {
             const tabButtons = document.querySelectorAll('.tab-btn');
             const tabContents = document.querySelectorAll('.tab-content');
-            
+
             tabButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     const targetTab = button.dataset.tab;
-                    
+
                     // Update active tab button
                     tabButtons.forEach(btn => {
                         btn.classList.remove('active', 'bg-blue-600');
@@ -1080,13 +1080,13 @@
                     });
                     button.classList.remove('bg-gray-700');
                     button.classList.add('active', 'bg-blue-600');
-                    
+
                     // Show target tab content
                     tabContents.forEach(content => {
                         content.classList.add('hidden');
                     });
                     document.getElementById(targetTab).classList.remove('hidden');
-                    
+
                     currentTab = targetTab;
                 });
             });
@@ -1094,21 +1094,21 @@
 
         async function detectHardware() {
             console.log('Detecting hardware...');
-            
+
             // Detect CPU
             const cpuInfo = {
                 cores: navigator.hardwareConcurrency || 4,
                 name: 'CPU détecté',
                 performance: 'good'
             };
-            
+
             // Detect Memory
             const memoryInfo = {
                 total: navigator.deviceMemory ? navigator.deviceMemory * 1024 : 8192,
                 available: navigator.deviceMemory ? navigator.deviceMemory * 1024 * 0.7 : 6144,
                 performance: 'good'
             };
-            
+
             // Detect GPU (WebGL)
             const canvas = document.createElement('canvas');
             const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
@@ -1117,7 +1117,7 @@
                 webgl: !!gl,
                 performance: gl ? 'good' : 'bad'
             };
-            
+
             // Detect Storage
             if ('storage' in navigator && 'estimate' in navigator.storage) {
                 const estimate = await navigator.storage.estimate();
@@ -1135,9 +1135,9 @@
                     performance: 'medium'
                 };
             }
-            
+
             hardwareInfo = { cpu: cpuInfo, memory: memoryInfo, gpu: gpuInfo, storage: storageInfo };
-            
+
             updateHardwareDisplay();
         }
 
@@ -1146,28 +1146,28 @@
             const memoryElement = document.getElementById('memoryInfo');
             const gpuElement = document.getElementById('gpuInfo');
             const storageElement = document.getElementById('storageInfo');
-            
+
             if (cpuElement) {
                 cpuElement.innerHTML = `
                     <div class="performance-indicator ${hardwareInfo.cpu.performance}"></div>
                     <span>${hardwareInfo.cpu.cores} cores</span>
                 `;
             }
-            
+
             if (memoryElement) {
                 memoryElement.innerHTML = `
                     <div class="performance-indicator ${hardwareInfo.memory.performance}"></div>
                     <span>${Math.round(hardwareInfo.memory.total / 1024)} GB</span>
                 `;
             }
-            
+
             if (gpuElement) {
                 gpuElement.innerHTML = `
                     <div class="performance-indicator ${hardwareInfo.gpu.performance}"></div>
                     <span>${hardwareInfo.gpu.webgl ? 'WebGL Actif' : 'WebGL Inactif'}</span>
                 `;
             }
-            
+
             if (storageElement) {
                 storageElement.innerHTML = `
                     <div class="performance-indicator ${hardwareInfo.storage.performance}"></div>
@@ -1178,7 +1178,7 @@
 
         async function initializeTensorFlow() {
             console.log('Initializing TensorFlow.js...');
-            
+
             try {
                 // Set backend based on hardware
                 if (hardwareInfo.gpu && hardwareInfo.gpu.webgl) {
@@ -1186,16 +1186,16 @@
                 } else {
                     await tf.setBackend('cpu');
                 }
-                
+
                 // Load COCO-SSD model
                 detectionModel = await cocoSsd.load();
                 console.log('TensorFlow.js initialized successfully');
-                
+
                 // Initialize class filters
                 initializeClassFilters();
-                
+
                 awardXP(50, 'Système IA initialisé');
-                
+
             } catch (error) {
                 console.error('Error initializing TensorFlow.js:', error);
                 showNotification('Erreur lors de l\'initialisation de l\'IA', 'error');
@@ -1205,7 +1205,7 @@
         function initializeClassFilters() {
             const classFilters = document.getElementById('classFilters');
             const classes = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket'];
-            
+
             classes.forEach(className => {
                 const label = document.createElement('label');
                 label.className = 'flex items-center space-x-2 text-sm';
@@ -1247,14 +1247,14 @@
                     type: 'public'
                 }
             ];
-            
+
             updateDatasetDisplay();
         }
 
         function updateDatasetDisplay() {
             const datasetLibrary = document.getElementById('datasetLibrary');
             datasetLibrary.innerHTML = '';
-            
+
             datasets.forEach(dataset => {
                 const datasetCard = document.createElement('div');
                 datasetCard.className = 'dataset-card';
@@ -1287,14 +1287,14 @@
                 { id: 'dataset_creator', name: 'Créateur de Dataset', description: 'Créer votre premier dataset', xp: 200, unlocked: false },
                 { id: 'cheat_master', name: 'Maître des Cheats', description: 'Créer 10 cheats différents', xp: 400, unlocked: false }
             ];
-            
+
             // Initialize daily challenges
             dailyChallenges = [
                 { id: 'daily_detection', name: 'Détection Quotidienne', description: 'Effectuer 100 détections aujourd\'hui', progress: 0, target: 100, xp: 50 },
                 { id: 'daily_training', name: 'Entraînement Quotidien', description: 'Entraîner un modèle aujourd\'hui', progress: 0, target: 1, xp: 100 },
                 { id: 'daily_annotation', name: 'Annotation Quotidienne', description: 'Annoter 50 images aujourd\'hui', progress: 0, target: 50, xp: 75 }
             ];
-            
+
             updateGamificationDisplay();
         }
 
@@ -1303,11 +1303,11 @@
             document.getElementById('playerLevel').textContent = userLevel;
             document.getElementById('totalXP').textContent = userXP;
             document.getElementById('totalAchievements').textContent = achievements.filter(a => a.unlocked).length;
-            
+
             // Update achievements
             const achievementsList = document.getElementById('achievementsList');
             achievementsList.innerHTML = '';
-            
+
             achievements.forEach(achievement => {
                 const achievementElement = document.createElement('div');
                 achievementElement.className = `flex items-center justify-between p-3 rounded-lg ${achievement.unlocked ? 'bg-green-800' : 'bg-gray-800'}`;
@@ -1325,11 +1325,11 @@
                 `;
                 achievementsList.appendChild(achievementElement);
             });
-            
+
             // Update daily challenges
             const dailyChallengesElement = document.getElementById('dailyChallenges');
             dailyChallengesElement.innerHTML = '';
-            
+
             dailyChallenges.forEach(challenge => {
                 const challengeElement = document.createElement('div');
                 challengeElement.className = 'bg-gray-800 rounded-lg p-4';
@@ -1354,7 +1354,7 @@
                 achievements.forEach(achievement => {
                     if (!achievement.unlocked) {
                         let shouldUnlock = false;
-                        
+
                         switch(achievement.id) {
                             case 'first_detection':
                                 shouldUnlock = totalDetections >= 1;
@@ -1372,7 +1372,7 @@
                                 shouldUnlock = cheats.length >= 10;
                                 break;
                         }
-                        
+
                         if (shouldUnlock) {
                             achievement.unlocked = true;
                             awardXP(achievement.xp, `Succès débloqué: ${achievement.name}`);
@@ -1380,7 +1380,7 @@
                         }
                     }
                 });
-                
+
                 updateGamificationDisplay();
             };
         }
@@ -1388,7 +1388,7 @@
         function initializeStorage() {
             // Initialize storage monitoring
             updateStorageDisplay();
-            
+
             // Set up periodic storage monitoring
             setInterval(updateStorageDisplay, 5000);
         }
@@ -1398,13 +1398,13 @@
             const modelsSize = Math.floor(Math.random() * 500) + 100;
             const datasetsSize = Math.floor(Math.random() * 1000) + 200;
             const cacheSize = Math.floor(Math.random() * 200) + 50;
-            
+
             document.getElementById('modelsSize').textContent = modelsSize + ' MB';
             document.getElementById('datasetsSize').textContent = datasetsSize + ' MB';
             document.getElementById('cacheSize').textContent = cacheSize + ' MB';
-            
+
             const totalStorage = hardwareInfo.storage ? hardwareInfo.storage.total / 1000000 : 1000;
-            
+
             document.getElementById('modelsBar').style.width = (modelsSize / totalStorage * 100) + '%';
             document.getElementById('datasetsBar').style.width = (datasetsSize / totalStorage * 100) + '%';
             document.getElementById('cacheBar').style.width = (cacheSize / totalStorage * 100) + '%';
@@ -1429,14 +1429,14 @@
                     code: 'function collectItems() { /* Item collection logic */ }'
                 }
             ];
-            
+
             updateCheatLibrary();
         }
 
         function updateCheatLibrary() {
             const cheatLibrary = document.getElementById('cheatLibrary');
             cheatLibrary.innerHTML = '';
-            
+
             cheats.forEach((cheat, index) => {
                 const cheatCard = document.createElement('div');
                 cheatCard.className = 'bg-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-700 transition-colors';
@@ -1467,13 +1467,13 @@
                 document.getElementById('imageUpload').click();
             });
             document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
-            
+
             // Detection controls
             document.getElementById('confidenceThreshold').addEventListener('input', (e) => {
                 document.getElementById('confidenceValue').textContent = e.target.value;
             });
             document.getElementById('startDetection').addEventListener('click', toggleDetection);
-            
+
             // Hardware controls
             document.getElementById('refreshHardware').addEventListener('click', detectHardware);
             document.getElementById('performanceMode').addEventListener('change', updatePerformanceMode);
@@ -1483,7 +1483,7 @@
             document.getElementById('gpuMemory').addEventListener('input', (e) => {
                 document.getElementById('gpuMemoryValue').textContent = e.target.value + ' MB';
             });
-            
+
             // Storage controls
             document.getElementById('clearCache').addEventListener('click', clearCache);
             document.getElementById('cleanupOldModels').addEventListener('click', cleanupOldModels);
@@ -1491,17 +1491,17 @@
             document.getElementById('storageLimit').addEventListener('input', (e) => {
                 document.getElementById('storageLimitValue').textContent = e.target.value + ' GB';
             });
-            
+
             // Dataset controls
             document.getElementById('createDataset').addEventListener('click', createDataset);
             document.getElementById('annotationTool').addEventListener('click', openAnnotationTool);
             document.getElementById('augmentData').addEventListener('click', augmentData);
             document.getElementById('validateDataset').addEventListener('click', validateDataset);
             document.getElementById('exportDataset').addEventListener('click', exportDataset);
-            
+
             // Training controls
             document.getElementById('startTraining').addEventListener('click', startTraining);
-            
+
             // Cheat controls
             document.getElementById('cheatAction').addEventListener('change', (e) => {
                 const configDiv = document.getElementById('cheatActionConfig');
@@ -1517,7 +1517,7 @@
             document.getElementById('generateCheat').addEventListener('click', generateCheat);
             document.getElementById('testCheat').addEventListener('click', testCheat);
             document.getElementById('saveCheat').addEventListener('click', saveCheat);
-            
+
             // Tutorial controls
             document.getElementById('tutorialBtn').addEventListener('click', startTutorial);
             document.getElementById('tutorialNext').addEventListener('click', nextTutorialStep);
@@ -1535,18 +1535,18 @@
                 webcamStream = await navigator.mediaDevices.getUserMedia({
                     video: { width: 640, height: 480 }
                 });
-                
+
                 const video = document.getElementById('webcamVideo');
                 video.srcObject = webcamStream;
                 video.style.display = 'block';
-                
+
                 const canvas = document.getElementById('webcamCanvas');
                 canvas.width = 640;
                 canvas.height = 480;
-                
+
                 showNotification('Webcam démarrée avec succès!', 'success');
                 awardXP(25, 'Webcam activée');
-                
+
             } catch (error) {
                 console.error('Error accessing webcam:', error);
                 showNotification('Erreur d\'accès à la webcam', 'error');
@@ -1558,18 +1558,18 @@
                 screenStream = await navigator.mediaDevices.getDisplayMedia({
                     video: { mediaSource: 'screen' }
                 });
-                
+
                 const video = document.getElementById('screenVideo');
                 video.srcObject = screenStream;
                 video.style.display = 'block';
-                
+
                 const canvas = document.getElementById('screenCanvas');
                 canvas.width = 640;
                 canvas.height = 480;
-                
+
                 showNotification('Capture d\'écran démarrée!', 'success');
                 awardXP(25, 'Capture d\'écran activée');
-                
+
             } catch (error) {
                 console.error('Error accessing screen capture:', error);
                 showNotification('Erreur de capture d\'écran', 'error');
@@ -1584,11 +1584,11 @@
                     const img = document.getElementById('uploadedImage');
                     img.src = e.target.result;
                     img.style.display = 'block';
-                    
+
                     const canvas = document.getElementById('imageCanvas');
                     canvas.width = img.width;
                     canvas.height = img.height;
-                    
+
                     showNotification('Image uploadée avec succès!', 'success');
                     awardXP(10, 'Image uploadée');
                 };
@@ -1599,44 +1599,44 @@
         // Detection functions
         async function toggleDetection() {
             const button = document.getElementById('startDetection');
-            
+
             if (!isDetecting) {
                 if (!detectionModel) {
                     showNotification('Modèle de détection non chargé', 'error');
                     return;
                 }
-                
+
                 isDetecting = true;
                 button.innerHTML = '<i class="fas fa-stop mr-2"></i>Arrêter Détection';
                 button.classList.add('bg-red-600');
-                
+
                 startDetectionLoop();
                 showNotification('Détection démarrée!', 'success');
                 awardXP(50, 'Détection démarrée');
-                
+
             } else {
                 isDetecting = false;
                 button.innerHTML = '<i class="fas fa-play mr-2"></i>Démarrer Détection';
                 button.classList.remove('bg-red-600');
-                
+
                 if (animationId) {
                     cancelAnimationFrame(animationId);
                 }
-                
+
                 showNotification('Détection arrêtée', 'info');
             }
         }
 
         function startDetectionLoop() {
             if (!isDetecting) return;
-            
+
             const webcamVideo = document.getElementById('webcamVideo');
             const screenVideo = document.getElementById('screenVideo');
             const uploadedImage = document.getElementById('uploadedImage');
-            
+
             let targetElement = null;
             let targetCanvas = null;
-            
+
             // Determine which source to use
             if (webcamVideo.style.display === 'block' && webcamVideo.videoWidth > 0) {
                 targetElement = webcamVideo;
@@ -1648,45 +1648,45 @@
                 targetElement = uploadedImage;
                 targetCanvas = document.getElementById('imageCanvas');
             }
-            
+
             if (targetElement && targetCanvas) {
                 detectObjects(targetElement, targetCanvas);
             }
-            
+
             animationId = requestAnimationFrame(startDetectionLoop);
         }
 
         async function detectObjects(sourceElement, canvas) {
             try {
                 const predictions = await detectionModel.detect(sourceElement);
-                
+
                 // Clear previous detections
                 const ctx = canvas.getContext('2d');
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
+
                 // Get confidence threshold
                 const confidenceThreshold = parseFloat(document.getElementById('confidenceThreshold').value);
-                
+
                 // Get enabled classes
                 const enabledClasses = Array.from(document.querySelectorAll('.class-filter:checked')).map(cb => cb.dataset.class);
-                
+
                 // Filter predictions
-                const filteredPredictions = predictions.filter(prediction => 
+                const filteredPredictions = predictions.filter(prediction =>
                     prediction.score >= confidenceThreshold &&
                     enabledClasses.includes(prediction.class)
                 );
-                
+
                 // Draw detections
                 filteredPredictions.forEach(prediction => {
                     drawDetection(ctx, prediction, canvas);
                 });
-                
+
                 // Update stats
                 updateDetectionStats(filteredPredictions);
-                
+
                 // Update total detections
                 totalDetections += filteredPredictions.length;
-                
+
                 // Update daily challenge
                 const dailyDetectionChallenge = dailyChallenges.find(c => c.id === 'daily_detection');
                 if (dailyDetectionChallenge) {
@@ -1696,10 +1696,10 @@
                         dailyDetectionChallenge.progress = dailyDetectionChallenge.target;
                     }
                 }
-                
+
                 // Check achievements
                 checkAchievements();
-                
+
             } catch (error) {
                 console.error('Error during detection:', error);
             }
@@ -1707,7 +1707,7 @@
 
         function drawDetection(ctx, prediction, canvas) {
             const [x, y, width, height] = prediction.bbox;
-            
+
             // Colors for different classes
             const colors = {
                 'person': '#ff0000',
@@ -1717,36 +1717,36 @@
                 'cat': '#ff00ff',
                 'default': '#ffffff'
             };
-            
+
             const color = colors[prediction.class] || colors.default;
-            
+
             // Draw bounding box
             ctx.strokeStyle = color;
             ctx.lineWidth = 2;
             ctx.strokeRect(x, y, width, height);
-            
+
             // Draw label
             ctx.fillStyle = color;
             ctx.font = '12px Arial';
             const label = `${prediction.class} (${Math.round(prediction.score * 100)}%)`;
             const textWidth = ctx.measureText(label).width;
-            
+
             ctx.fillRect(x, y - 20, textWidth + 10, 20);
             ctx.fillStyle = '#000000';
             ctx.fillText(label, x + 5, y - 5);
-            
+
             // Log detection
             logDetection(prediction);
         }
 
         function updateDetectionStats(predictions) {
             document.getElementById('totalDetections').textContent = totalDetections;
-            
+
             if (predictions.length > 0) {
                 const avgConfidence = predictions.reduce((sum, p) => sum + p.score, 0) / predictions.length;
                 document.getElementById('avgConfidence').textContent = Math.round(avgConfidence * 100) + '%';
             }
-            
+
             // Update FPS (simplified)
             document.getElementById('detectionFPS').textContent = '30';
         }
@@ -1757,10 +1757,10 @@
             const entry = document.createElement('div');
             entry.className = 'text-xs text-gray-400';
             entry.textContent = `[${timestamp}] Détecté: ${prediction.class} (${Math.round(prediction.score * 100)}%)`;
-            
+
             log.appendChild(entry);
             log.scrollTop = log.scrollHeight;
-            
+
             // Keep only last 50 entries
             while (log.children.length > 50) {
                 log.removeChild(log.firstChild);
@@ -1771,7 +1771,7 @@
         function updatePerformanceMode() {
             const mode = document.getElementById('performanceMode').value;
             showNotification(`Mode ${mode} activé`, 'info');
-            
+
             // Simulate performance adjustment
             switch(mode) {
                 case 'performance':
@@ -1821,12 +1821,12 @@
             const name = document.getElementById('datasetName').value;
             const description = document.getElementById('datasetDescription').value;
             const categories = document.getElementById('datasetCategories').value;
-            
+
             if (!name || !description || !categories) {
                 showNotification('Veuillez remplir tous les champs', 'error');
                 return;
             }
-            
+
             const newDataset = {
                 name: name,
                 description: description,
@@ -1836,15 +1836,15 @@
                 status: 'created',
                 type: 'custom'
             };
-            
+
             datasets.push(newDataset);
             updateDatasetDisplay();
-            
+
             // Clear form
             document.getElementById('datasetName').value = '';
             document.getElementById('datasetDescription').value = '';
             document.getElementById('datasetCategories').value = '';
-            
+
             showNotification('Dataset créé avec succès!', 'success');
             awardXP(100, 'Dataset créé');
             checkAchievements();
@@ -1852,7 +1852,7 @@
 
         function downloadDataset(name) {
             showNotification(`Téléchargement de ${name} démarré...`, 'info');
-            
+
             // Simulate download progress
             let progress = 0;
             const interval = setInterval(() => {
@@ -1901,51 +1901,51 @@
                 showNotification('Un entraînement est déjà en cours', 'error');
                 return;
             }
-            
+
             const baseModel = document.getElementById('baseModel').value;
             const dataset = document.getElementById('trainingDataset').value;
             const learningRate = document.getElementById('learningRate').value;
             const epochs = parseInt(document.getElementById('epochs').value);
             const batchSize = parseInt(document.getElementById('batchSize').value);
-            
+
             if (!dataset) {
                 showNotification('Veuillez sélectionner un dataset', 'error');
                 return;
             }
-            
+
             isTraining = true;
             document.getElementById('startTraining').innerHTML = '<i class="fas fa-stop mr-2"></i>Arrêter Entraînement';
-            
+
             showNotification('Entraînement démarré!', 'success');
             awardXP(200, 'Entraînement démarré');
-            
+
             // Simulate training progress
             let currentEpoch = 0;
             const trainingInterval = setInterval(() => {
                 currentEpoch++;
                 const progress = (currentEpoch / epochs) * 100;
-                
+
                 // Update progress bars
                 document.getElementById('overallProgress').textContent = Math.round(progress) + '%';
                 document.getElementById('overallProgressBar').style.width = progress + '%';
                 document.getElementById('currentEpoch').textContent = `${currentEpoch}/${epochs}`;
-                
+
                 // Simulate metrics
                 const loss = Math.max(0.1, 2.0 - (currentEpoch / epochs) * 1.5);
                 const accuracy = Math.min(0.95, 0.5 + (currentEpoch / epochs) * 0.4);
-                
+
                 document.getElementById('trainingLoss').textContent = loss.toFixed(3);
                 document.getElementById('trainingAccuracy').textContent = (accuracy * 100).toFixed(2) + '%';
                 document.getElementById('validationLoss').textContent = (loss + 0.1).toFixed(3);
                 document.getElementById('validationAccuracy').textContent = ((accuracy - 0.05) * 100).toFixed(2) + '%';
-                
+
                 if (currentEpoch >= epochs) {
                     clearInterval(trainingInterval);
                     isTraining = false;
                     document.getElementById('startTraining').innerHTML = '<i class="fas fa-play mr-2"></i>Démarrer Entraînement';
                     showNotification('Entraînement terminé!', 'success');
                     awardXP(500, 'Entraînement terminé');
-                    
+
                     // Add to training history
                     trainingHistory.push({
                         date: new Date(),
@@ -1955,7 +1955,7 @@
                         finalAccuracy: accuracy,
                         finalLoss: loss
                     });
-                    
+
                     checkAchievements();
                 }
             }, 1000);
@@ -1969,18 +1969,18 @@
             const action = document.getElementById('cheatAction').value;
             const actionValue = document.getElementById('cheatActionValue').value;
             const delay = document.getElementById('cheatDelay').value;
-            
+
             if (!name) {
                 showNotification('Veuillez entrer un nom pour le cheat', 'error');
                 return;
             }
-            
+
             const cheatCode = generateCheatCode(name, target, confidence, action, actionValue, delay);
             document.getElementById('cheatCode').value = cheatCode;
-            
+
             showNotification('Cheat généré avec succès!', 'success');
             awardXP(100, 'Cheat généré');
-            
+
             // Add to output log
             const output = document.getElementById('cheatOutput');
             output.innerHTML += `<br>[${new Date().toLocaleTimeString()}] Cheat "${name}" généré`;
@@ -2001,37 +2001,37 @@ class ${name.replace(/\s+/g, '')}Cheat {
         this.delay = ${delay};
         this.isActive = false;
     }
-    
+
     async detectAndAct(videoElement) {
         if (!this.isActive) return;
-        
+
         try {
             // Détection d'objets
             const predictions = await detectionModel.detect(videoElement);
-            
+
             // Filtrer les prédictions
-            const targets = predictions.filter(pred => 
-                pred.class === this.target && 
+            const targets = predictions.filter(pred =>
+                pred.class === this.target &&
                 pred.score >= this.confidence
             );
-            
+
             // Exécuter l'action pour chaque cible
             targets.forEach(target => {
                 setTimeout(() => {
                     this.executeAction(target);
                 }, this.delay);
             });
-            
+
         } catch (error) {
             console.error('Erreur dans le cheat:', error);
         }
     }
-    
+
     executeAction(target) {
         const [x, y, width, height] = target.bbox;
         const centerX = x + width / 2;
         const centerY = y + height / 2;
-        
+
         switch(this.action) {
             case 'click':
                 this.simulateClick(centerX, centerY);
@@ -2047,32 +2047,32 @@ class ${name.replace(/\s+/g, '')}Cheat {
                 break;
         }
     }
-    
+
     simulateClick(x, y) {
         console.log(\`Clic simulé à (\${x}, \${y})\`);
         // Note: Les clics réels nécessitent des extensions navigateur
     }
-    
+
     simulateKeyPress(key) {
         console.log(\`Touche simulée: \${key}\`);
         // Simulation de frappe clavier
     }
-    
+
     simulateMouseMove(x, y) {
         console.log(\`Mouvement souris vers (\${x}, \${y})\`);
         // Simulation de mouvement souris
     }
-    
+
     executeCustomAction(target) {
         console.log('Action personnalisée exécutée:', target);
         // Code personnalisé ici
     }
-    
+
     activate() {
         this.isActive = true;
         console.log('Cheat ${name} activé');
     }
-    
+
     deactivate() {
         this.isActive = false;
         console.log('Cheat ${name} désactivé');
@@ -2099,7 +2099,7 @@ setInterval(() => {
                 showNotification('Aucun code à tester', 'error');
                 return;
             }
-            
+
             try {
                 // Simulate cheat testing
                 const output = document.getElementById('cheatOutput');
@@ -2109,10 +2109,10 @@ setInterval(() => {
                 output.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ✓ Actions configurées`;
                 output.innerHTML += `<br>[${new Date().toLocaleTimeString()}] Test terminé avec succès`;
                 output.scrollTop = output.scrollHeight;
-                
+
                 showNotification('Test du cheat réussi!', 'success');
                 awardXP(50, 'Cheat testé');
-                
+
             } catch (error) {
                 showNotification('Erreur dans le code du cheat', 'error');
             }
@@ -2121,12 +2121,12 @@ setInterval(() => {
         function saveCheat() {
             const name = document.getElementById('cheatName').value;
             const code = document.getElementById('cheatCode').value;
-            
+
             if (!name || !code) {
                 showNotification('Nom et code requis pour sauvegarder', 'error');
                 return;
             }
-            
+
             const newCheat = {
                 name: name,
                 description: `Cheat personnalisé: ${name}`,
@@ -2135,10 +2135,10 @@ setInterval(() => {
                 confidence: parseFloat(document.getElementById('cheatConfidence').value),
                 code: code
             };
-            
+
             cheats.push(newCheat);
             updateCheatLibrary();
-            
+
             showNotification('Cheat sauvegardé!', 'success');
             awardXP(75, 'Cheat sauvegardé');
             checkAchievements();
@@ -2153,7 +2153,7 @@ setInterval(() => {
                 document.getElementById('cheatConfidence').value = cheat.confidence;
                 document.getElementById('cheatConfidenceValue').textContent = cheat.confidence;
                 document.getElementById('cheatCode').value = cheat.code;
-                
+
                 showNotification(`Cheat "${cheat.name}" chargé`, 'success');
             }
         }
@@ -2165,7 +2165,7 @@ setInterval(() => {
                 output.innerHTML += `<br>[${new Date().toLocaleTimeString()}] Test du cheat "${cheat.name}"...`;
                 output.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ✓ Cheat activé`;
                 output.scrollTop = output.scrollHeight;
-                
+
                 showNotification(`Test du cheat "${cheat.name}" démarré`, 'success');
             }
         }
@@ -2173,7 +2173,7 @@ setInterval(() => {
         // Gamification functions
         function awardXP(amount, reason) {
             userXP += amount;
-            
+
             // Check for level up
             while (userXP >= nextLevelXP) {
                 userXP -= nextLevelXP;
@@ -2181,15 +2181,15 @@ setInterval(() => {
                 nextLevelXP = userLevel * 100;
                 showNotification(`🎉 Niveau ${userLevel} atteint!`, 'success');
             }
-            
+
             // Update display
             document.getElementById('userLevel').textContent = userLevel;
             document.getElementById('userXP').textContent = userXP;
             document.getElementById('nextLevelXP').textContent = nextLevelXP;
-            
+
             const xpPercentage = (userXP / nextLevelXP) * 100;
             document.getElementById('xpBar').style.width = xpPercentage + '%';
-            
+
             // Show XP notification
             if (reason) {
                 const output = document.getElementById('cheatOutput');
@@ -2207,15 +2207,15 @@ setInterval(() => {
         function showTutorialStep() {
             const step = tutorialSteps[currentTutorialStep];
             if (!step) return;
-            
+
             const overlay = document.getElementById('tutorialOverlay');
             const content = document.getElementById('tutorialContent');
             const title = document.getElementById('tutorialTitle');
             const text = document.getElementById('tutorialText');
-            
+
             title.textContent = step.title;
             text.textContent = step.text;
-            
+
             // Position tutorial content near target element
             const targetElement = document.getElementById(step.target);
             if (targetElement) {
@@ -2223,9 +2223,9 @@ setInterval(() => {
                 content.style.left = Math.min(rect.left, window.innerWidth - 420) + 'px';
                 content.style.top = Math.max(rect.bottom + 10, 100) + 'px';
             }
-            
+
             overlay.style.display = 'block';
-            
+
             // Update navigation buttons
             document.getElementById('tutorialPrev').style.display = currentTutorialStep > 0 ? 'block' : 'none';
             document.getElementById('tutorialNext').textContent = currentTutorialStep === tutorialSteps.length - 1 ? 'Terminer' : 'Suivant';
@@ -2256,7 +2256,7 @@ setInterval(() => {
             notification.textContent = message;
             notification.className = `notification ${type}`;
             notification.classList.add('show');
-            
+
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
@@ -2272,16 +2272,16 @@ setInterval(() => {
                 nextLevelXP = data.nextLevelXP || 100;
                 totalDetections = data.totalDetections || 0;
                 achievements = data.achievements || achievements;
-                
+
                 // Update displays
                 document.getElementById('userLevel').textContent = userLevel;
                 document.getElementById('userXP').textContent = userXP;
                 document.getElementById('nextLevelXP').textContent = nextLevelXP;
                 document.getElementById('totalDetections').textContent = totalDetections;
-                
+
                 const xpPercentage = (userXP / nextLevelXP) * 100;
                 document.getElementById('xpBar').style.width = xpPercentage + '%';
-                
+
                 updateGamificationDisplay();
             }
         }
@@ -2294,7 +2294,7 @@ setInterval(() => {
                 totalDetections: totalDetections,
                 achievements: achievements
             };
-            
+
             localStorage.setItem('gameVisionUserData', JSON.stringify(userData));
         }
 

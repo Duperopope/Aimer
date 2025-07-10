@@ -17,6 +17,7 @@ from pathlib import Path
 
 from .logger import Logger
 
+
 class GamificationSystem:
     """Système de gamification complet"""
 
@@ -32,7 +33,8 @@ class GamificationSystem:
             cursor = conn.cursor()
 
             # Table des utilisateurs
-            cursor.execute('''
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS users (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     username TEXT UNIQUE NOT NULL,
@@ -43,10 +45,12 @@ class GamificationSystem:
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     last_login DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
-            ''')
+            """
+            )
 
             # Table des badges
-            cursor.execute('''
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS badges (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT UNIQUE NOT NULL,
@@ -59,10 +63,12 @@ class GamificationSystem:
                     xp_reward INTEGER DEFAULT 0,
                     coin_reward INTEGER DEFAULT 0
                 )
-            ''')
+            """
+            )
 
             # Table des badges utilisateurs
-            cursor.execute('''
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS user_badges (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_id INTEGER,
@@ -71,10 +77,12 @@ class GamificationSystem:
                     FOREIGN KEY (user_id) REFERENCES users (id),
                     FOREIGN KEY (badge_id) REFERENCES badges (id)
                 )
-            ''')
+            """
+            )
 
             # Table des activités
-            cursor.execute('''
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS activities (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_id INTEGER,
@@ -85,10 +93,12 @@ class GamificationSystem:
                     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (user_id) REFERENCES users (id)
                 )
-            ''')
+            """
+            )
 
             # Table des défis
-            cursor.execute('''
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS challenges (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
@@ -101,10 +111,12 @@ class GamificationSystem:
                     end_date DATETIME,
                     is_active BOOLEAN DEFAULT 1
                 )
-            ''')
+            """
+            )
 
             # Table des défis utilisateurs
-            cursor.execute('''
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS user_challenges (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_id INTEGER,
@@ -115,10 +127,12 @@ class GamificationSystem:
                     FOREIGN KEY (user_id) REFERENCES users (id),
                     FOREIGN KEY (challenge_id) REFERENCES challenges (id)
                 )
-            ''')
+            """
+            )
 
             # Table des statistiques
-            cursor.execute('''
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS user_stats (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_id INTEGER,
@@ -131,7 +145,8 @@ class GamificationSystem:
                     total_time_spent INTEGER DEFAULT 0,
                     FOREIGN KEY (user_id) REFERENCES users (id)
                 )
-            ''')
+            """
+            )
 
             conn.commit()
             conn.close()
@@ -150,136 +165,131 @@ class GamificationSystem:
         default_badges = [
             # Badges de débutant
             {
-                'name': 'Premier Pas',
-                'description': 'Première détection d\'objet réalisée',
-                'icon': '👶',
-                'category': 'beginners',
-                'rarity': 'common',
-                'requirement_type': 'detections',
-                'requirement_value': 1,
-                'xp_reward': 10,
-                'coin_reward': 5
+                "name": "Premier Pas",
+                "description": "Première détection d'objet réalisée",
+                "icon": "👶",
+                "category": "beginners",
+                "rarity": "common",
+                "requirement_type": "detections",
+                "requirement_value": 1,
+                "xp_reward": 10,
+                "coin_reward": 5,
             },
             {
-                'name': 'Explorateur',
-                'description': '10 détections réalisées avec succès',
-                'icon': '🔍',
-                'category': 'beginners',
-                'rarity': 'common',
-                'requirement_type': 'detections',
-                'requirement_value': 10,
-                'xp_reward': 50,
-                'coin_reward': 25
+                "name": "Explorateur",
+                "description": "10 détections réalisées avec succès",
+                "icon": "🔍",
+                "category": "beginners",
+                "rarity": "common",
+                "requirement_type": "detections",
+                "requirement_value": 10,
+                "xp_reward": 50,
+                "coin_reward": 25,
             },
-
             # Badges de progression
             {
-                'name': 'Détecteur Expérimenté',
-                'description': '100 détections réalisées',
-                'icon': '🎯',
-                'category': 'progression',
-                'rarity': 'uncommon',
-                'requirement_type': 'detections',
-                'requirement_value': 100,
-                'xp_reward': 200,
-                'coin_reward': 100
+                "name": "Détecteur Expérimenté",
+                "description": "100 détections réalisées",
+                "icon": "🎯",
+                "category": "progression",
+                "rarity": "uncommon",
+                "requirement_type": "detections",
+                "requirement_value": 100,
+                "xp_reward": 200,
+                "coin_reward": 100,
             },
             {
-                'name': 'Maître Détecteur',
-                'description': '1000 détections réalisées',
-                'icon': '🏆',
-                'category': 'progression',
-                'rarity': 'rare',
-                'requirement_type': 'detections',
-                'requirement_value': 1000,
-                'xp_reward': 500,
-                'coin_reward': 250
+                "name": "Maître Détecteur",
+                "description": "1000 détections réalisées",
+                "icon": "🏆",
+                "category": "progression",
+                "rarity": "rare",
+                "requirement_type": "detections",
+                "requirement_value": 1000,
+                "xp_reward": 500,
+                "coin_reward": 250,
             },
-
             # Badges de formation
             {
-                'name': 'Formateur IA',
-                'description': 'Premier modèle entraîné avec succès',
-                'icon': '🧠',
-                'category': 'training',
-                'rarity': 'uncommon',
-                'requirement_type': 'models_trained',
-                'requirement_value': 1,
-                'xp_reward': 100,
-                'coin_reward': 50
+                "name": "Formateur IA",
+                "description": "Premier modèle entraîné avec succès",
+                "icon": "🧠",
+                "category": "training",
+                "rarity": "uncommon",
+                "requirement_type": "models_trained",
+                "requirement_value": 1,
+                "xp_reward": 100,
+                "coin_reward": 50,
             },
             {
-                'name': 'Maître Formateur',
-                'description': '10 modèles entraînés',
-                'icon': '🎓',
-                'category': 'training',
-                'rarity': 'rare',
-                'requirement_type': 'models_trained',
-                'requirement_value': 10,
-                'xp_reward': 300,
-                'coin_reward': 150
+                "name": "Maître Formateur",
+                "description": "10 modèles entraînés",
+                "icon": "🎓",
+                "category": "training",
+                "rarity": "rare",
+                "requirement_type": "models_trained",
+                "requirement_value": 10,
+                "xp_reward": 300,
+                "coin_reward": 150,
             },
-
             # Badges de précision
             {
-                'name': 'Œil de Lynx',
-                'description': 'Détection avec 95% de précision',
-                'icon': '👁️',
-                'category': 'precision',
-                'rarity': 'rare',
-                'requirement_type': 'accuracy',
-                'requirement_value': 95,
-                'xp_reward': 200,
-                'coin_reward': 100
+                "name": "Œil de Lynx",
+                "description": "Détection avec 95% de précision",
+                "icon": "👁️",
+                "category": "precision",
+                "rarity": "rare",
+                "requirement_type": "accuracy",
+                "requirement_value": 95,
+                "xp_reward": 200,
+                "coin_reward": 100,
             },
             {
-                'name': 'Perfection Absolue',
-                'description': 'Détection avec 99% de précision',
-                'icon': '⭐',
-                'category': 'precision',
-                'rarity': 'epic',
-                'requirement_type': 'accuracy',
-                'requirement_value': 99,
-                'xp_reward': 500,
-                'coin_reward': 300
+                "name": "Perfection Absolue",
+                "description": "Détection avec 99% de précision",
+                "icon": "⭐",
+                "category": "precision",
+                "rarity": "epic",
+                "requirement_type": "accuracy",
+                "requirement_value": 99,
+                "xp_reward": 500,
+                "coin_reward": 300,
             },
-
             # Badges de vitesse
             {
-                'name': 'Éclair',
-                'description': 'Détection en moins de 100ms',
-                'icon': '⚡',
-                'category': 'speed',
-                'rarity': 'uncommon',
-                'requirement_type': 'speed',
-                'requirement_value': 100,
-                'xp_reward': 150,
-                'coin_reward': 75
+                "name": "Éclair",
+                "description": "Détection en moins de 100ms",
+                "icon": "⚡",
+                "category": "speed",
+                "rarity": "uncommon",
+                "requirement_type": "speed",
+                "requirement_value": 100,
+                "xp_reward": 150,
+                "coin_reward": 75,
             },
-
             # Badges spéciaux
             {
-                'name': 'Créateur de Données',
-                'description': 'Premier dataset personnalisé créé',
-                'icon': '🎨',
-                'category': 'creation',
-                'rarity': 'uncommon',
-                'requirement_type': 'datasets_created',
-                'requirement_value': 1,
-                'xp_reward': 100,
-                'coin_reward': 50
+                "name": "Créateur de Données",
+                "description": "Premier dataset personnalisé créé",
+                "icon": "🎨",
+                "category": "creation",
+                "rarity": "uncommon",
+                "requirement_type": "datasets_created",
+                "requirement_value": 1,
+                "xp_reward": 100,
+                "coin_reward": 50,
             },
             {
-                'name': 'Hackeur Éthique',
-                'description': 'Premier cheat de computer vision créé',
-                'icon': '💻',
-                'category': 'gaming',
-                'rarity': 'rare',
-                'requirement_type': 'cheats_created',
-                'requirement_value': 1,
-                'xp_reward': 200,
-                'coin_reward': 100
-            }
+                "name": "Hackeur Éthique",
+                "description": "Premier cheat de computer vision créé",
+                "icon": "💻",
+                "category": "gaming",
+                "rarity": "rare",
+                "requirement_type": "cheats_created",
+                "requirement_value": 1,
+                "xp_reward": 200,
+                "coin_reward": 100,
+            },
         ]
 
         try:
@@ -287,15 +297,24 @@ class GamificationSystem:
             cursor = conn.cursor()
 
             for badge in default_badges:
-                cursor.execute('''
+                cursor.execute(
+                    """
                     INSERT OR IGNORE INTO badges
                     (name, description, icon, category, rarity, requirement_type, requirement_value, xp_reward, coin_reward)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (
-                    badge['name'], badge['description'], badge['icon'], badge['category'],
-                    badge['rarity'], badge['requirement_type'], badge['requirement_value'],
-                    badge['xp_reward'], badge['coin_reward']
-                ))
+                """,
+                    (
+                        badge["name"],
+                        badge["description"],
+                        badge["icon"],
+                        badge["category"],
+                        badge["rarity"],
+                        badge["requirement_type"],
+                        badge["requirement_value"],
+                        badge["xp_reward"],
+                        badge["coin_reward"],
+                    ),
+                )
 
             conn.commit()
             conn.close()
@@ -307,29 +326,29 @@ class GamificationSystem:
         """Initialise les défis quotidiens"""
         daily_challenges = [
             {
-                'name': 'Détecteur Quotidien',
-                'description': 'Réalise 20 détections aujourd\'hui',
-                'type': 'daily',
-                'target_value': 20,
-                'xp_reward': 100,
-                'coin_reward': 50
+                "name": "Détecteur Quotidien",
+                "description": "Réalise 20 détections aujourd'hui",
+                "type": "daily",
+                "target_value": 20,
+                "xp_reward": 100,
+                "coin_reward": 50,
             },
             {
-                'name': 'Précision Parfaite',
-                'description': 'Atteins 90% de précision sur 10 détections',
-                'type': 'daily',
-                'target_value': 90,
-                'xp_reward': 150,
-                'coin_reward': 75
+                "name": "Précision Parfaite",
+                "description": "Atteins 90% de précision sur 10 détections",
+                "type": "daily",
+                "target_value": 90,
+                "xp_reward": 150,
+                "coin_reward": 75,
             },
             {
-                'name': 'Marathon IA',
-                'description': 'Utilise l\'application pendant 30 minutes',
-                'type': 'daily',
-                'target_value': 30,
-                'xp_reward': 80,
-                'coin_reward': 40
-            }
+                "name": "Marathon IA",
+                "description": "Utilise l'application pendant 30 minutes",
+                "type": "daily",
+                "target_value": 30,
+                "xp_reward": 80,
+                "coin_reward": 40,
+            },
         ]
 
         try:
@@ -340,15 +359,23 @@ class GamificationSystem:
             tomorrow = today + timedelta(days=1)
 
             for challenge in daily_challenges:
-                cursor.execute('''
+                cursor.execute(
+                    """
                     INSERT OR IGNORE INTO challenges
                     (name, description, type, target_value, xp_reward, coin_reward, start_date, end_date)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (
-                    challenge['name'], challenge['description'], challenge['type'],
-                    challenge['target_value'], challenge['xp_reward'], challenge['coin_reward'],
-                    today, tomorrow
-                ))
+                """,
+                    (
+                        challenge["name"],
+                        challenge["description"],
+                        challenge["type"],
+                        challenge["target_value"],
+                        challenge["xp_reward"],
+                        challenge["coin_reward"],
+                        today,
+                        tomorrow,
+                    ),
+                )
 
             conn.commit()
             conn.close()
@@ -362,22 +389,31 @@ class GamificationSystem:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
 
-            cursor.execute('''
+            cursor.execute(
+                """
                 INSERT INTO users (username) VALUES (?)
-            ''', (username,))
+            """,
+                (username,),
+            )
 
             user_id = cursor.lastrowid
 
             # Initialiser les statistiques
-            cursor.execute('''
+            cursor.execute(
+                """
                 INSERT INTO user_stats (user_id) VALUES (?)
-            ''', (user_id,))
+            """,
+                (user_id,),
+            )
 
             # Initialiser les défis actifs pour l'utilisateur
-            cursor.execute('''
+            cursor.execute(
+                """
                 INSERT INTO user_challenges (user_id, challenge_id, progress)
                 SELECT ?, id, 0 FROM challenges WHERE is_active = 1
-            ''', (user_id,))
+            """,
+                (user_id,),
+            )
 
             conn.commit()
             conn.close()
@@ -398,7 +434,7 @@ class GamificationSystem:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
 
-            cursor.execute('SELECT id FROM users WHERE username = ?', (username,))
+            cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
             result = cursor.fetchone()
 
             conn.close()
@@ -416,7 +452,9 @@ class GamificationSystem:
             user_id = self.create_user(username)
         return user_id
 
-    def add_xp(self, user_id: int, amount: int, activity_type: str, description: str = "") -> bool:
+    def add_xp(
+        self, user_id: int, amount: int, activity_type: str, description: str = ""
+    ) -> bool:
         """Ajoute de l'XP à un utilisateur"""
         try:
             conn = sqlite3.connect(self.db_path)
@@ -426,7 +464,9 @@ class GamificationSystem:
             coins_gained = int(amount * 0.1)
 
             # Récupérer les données actuelles
-            cursor.execute('SELECT level, xp, total_xp FROM users WHERE id = ?', (user_id,))
+            cursor.execute(
+                "SELECT level, xp, total_xp FROM users WHERE id = ?", (user_id,)
+            )
             current_level, current_xp, total_xp = cursor.fetchone()
 
             # Calculer le nouveau total XP
@@ -445,17 +485,23 @@ class GamificationSystem:
                 coins_gained += level_bonus
 
             # Mettre à jour l'utilisateur
-            cursor.execute('''
+            cursor.execute(
+                """
                 UPDATE users
                 SET level = ?, xp = ?, total_xp = ?, coins = coins + ?
                 WHERE id = ?
-            ''', (new_level, new_current_xp, new_total_xp, coins_gained, user_id))
+            """,
+                (new_level, new_current_xp, new_total_xp, coins_gained, user_id),
+            )
 
             # Enregistrer l'activité
-            cursor.execute('''
+            cursor.execute(
+                """
                 INSERT INTO activities (user_id, activity_type, description, xp_gained, coins_gained)
                 VALUES (?, ?, ?, ?, ?)
-            ''', (user_id, activity_type, description, amount, coins_gained))
+            """,
+                (user_id, activity_type, description, amount, coins_gained),
+            )
 
             conn.commit()
             conn.close()
@@ -492,7 +538,7 @@ class GamificationSystem:
             stats = self.get_user_stats(user_id)
 
             # Vérifier tous les badges
-            cursor.execute('SELECT * FROM badges')
+            cursor.execute("SELECT * FROM badges")
             badges = cursor.fetchall()
 
             for badge in badges:
@@ -501,10 +547,13 @@ class GamificationSystem:
                 requirement_value = badge[6]
 
                 # Vérifier si l'utilisateur a déjà ce badge
-                cursor.execute('''
+                cursor.execute(
+                    """
                     SELECT COUNT(*) FROM user_badges
                     WHERE user_id = ? AND badge_id = ?
-                ''', (user_id, badge_id))
+                """,
+                    (user_id, badge_id),
+                )
 
                 if cursor.fetchone()[0] > 0:
                     continue  # Badge déjà obtenu
@@ -512,42 +561,78 @@ class GamificationSystem:
                 # Vérifier les conditions
                 earned = False
 
-                if requirement_type == 'detections' and stats['detections_count'] >= requirement_value:
+                if (
+                    requirement_type == "detections"
+                    and stats["detections_count"] >= requirement_value
+                ):
                     earned = True
-                elif requirement_type == 'models_trained' and stats['models_trained'] >= requirement_value:
+                elif (
+                    requirement_type == "models_trained"
+                    and stats["models_trained"] >= requirement_value
+                ):
                     earned = True
-                elif requirement_type == 'accuracy' and stats['best_accuracy'] >= requirement_value:
+                elif (
+                    requirement_type == "accuracy"
+                    and stats["best_accuracy"] >= requirement_value
+                ):
                     earned = True
-                elif requirement_type == 'speed' and stats['best_speed'] <= requirement_value and stats['best_speed'] > 0:
+                elif (
+                    requirement_type == "speed"
+                    and stats["best_speed"] <= requirement_value
+                    and stats["best_speed"] > 0
+                ):
                     earned = True
-                elif requirement_type == 'datasets_created' and stats['datasets_created'] >= requirement_value:
+                elif (
+                    requirement_type == "datasets_created"
+                    and stats["datasets_created"] >= requirement_value
+                ):
                     earned = True
-                elif requirement_type == 'cheats_created' and stats['cheats_created'] >= requirement_value:
+                elif (
+                    requirement_type == "cheats_created"
+                    and stats["cheats_created"] >= requirement_value
+                ):
                     earned = True
 
                 if earned:
                     # Attribuer le badge
-                    cursor.execute('''
+                    cursor.execute(
+                        """
                         INSERT INTO user_badges (user_id, badge_id)
                         VALUES (?, ?)
-                    ''', (user_id, badge_id))
+                    """,
+                        (user_id, badge_id),
+                    )
 
                     # Donner les récompenses
                     xp_reward = badge[7]
                     coin_reward = badge[8]
 
-                    cursor.execute('''
+                    cursor.execute(
+                        """
                         UPDATE users
                         SET xp = xp + ?, total_xp = total_xp + ?, coins = coins + ?
                         WHERE id = ?
-                    ''', (xp_reward, xp_reward, coin_reward, user_id))
+                    """,
+                        (xp_reward, xp_reward, coin_reward, user_id),
+                    )
 
-                    cursor.execute('''
+                    cursor.execute(
+                        """
                         INSERT INTO activities (user_id, activity_type, description, xp_gained, coins_gained)
                         VALUES (?, ?, ?, ?, ?)
-                    ''', (user_id, 'badge_earned', f'Badge "{badge[1]}" obtenu!', xp_reward, coin_reward))
+                    """,
+                        (
+                            user_id,
+                            "badge_earned",
+                            f'Badge "{badge[1]}" obtenu!',
+                            xp_reward,
+                            coin_reward,
+                        ),
+                    )
 
-                    self.logger.info(f"Badge {badge[1]} attribué à l'utilisateur {user_id}")
+                    self.logger.info(
+                        f"Badge {badge[1]} attribué à l'utilisateur {user_id}"
+                    )
 
             conn.commit()
             conn.close()
@@ -561,34 +646,37 @@ class GamificationSystem:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
 
-            cursor.execute('''
+            cursor.execute(
+                """
                 SELECT detections_count, models_trained, datasets_created, cheats_created,
                        best_accuracy, best_speed, total_time_spent
                 FROM user_stats WHERE user_id = ?
-            ''', (user_id,))
+            """,
+                (user_id,),
+            )
 
             result = cursor.fetchone()
             conn.close()
 
             if result:
                 return {
-                    'detections_count': result[0],
-                    'models_trained': result[1],
-                    'datasets_created': result[2],
-                    'cheats_created': result[3],
-                    'best_accuracy': result[4],
-                    'best_speed': result[5],
-                    'total_time_spent': result[6]
+                    "detections_count": result[0],
+                    "models_trained": result[1],
+                    "datasets_created": result[2],
+                    "cheats_created": result[3],
+                    "best_accuracy": result[4],
+                    "best_speed": result[5],
+                    "total_time_spent": result[6],
                 }
             else:
                 return {
-                    'detections_count': 0,
-                    'models_trained': 0,
-                    'datasets_created': 0,
-                    'cheats_created': 0,
-                    'best_accuracy': 0.0,
-                    'best_speed': 0,
-                    'total_time_spent': 0
+                    "detections_count": 0,
+                    "models_trained": 0,
+                    "datasets_created": 0,
+                    "cheats_created": 0,
+                    "best_accuracy": 0.0,
+                    "best_speed": 0,
+                    "total_time_spent": 0,
                 }
 
         except Exception as e:
@@ -606,10 +694,15 @@ class GamificationSystem:
             values = []
 
             for key, value in kwargs.items():
-                if key in ['detections_count', 'models_trained', 'datasets_created', 'cheats_created']:
+                if key in [
+                    "detections_count",
+                    "models_trained",
+                    "datasets_created",
+                    "cheats_created",
+                ]:
                     updates.append(f"{key} = {key} + ?")
                     values.append(value)
-                elif key in ['best_accuracy', 'best_speed', 'total_time_spent']:
+                elif key in ["best_accuracy", "best_speed", "total_time_spent"]:
                     updates.append(f"{key} = ?")
                     values.append(value)
 
@@ -632,23 +725,29 @@ class GamificationSystem:
             cursor = conn.cursor()
 
             # Infos utilisateur
-            cursor.execute('''
+            cursor.execute(
+                """
                 SELECT username, level, xp, total_xp, coins, created_at, last_login
                 FROM users WHERE id = ?
-            ''', (user_id,))
+            """,
+                (user_id,),
+            )
 
             user_data = cursor.fetchone()
             if not user_data:
                 return None
 
             # Badges obtenus
-            cursor.execute('''
+            cursor.execute(
+                """
                 SELECT b.name, b.description, b.icon, b.rarity, ub.earned_at
                 FROM user_badges ub
                 JOIN badges b ON ub.badge_id = b.id
                 WHERE ub.user_id = ?
                 ORDER BY ub.earned_at DESC
-            ''', (user_id,))
+            """,
+                (user_id,),
+            )
 
             badges = cursor.fetchall()
 
@@ -658,38 +757,41 @@ class GamificationSystem:
             conn.close()
 
             return {
-                'username': user_data[0],
-                'level': user_data[1],
-                'xp': user_data[2],
-                'total_xp': user_data[3],
-                'coins': user_data[4],
-                'created_at': user_data[5],
-                'last_login': user_data[6],
-                'badges': [
+                "username": user_data[0],
+                "level": user_data[1],
+                "xp": user_data[2],
+                "total_xp": user_data[3],
+                "coins": user_data[4],
+                "created_at": user_data[5],
+                "last_login": user_data[6],
+                "badges": [
                     {
-                        'name': badge[0],
-                        'description': badge[1],
-                        'icon': badge[2],
-                        'rarity': badge[3],
-                        'earned_at': badge[4]
-                    } for badge in badges
+                        "name": badge[0],
+                        "description": badge[1],
+                        "icon": badge[2],
+                        "rarity": badge[3],
+                        "earned_at": badge[4],
+                    }
+                    for badge in badges
                 ],
-                'stats': stats
+                "stats": stats,
             }
 
         except Exception as e:
             self.logger.error(f"Erreur récupération profil: {e}")
             return None
 
-    def record_activity(self, user_id: int, activity_type: str, details: str = "", **stats_updates) -> Dict[str, Any]:
+    def record_activity(
+        self, user_id: int, activity_type: str, details: str = "", **stats_updates
+    ) -> Dict[str, Any]:
         """Enregistre une activité et donne de l'XP"""
         xp_rewards = {
-            'detection': 5,
-            'training': 50,
-            'dataset_creation': 100,
-            'cheat_creation': 75,
-            'login': 10,
-            'daily_challenge': 100
+            "detection": 5,
+            "training": 50,
+            "dataset_creation": 100,
+            "cheat_creation": 75,
+            "login": 10,
+            "daily_challenge": 100,
         }
 
         xp_amount = xp_rewards.get(activity_type, 1)
@@ -706,9 +808,9 @@ class GamificationSystem:
             self.update_user_stats(user_id, **stats_updates)
 
         return {
-            'xp_gained': xp_amount,
-            'level_up': level_up,
-            'description': description
+            "xp_gained": xp_amount,
+            "level_up": level_up,
+            "description": description,
         }
 
     def get_leaderboard(self, limit: int = 10) -> List[Dict[str, Any]]:
@@ -717,23 +819,28 @@ class GamificationSystem:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
 
-            cursor.execute('''
+            cursor.execute(
+                """
                 SELECT username, level, total_xp,
                        (SELECT COUNT(*) FROM user_badges WHERE user_id = users.id) as badges_count
                 FROM users
                 ORDER BY total_xp DESC
                 LIMIT ?
-            ''', (limit,))
+            """,
+                (limit,),
+            )
 
             leaderboard = []
             for i, row in enumerate(cursor.fetchall()):
-                leaderboard.append({
-                    'rank': i + 1,
-                    'username': row[0],
-                    'level': row[1],
-                    'total_xp': row[2],
-                    'badges_count': row[3]
-                })
+                leaderboard.append(
+                    {
+                        "rank": i + 1,
+                        "username": row[0],
+                        "level": row[1],
+                        "total_xp": row[2],
+                        "badges_count": row[3],
+                    }
+                )
 
             conn.close()
 
