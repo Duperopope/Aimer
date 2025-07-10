@@ -10,6 +10,12 @@
 ### Option 1: GitHub Codespaces (Recommandé)
 Cliquez sur le badge "Open in GitHub Codespaces" ci-dessus pour lancer AIMER dans votre navigateur en un clic !
 
+**Dans Codespaces :**
+- L'auto-setup se lance automatiquement au démarrage
+- Si ce n'est pas le cas, tapez : `python main.py --auto-fix`
+- Pour l'interface web : `python launch_web.py`
+- L'interface s'ouvrira automatiquement sur le port 5000
+
 ### Option 2: Interface Web Locale
 ```bash
 git clone https://github.com/Duperopope/Aimer.git
@@ -61,6 +67,7 @@ python main.py --auto-fix
   ```bash
   python main.py --auto-fix
   ```
+- Activer la webcam depuis l'onglet Détection (bouton Webcam, bouton Arrêter Webcam pour stopper)
 
 ## 🌐 Interface Web
 
@@ -94,6 +101,12 @@ python launch_web.py
 
 ### Option 1: GitHub Codespaces (Recommandé)
 Cliquez sur le badge "Open in GitHub Codespaces" ci-dessus pour lancer AIMER dans votre navigateur en un clic !
+
+**Dans Codespaces :**
+- L'auto-setup se lance automatiquement au démarrage
+- Si ce n'est pas le cas, tapez : `python main.py --auto-fix`
+- Pour l'interface web : `python launch_web.py`
+- L'interface s'ouvrira automatiquement sur le port 5000
 
 ### Option 2: Interface Web Locale
 ```bash

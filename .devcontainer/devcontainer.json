@@ -29,6 +29,7 @@
       "onAutoForward": "openBrowser"
     }
   },
-  "postCreateCommand": "python main.py --auto-fix",
+  "postCreateCommand": "chmod +x .devcontainer/setup.sh && ./.devcontainer/setup.sh",
+  "postStartCommand": "echo '🎯 AIMER PRO prêt ! Tapez: python main.py --auto-fix (si pas encore fait) ou python launch_web.py'",
   "remoteUser": "vscode"
 }
