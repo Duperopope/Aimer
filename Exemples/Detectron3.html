@@ -1,0 +1,3090 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameVision AI - Générateur d'Application Complète</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .progress-bar {
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="gradient-bg text-white py-6">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl font-bold mb-2">
+                <i class="fas fa-robot mr-3"></i>GameVision AI - Générateur Complet
+            </h1>
+            <p class="text-xl opacity-90">Génère automatiquement une application complète de computer vision</p>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Panneau Principal -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-800">
+                        <i class="fas fa-cogs mr-2 text-blue-500"></i>Générateur d'Application
+                    </h2>
+                    
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-3">Configuration du Projet</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nom du Projet</label>
+                                <input type="text" id="projectName" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="GameVision_AI" placeholder="Nom du projet">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Port Serveur</label>
+                                <input type="number" id="serverPort" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="5000" placeholder="5000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-3">Modules à Générer</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="serverModule" checked class="mr-2">
+                                <span class="text-sm">Serveur Python</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="detectionModule" checked class="mr-2">
+                                <span class="text-sm">Détection Objets</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="hardwareModule" checked class="mr-2">
+                                <span class="text-sm">Hardware Monitor</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="datasetModule" checked class="mr-2">
+                                <span class="text-sm">Gestion Datasets</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="gamificationModule" checked class="mr-2">
+                                <span class="text-sm">Gamification</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="cheatModule" checked class="mr-2">
+                                <span class="text-sm">Cheat Generator</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <button onclick="generateApplication()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200">
+                            <i class="fas fa-magic mr-2"></i>Générer l'Application Complète
+                        </button>
+                    </div>
+
+                    <div id="progressSection" class="hidden">
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm text-gray-600 mb-1">
+                                <span>Progression de la génération</span>
+                                <span id="progressText">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div id="progressBar" class="bg-blue-600 h-2 rounded-full progress-bar"></div>
+                            </div>
+                        </div>
+                        <div id="currentStep" class="text-sm text-gray-600 mb-4">Préparation...</div>
+                        <div id="logOutput" class="bg-gray-100 p-4 rounded-lg h-32 overflow-y-auto text-sm font-mono"></div>
+                    </div>
+                </div>
+
+                <!-- Panneau de Contrôle -->
+                <div class="bg-white rounded-lg shadow-lg p-6 card-hover mt-6">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-800">
+                        <i class="fas fa-play-circle mr-2 text-green-500"></i>Contrôle de l'Application
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button onclick="startServer()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">
+                            <i class="fas fa-play mr-2"></i>Démarrer
+                        </button>
+                        <button onclick="stopServer()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">
+                            <i class="fas fa-stop mr-2"></i>Arrêter
+                        </button>
+                        <button onclick="openApp()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg">
+                            <i class="fas fa-external-link-alt mr-2"></i>Ouvrir App
+                        </button>
+                    </div>
+                    
+                    <div id="serverStatus" class="mt-4 p-3 bg-gray-100 rounded-lg">
+                        <span class="text-sm text-gray-600">Status: </span>
+                        <span id="statusText" class="font-semibold text-gray-800">Arrêté</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panneau Latéral -->
+            <div>
+                <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                    <h2 class="text-xl font-bold mb-4 text-gray-800">
+                        <i class="fas fa-info-circle mr-2 text-blue-500"></i>Fichiers Générés
+                    </h2>
+                    
+                    <div id="filesList" class="space-y-2 text-sm">
+                        <div class="text-gray-500">Aucun fichier généré</div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-lg p-6 card-hover mt-6">
+                    <h2 class="text-xl font-bold mb-4 text-gray-800">
+                        <i class="fas fa-chart-line mr-2 text-green-500"></i>Statistiques
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Fichiers générés:</span>
+                            <span id="filesCount" class="font-semibold">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Taille totale:</span>
+                            <span id="totalSize" class="font-semibold">0 KB</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Temps génération:</span>
+                            <span id="generationTime" class="font-semibold">0s</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-lg p-6 card-hover mt-6">
+                    <h2 class="text-xl font-bold mb-4 text-gray-800">
+                        <i class="fas fa-terminal mr-2 text-purple-500"></i>Console
+                    </h2>
+                    
+                    <div id="consoleOutput" class="bg-black text-green-400 p-4 rounded-lg h-48 overflow-y-auto text-sm font-mono">
+                        <div>GameVision AI Generator v1.0</div>
+                        <div>Prêt à générer votre application...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let generatedFiles = [];
+        let serverProcess = null;
+        let startTime = null;
+
+        // Templates des fichiers à générer
+        const templates = {
+            'server.py': `#!/usr/bin/env python3
+"""
+GameVision AI - Serveur Principal
+Application complète de computer vision avec détection temps réel
+"""
+
+import os
+import sys
+import json
+import threading
+import time
+from datetime import datetime
+from flask import Flask, render_template, request, jsonify, send_file
+from flask_socketio import SocketIO, emit
+import cv2
+import numpy as np
+import psutil
+import platform
+import GPUtil
+import tensorflow as tf
+from tensorflow import keras
+import sqlite3
+from werkzeug.utils import secure_filename
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'gamevision_secret_key'
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+# Configuration
+UPLOAD_FOLDER = 'uploads'
+MODELS_FOLDER = 'models'
+DATASETS_FOLDER = 'datasets'
+CACHE_FOLDER = 'cache'
+
+# Créer les dossiers nécessaires
+for folder in [UPLOAD_FOLDER, MODELS_FOLDER, DATASETS_FOLDER, CACHE_FOLDER]:
+    os.makedirs(folder, exist_ok=True)
+
+# Base de données SQLite
+def init_db():
+    conn = sqlite3.connect('gamevision.db')
+    cursor = conn.cursor()
+    
+    # Table des utilisateurs et progression
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            level INTEGER DEFAULT 1,
+            xp INTEGER DEFAULT 0,
+            badges TEXT DEFAULT '[]',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    # Table des détections
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS detections (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            object_type TEXT,
+            confidence REAL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
+    
+    # Table des modèles
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS models (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            type TEXT NOT NULL,
+            accuracy REAL,
+            file_path TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    conn.commit()
+    conn.close()
+
+# Détection hardware
+def get_hardware_info():
+    try:
+        # CPU Info
+        cpu_info = {
+            'name': platform.processor(),
+            'cores': psutil.cpu_count(logical=False),
+            'threads': psutil.cpu_count(logical=True),
+            'frequency': psutil.cpu_freq().current if psutil.cpu_freq() else 0,
+            'usage': psutil.cpu_percent()
+        }
+        
+        # RAM Info
+        ram = psutil.virtual_memory()
+        ram_info = {
+            'total': ram.total,
+            'available': ram.available,
+            'used': ram.used,
+            'percentage': ram.percent
+        }
+        
+        # GPU Info
+        gpu_info = []
+        try:
+            gpus = GPUtil.getGPUs()
+            for gpu in gpus:
+                gpu_info.append({
+                    'name': gpu.name,
+                    'memory_total': gpu.memoryTotal,
+                    'memory_used': gpu.memoryUsed,
+                    'memory_free': gpu.memoryFree,
+                    'load': gpu.load,
+                    'temperature': gpu.temperature
+                })
+        except:
+            gpu_info = [{'name': 'Non détecté', 'memory_total': 0}]
+        
+        # Disques
+        disk_info = []
+        for disk in psutil.disk_partitions():
+            try:
+                disk_usage = psutil.disk_usage(disk.mountpoint)
+                disk_info.append({
+                    'device': disk.device,
+                    'mountpoint': disk.mountpoint,
+                    'fstype': disk.fstype,
+                    'total': disk_usage.total,
+                    'used': disk_usage.used,
+                    'free': disk_usage.free,
+                    'percentage': (disk_usage.used / disk_usage.total) * 100
+                })
+            except:
+                continue
+        
+        return {
+            'cpu': cpu_info,
+            'ram': ram_info,
+            'gpu': gpu_info,
+            'disks': disk_info,
+            'platform': platform.system(),
+            'python_version': platform.python_version()
+        }
+    except Exception as e:
+        return {'error': str(e)}
+
+# Routes principales
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/api/hardware')
+def hardware():
+    return jsonify(get_hardware_info())
+
+@app.route('/api/detect', methods=['POST'])
+def detect_objects():
+    try:
+        # Simuler la détection d'objets
+        # Dans une vraie app, ici on utiliserait TensorFlow/OpenCV
+        result = {
+            'objects': [
+                {'name': 'person', 'confidence': 0.95, 'bbox': [100, 100, 200, 300]},
+                {'name': 'car', 'confidence': 0.88, 'bbox': [300, 150, 450, 250]}
+            ],
+            'processing_time': 0.1,
+            'frame_rate': 30
+        }
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+@app.route('/api/train', methods=['POST'])
+def train_model():
+    try:
+        data = request.json
+        model_name = data.get('model_name', 'custom_model')
+        
+        # Simuler l'entraînement
+        # Dans une vraie app, ici on utiliserait TensorFlow
+        
+        result = {
+            'model_name': model_name,
+            'status': 'training_started',
+            'estimated_time': 3600  # 1 heure
+        }
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+# WebSocket pour communication temps réel
+@socketio.on('connect')
+def handle_connect():
+    print('Client connecté')
+    emit('status', {'message': 'Connecté au serveur GameVision AI'})
+
+@socketio.on('start_detection')
+def handle_start_detection():
+    print('Démarrage détection')
+    # Ici on démarrerait la détection temps réel
+    emit('detection_started', {'status': 'success'})
+
+if __name__ == '__main__':
+    init_db()
+    port = int(os.environ.get('PORT', 5000))
+    print(f'Démarrage GameVision AI sur le port {port}')
+    socketio.run(app, host='0.0.0.0', port=port, debug=True)
+`,
+
+            'detection.py': `#!/usr/bin/env python3
+"""
+GameVision AI - Module de Détection d'Objets
+Détection en temps réel avec TensorFlow et OpenCV
+"""
+
+import cv2
+import numpy as np
+import tensorflow as tf
+from tensorflow import keras
+import time
+import threading
+import queue
+import json
+from datetime import datetime
+
+class ObjectDetector:
+    def __init__(self, model_path=None):
+        self.model_path = model_path
+        self.model = None
+        self.classes = []
+        self.is_running = False
+        self.detection_queue = queue.Queue()
+        self.load_model()
+        
+    def load_model(self):
+        """Charge le modèle de détection"""
+        try:
+            if self.model_path:
+                self.model = tf.keras.models.load_model(self.model_path)
+            else:
+                # Utiliser un modèle pré-entraîné (simulé)
+                print("Chargement du modèle COCO-SSD...")
+                self.classes = [
+                    'person', 'bicycle', 'car', 'motorcycle', 'airplane',
+                    'bus', 'train', 'truck', 'boat', 'traffic light',
+                    'fire hydrant', 'stop sign', 'parking meter', 'bench',
+                    'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
+                    'elephant', 'bear', 'zebra', 'giraffe', 'backpack',
+                    'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee',
+                    'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat',
+                    'baseball glove', 'skateboard', 'surfboard', 'tennis racket',
+                    'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon',
+                    'bowl', 'banana', 'apple', 'sandwich', 'orange',
+                    'broccoli', 'carrot', 'hot dog', 'pizza', 'donut',
+                    'cake', 'chair', 'couch', 'potted plant', 'bed',
+                    'dining table', 'toilet', 'tv', 'laptop', 'mouse',
+                    'remote', 'keyboard', 'cell phone', 'microwave',
+                    'oven', 'toaster', 'sink', 'refrigerator', 'book',
+                    'clock', 'vase', 'scissors', 'teddy bear', 'hair drier',
+                    'toothbrush'
+                ]
+                print(f"Modèle chargé avec {len(self.classes)} classes")
+        except Exception as e:
+            print(f"Erreur lors du chargement du modèle: {e}")
+            
+    def detect_objects(self, frame):
+        """Détecte les objets dans une frame"""
+        try:
+            # Préprocessing
+            input_frame = cv2.resize(frame, (640, 480))
+            input_frame = input_frame.astype(np.float32) / 255.0
+            
+            # Simulation de détection (remplacer par vraie détection)
+            detections = self.simulate_detection(input_frame)
+            
+            return detections
+        except Exception as e:
+            print(f"Erreur détection: {e}")
+            return []
+            
+    def simulate_detection(self, frame):
+        """Simule la détection d'objets"""
+        # Simulation pour démonstration
+        h, w = frame.shape[:2]
+        
+        # Générer des détections aléatoires
+        detections = []
+        import random
+        
+        for _ in range(random.randint(1, 5)):
+            x1 = random.randint(0, w//2)
+            y1 = random.randint(0, h//2)
+            x2 = random.randint(x1, w)
+            y2 = random.randint(y1, h)
+            
+            detection = {
+                'class': random.choice(self.classes),
+                'confidence': random.uniform(0.5, 0.99),
+                'bbox': [x1, y1, x2, y2],
+                'timestamp': datetime.now().isoformat()
+            }
+            detections.append(detection)
+            
+        return detections
+        
+    def draw_detections(self, frame, detections):
+        """Dessine les détections sur la frame"""
+        colors = {
+            'person': (0, 255, 0),
+            'car': (255, 0, 0),
+            'bicycle': (0, 0, 255),
+            'default': (255, 255, 0)
+        }
+        
+        for detection in detections:
+            x1, y1, x2, y2 = detection['bbox']
+            class_name = detection['class']
+            confidence = detection['confidence']
+            
+            # Couleur selon la classe
+            color = colors.get(class_name, colors['default'])
+            
+            # Dessiner le rectangle
+            cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+            
+            # Dessiner le label
+            label = f"{class_name}: {confidence:.2f}"
+            label_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)[0]
+            cv2.rectangle(frame, (x1, y1-label_size[1]-10), (x1+label_size[0], y1), color, -1)
+            cv2.putText(frame, label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+            
+        return frame
+        
+    def start_camera_detection(self, camera_index=0):
+        """Démarre la détection sur caméra"""
+        try:
+            cap = cv2.VideoCapture(camera_index)
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+            
+            self.is_running = True
+            
+            while self.is_running:
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                    
+                # Détection
+                detections = self.detect_objects(frame)
+                
+                # Dessiner les détections
+                frame_with_detections = self.draw_detections(frame, detections)
+                
+                # Afficher
+                cv2.imshow('GameVision AI - Détection', frame_with_detections)
+                
+                # Quitter avec 'q'
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+                    
+            cap.release()
+            cv2.destroyAllWindows()
+            
+        except Exception as e:
+            print(f"Erreur caméra: {e}")
+            
+    def stop_detection(self):
+        """Arrête la détection"""
+        self.is_running = False
+
+# Classe pour la détection d'écran
+class ScreenDetector(ObjectDetector):
+    def __init__(self):
+        super().__init__()
+        
+    def capture_screen(self):
+        """Capture l'écran"""
+        try:
+            import pyautogui
+            import numpy as np
+            
+            # Capture d'écran
+            screenshot = pyautogui.screenshot()
+            frame = np.array(screenshot)
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            
+            return frame
+        except Exception as e:
+            print(f"Erreur capture écran: {e}")
+            return None
+            
+    def start_screen_detection(self):
+        """Démarre la détection d'écran"""
+        self.is_running = True
+        
+        while self.is_running:
+            frame = self.capture_screen()
+            if frame is not None:
+                detections = self.detect_objects(frame)
+                frame_with_detections = self.draw_detections(frame, detections)
+                
+                # Redimensionner pour l'affichage
+                display_frame = cv2.resize(frame_with_detections, (800, 600))
+                cv2.imshow('GameVision AI - Détection Écran', display_frame)
+                
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+                
+        cv2.destroyAllWindows()
+
+if __name__ == '__main__':
+    detector = ObjectDetector()
+    detector.start_camera_detection()
+`,
+
+            'hardware_monitor.py': `#!/usr/bin/env python3
+"""
+GameVision AI - Moniteur Hardware
+Surveillance et optimisation des performances système
+"""
+
+import psutil
+import platform
+import time
+import threading
+import json
+import sqlite3
+from datetime import datetime
+import os
+
+try:
+    import GPUtil
+except ImportError:
+    GPUtil = None
+
+class HardwareMonitor:
+    def __init__(self):
+        self.monitoring = False
+        self.data_history = []
+        self.max_history = 1000
+        
+    def get_cpu_info(self):
+        """Informations détaillées du CPU"""
+        cpu_freq = psutil.cpu_freq()
+        cpu_times = psutil.cpu_times()
+        
+        return {
+            'name': platform.processor(),
+            'architecture': platform.machine(),
+            'cores_physical': psutil.cpu_count(logical=False),
+            'cores_logical': psutil.cpu_count(logical=True),
+            'frequency': {
+                'current': cpu_freq.current if cpu_freq else 0,
+                'min': cpu_freq.min if cpu_freq else 0,
+                'max': cpu_freq.max if cpu_freq else 0
+            },
+            'usage': {
+                'overall': psutil.cpu_percent(interval=1),
+                'per_core': psutil.cpu_percent(interval=1, percpu=True)
+            },
+            'times': {
+                'user': cpu_times.user,
+                'system': cpu_times.system,
+                'idle': cpu_times.idle
+            }
+        }
+        
+    def get_memory_info(self):
+        """Informations mémoire"""
+        virtual_mem = psutil.virtual_memory()
+        swap_mem = psutil.swap_memory()
+        
+        return {
+            'virtual': {
+                'total': virtual_mem.total,
+                'available': virtual_mem.available,
+                'used': virtual_mem.used,
+                'free': virtual_mem.free,
+                'percentage': virtual_mem.percent,
+                'cached': getattr(virtual_mem, 'cached', 0),
+                'buffers': getattr(virtual_mem, 'buffers', 0)
+            },
+            'swap': {
+                'total': swap_mem.total,
+                'used': swap_mem.used,
+                'free': swap_mem.free,
+                'percentage': swap_mem.percent
+            }
+        }
+        
+    def get_gpu_info(self):
+        """Informations GPU"""
+        gpu_info = []
+        
+        if GPUtil:
+            try:
+                gpus = GPUtil.getGPUs()
+                for gpu in gpus:
+                    gpu_info.append({
+                        'id': gpu.id,
+                        'name': gpu.name,
+                        'memory': {
+                            'total': gpu.memoryTotal,
+                            'used': gpu.memoryUsed,
+                            'free': gpu.memoryFree,
+                            'percentage': (gpu.memoryUsed / gpu.memoryTotal) * 100
+                        },
+                        'load': gpu.load * 100,
+                        'temperature': gpu.temperature
+                    })
+            except Exception as e:
+                gpu_info = [{'error': str(e)}]
+        else:
+            gpu_info = [{'error': 'GPUtil non disponible'}]
+            
+        return gpu_info
+        
+    def get_disk_info(self):
+        """Informations disques"""
+        disk_info = []
+        
+        for partition in psutil.disk_partitions():
+            try:
+                usage = psutil.disk_usage(partition.mountpoint)
+                
+                disk_info.append({
+                    'device': partition.device,
+                    'mountpoint': partition.mountpoint,
+                    'fstype': partition.fstype,
+                    'total': usage.total,
+                    'used': usage.used,
+                    'free': usage.free,
+                    'percentage': (usage.used / usage.total) * 100
+                })
+            except PermissionError:
+                continue
+                
+        return disk_info
+        
+    def get_network_info(self):
+        """Informations réseau"""
+        network_io = psutil.net_io_counters()
+        
+        return {
+            'bytes_sent': network_io.bytes_sent,
+            'bytes_recv': network_io.bytes_recv,
+            'packets_sent': network_io.packets_sent,
+            'packets_recv': network_io.packets_recv,
+            'errin': network_io.errin,
+            'errout': network_io.errout,
+            'dropin': network_io.dropin,
+            'dropout': network_io.dropout
+        }
+        
+    def get_system_info(self):
+        """Informations système"""
+        boot_time = datetime.fromtimestamp(psutil.boot_time())
+        
+        return {
+            'platform': platform.system(),
+            'platform_release': platform.release(),
+            'platform_version': platform.version(),
+            'architecture': platform.machine(),
+            'hostname': platform.node(),
+            'processor': platform.processor(),
+            'python_version': platform.python_version(),
+            'boot_time': boot_time.isoformat(),
+            'uptime': (datetime.now() - boot_time).total_seconds()
+        }
+        
+    def get_complete_info(self):
+        """Informations complètes du système"""
+        return {
+            'timestamp': datetime.now().isoformat(),
+            'cpu': self.get_cpu_info(),
+            'memory': self.get_memory_info(),
+            'gpu': self.get_gpu_info(),
+            'disks': self.get_disk_info(),
+            'network': self.get_network_info(),
+            'system': self.get_system_info()
+        }
+        
+    def optimize_for_ai(self):
+        """Optimise le système pour l'IA"""
+        recommendations = []
+        
+        # Analyser les ressources
+        cpu_usage = psutil.cpu_percent(interval=1)
+        memory = psutil.virtual_memory()
+        
+        # Recommandations CPU
+        if cpu_usage > 80:
+            recommendations.append({
+                'type': 'warning',
+                'component': 'CPU',
+                'message': 'Utilisation CPU élevée, considérez fermer des applications',
+                'action': 'close_apps'
+            })
+        
+        # Recommandations mémoire
+        if memory.percent > 80:
+            recommendations.append({
+                'type': 'warning',
+                'component': 'Memory',
+                'message': 'Mémoire insuffisante, considérez libérer de la RAM',
+                'action': 'free_memory'
+            })
+        
+        # Recommandations GPU
+        gpu_info = self.get_gpu_info()
+        if gpu_info and not gpu_info[0].get('error'):
+            gpu = gpu_info[0]
+            if gpu.get('load', 0) > 80:
+                recommendations.append({
+                    'type': 'warning',
+                    'component': 'GPU',
+                    'message': 'GPU surchargé, réduire la qualité graphique',
+                    'action': 'reduce_quality'
+                })
+        
+        # Recommandations stockage
+        for disk in self.get_disk_info():
+            if disk['percentage'] > 90:
+                recommendations.append({
+                    'type': 'critical',
+                    'component': 'Storage',
+                    'message': f"Disque {disk['device']} presque plein",
+                    'action': 'free_space'
+                })
+        
+        return recommendations
+        
+    def start_monitoring(self, interval=5):
+        """Démarre le monitoring continu"""
+        self.monitoring = True
+        
+        def monitor_loop():
+            while self.monitoring:
+                data = self.get_complete_info()
+                self.data_history.append(data)
+                
+                # Limiter l'historique
+                if len(self.data_history) > self.max_history:
+                    self.data_history.pop(0)
+                
+                time.sleep(interval)
+        
+        thread = threading.Thread(target=monitor_loop)
+        thread.daemon = True
+        thread.start()
+        
+    def stop_monitoring(self):
+        """Arrête le monitoring"""
+        self.monitoring = False
+        
+    def save_data(self, filename='hardware_data.json'):
+        """Sauvegarde les données de monitoring"""
+        with open(filename, 'w') as f:
+            json.dump(self.data_history, f, indent=2)
+            
+    def get_performance_report(self):
+        """Génère un rapport de performance"""
+        if not self.data_history:
+            return {'error': 'Aucune donnée de monitoring'}
+        
+        latest = self.data_history[-1]
+        
+        return {
+            'timestamp': latest['timestamp'],
+            'cpu_usage': latest['cpu']['usage']['overall'],
+            'memory_usage': latest['memory']['virtual']['percentage'],
+            'disk_usage': [d['percentage'] for d in latest['disks']],
+            'gpu_usage': latest['gpu'][0].get('load', 0) if latest['gpu'] else 0,
+            'recommendations': self.optimize_for_ai(),
+            'system_health': self.calculate_system_health()
+        }
+        
+    def calculate_system_health(self):
+        """Calcule la santé globale du système"""
+        if not self.data_history:
+            return 0
+        
+        latest = self.data_history[-1]
+        
+        # Calculer le score de santé (0-100)
+        cpu_score = max(0, 100 - latest['cpu']['usage']['overall'])
+        memory_score = max(0, 100 - latest['memory']['virtual']['percentage'])
+        
+        # Score moyen des disques
+        disk_scores = [max(0, 100 - d['percentage']) for d in latest['disks']]
+        disk_score = sum(disk_scores) / len(disk_scores) if disk_scores else 50
+        
+        # Score GPU
+        gpu_score = 100
+        if latest['gpu'] and not latest['gpu'][0].get('error'):
+            gpu_score = max(0, 100 - latest['gpu'][0].get('load', 0))
+        
+        # Score global
+        overall_score = (cpu_score + memory_score + disk_score + gpu_score) / 4
+        
+        return {
+            'overall': overall_score,
+            'cpu': cpu_score,
+            'memory': memory_score,
+            'disk': disk_score,
+            'gpu': gpu_score,
+            'status': 'excellent' if overall_score > 80 else 'good' if overall_score > 60 else 'poor'
+        }
+
+if __name__ == '__main__':
+    monitor = HardwareMonitor()
+    
+    # Test complet
+    print("=== GameVision AI Hardware Monitor ===")
+    print(json.dumps(monitor.get_complete_info(), indent=2))
+    
+    # Recommandations
+    print("\\n=== Recommandations d'optimisation ===")
+    recommendations = monitor.optimize_for_ai()
+    for rec in recommendations:
+        print(f"{rec['type'].upper()}: {rec['message']}")
+`,
+
+            'dataset_manager.py': `#!/usr/bin/env python3
+"""
+GameVision AI - Gestionnaire de Datasets
+Gestion, optimisation et création de datasets pour l'IA
+"""
+
+import os
+import json
+import shutil
+import urllib.request
+import zipfile
+import tarfile
+import sqlite3
+import hashlib
+import threading
+import time
+from datetime import datetime
+import numpy as np
+from PIL import Image
+import cv2
+
+class DatasetManager:
+    def __init__(self, base_path='datasets'):
+        self.base_path = base_path
+        self.db_path = os.path.join(base_path, 'datasets.db')
+        self.temp_path = os.path.join(base_path, 'temp')
+        self.cache_path = os.path.join(base_path, 'cache')
+        
+        # Créer les dossiers
+        for path in [base_path, self.temp_path, self.cache_path]:
+            os.makedirs(path, exist_ok=True)
+            
+        self.init_database()
+        
+    def init_database(self):
+        """Initialise la base de données"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        # Table des datasets
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS datasets (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT UNIQUE NOT NULL,
+                type TEXT NOT NULL,
+                size INTEGER,
+                num_images INTEGER,
+                num_classes INTEGER,
+                path TEXT,
+                url TEXT,
+                checksum TEXT,
+                status TEXT DEFAULT 'pending',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Table des images
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS images (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                dataset_id INTEGER,
+                filename TEXT,
+                path TEXT,
+                width INTEGER,
+                height INTEGER,
+                format TEXT,
+                size INTEGER,
+                annotations TEXT,
+                FOREIGN KEY (dataset_id) REFERENCES datasets (id)
+            )
+        ''')
+        
+        # Table des annotations
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS annotations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                image_id INTEGER,
+                class_name TEXT,
+                x1 REAL,
+                y1 REAL,
+                x2 REAL,
+                y2 REAL,
+                confidence REAL DEFAULT 1.0,
+                FOREIGN KEY (image_id) REFERENCES images (id)
+            )
+        ''')
+        
+        conn.commit()
+        conn.close()
+        
+    def get_popular_datasets(self):
+        """Retourne la liste des datasets populaires"""
+        return {
+            'coco': {
+                'name': 'COCO 2017',
+                'description': 'Dataset de détection d\'objets avec 80 classes',
+                'size': '25GB',
+                'num_images': 330000,
+                'num_classes': 80,
+                'url': 'http://images.cocodataset.org/zips/train2017.zip',
+                'type': 'object_detection'
+            },
+            'open_images': {
+                'name': 'Open Images V6',
+                'description': 'Dataset Google avec 600 classes',
+                'size': '500GB',
+                'num_images': 9000000,
+                'num_classes': 600,
+                'url': 'https://storage.googleapis.com/openimages/web/download.html',
+                'type': 'object_detection'
+            },
+            'imagenet': {
+                'name': 'ImageNet',
+                'description': 'Dataset de classification avec 1000 classes',
+                'size': '150GB',
+                'num_images': 14000000,
+                'num_classes': 1000,
+                'url': 'http://www.image-net.org/download',
+                'type': 'classification'
+            },
+            'cityscapes': {
+                'name': 'Cityscapes',
+                'description': 'Dataset de segmentation urbaine',
+                'size': '11GB',
+                'num_images': 25000,
+                'num_classes': 30,
+                'url': 'https://www.cityscapes-dataset.com/downloads/',
+                'type': 'segmentation'
+            }
+        }
+        
+    def download_dataset(self, dataset_key, progress_callback=None):
+        """Télécharge un dataset"""
+        datasets = self.get_popular_datasets()
+        
+        if dataset_key not in datasets:
+            raise ValueError(f"Dataset {dataset_key} non trouvé")
+            
+        dataset_info = datasets[dataset_key]
+        dataset_path = os.path.join(self.base_path, dataset_key)
+        
+        # Créer le dossier
+        os.makedirs(dataset_path, exist_ok=True)
+        
+        # Sauvegarder en DB
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            INSERT OR REPLACE INTO datasets 
+            (name, type, path, url, status) 
+            VALUES (?, ?, ?, ?, ?)
+        ''', (
+            dataset_info['name'],
+            dataset_info['type'],
+            dataset_path,
+            dataset_info['url'],
+            'downloading'
+        ))
+        
+        dataset_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        
+        # Simuler le téléchargement
+        def download_progress():
+            for i in range(101):
+                time.sleep(0.1)  # Simuler le temps de téléchargement
+                if progress_callback:
+                    progress_callback(i)
+                    
+            # Marquer comme terminé
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute('''
+                UPDATE datasets 
+                SET status = 'completed', updated_at = CURRENT_TIMESTAMP 
+                WHERE id = ?
+            ''', (dataset_id,))
+            conn.commit()
+            conn.close()
+            
+        thread = threading.Thread(target=download_progress)
+        thread.start()
+        
+        return dataset_id
+        
+    def create_custom_dataset(self, name, description=""):
+        """Crée un dataset personnalisé"""
+        dataset_path = os.path.join(self.base_path, name)
+        os.makedirs(dataset_path, exist_ok=True)
+        
+        # Créer structure
+        for folder in ['images', 'annotations', 'train', 'val', 'test']:
+            os.makedirs(os.path.join(dataset_path, folder), exist_ok=True)
+            
+        # Sauvegarder en DB
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            INSERT INTO datasets 
+            (name, type, path, status) 
+            VALUES (?, ?, ?, ?)
+        ''', (name, 'custom', dataset_path, 'created'))
+        
+        dataset_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        
+        return dataset_id
+        
+    def add_image_to_dataset(self, dataset_id, image_path, annotations=None):
+        """Ajoute une image à un dataset"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        # Récupérer les infos du dataset
+        cursor.execute('SELECT path FROM datasets WHERE id = ?', (dataset_id,))
+        dataset_path = cursor.fetchone()[0]
+        
+        # Copier l'image
+        filename = os.path.basename(image_path)
+        dest_path = os.path.join(dataset_path, 'images', filename)
+        shutil.copy2(image_path, dest_path)
+        
+        # Obtenir les infos de l'image
+        with Image.open(dest_path) as img:
+            width, height = img.size
+            format_img = img.format
+            size = os.path.getsize(dest_path)
+            
+        # Sauvegarder en DB
+        cursor.execute('''
+            INSERT INTO images 
+            (dataset_id, filename, path, width, height, format, size, annotations)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (dataset_id, filename, dest_path, width, height, format_img, size, json.dumps(annotations or [])))
+        
+        image_id = cursor.lastrowid
+        
+        # Sauvegarder les annotations
+        if annotations:
+            for ann in annotations:
+                cursor.execute('''
+                    INSERT INTO annotations 
+                    (image_id, class_name, x1, y1, x2, y2, confidence)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                ''', (image_id, ann['class'], ann['x1'], ann['y1'], ann['x2'], ann['y2'], ann.get('confidence', 1.0)))
+        
+        conn.commit()
+        conn.close()
+        
+        return image_id
+        
+    def get_dataset_stats(self, dataset_id):
+        """Obtient les statistiques d'un dataset"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        # Infos générales
+        cursor.execute('''
+            SELECT name, type, path, status, created_at 
+            FROM datasets WHERE id = ?
+        ''', (dataset_id,))
+        
+        dataset_info = cursor.fetchone()
+        if not dataset_info:
+            return None
+            
+        # Nombre d'images
+        cursor.execute('''
+            SELECT COUNT(*), AVG(width), AVG(height), SUM(size)
+            FROM images WHERE dataset_id = ?
+        ''', (dataset_id,))
+        
+        image_stats = cursor.fetchone()
+        
+        # Classes
+        cursor.execute('''
+            SELECT class_name, COUNT(*) 
+            FROM annotations 
+            WHERE image_id IN (SELECT id FROM images WHERE dataset_id = ?)
+            GROUP BY class_name
+        ''', (dataset_id,))
+        
+        classes = dict(cursor.fetchall())
+        
+        conn.close()
+        
+        return {
+            'name': dataset_info[0],
+            'type': dataset_info[1],
+            'path': dataset_info[2],
+            'status': dataset_info[3],
+            'created_at': dataset_info[4],
+            'num_images': image_stats[0] or 0,
+            'avg_width': image_stats[1] or 0,
+            'avg_height': image_stats[2] or 0,
+            'total_size': image_stats[3] or 0,
+            'classes': classes,
+            'num_classes': len(classes)
+        }
+        
+    def optimize_dataset(self, dataset_id):
+        """Optimise un dataset"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        # Récupérer les images
+        cursor.execute('''
+            SELECT id, path, width, height 
+            FROM images WHERE dataset_id = ?
+        ''', (dataset_id,))
+        
+        images = cursor.fetchall()
+        optimizations = []
+        
+        for img_id, path, width, height in images:
+            # Optimisations possibles
+            
+            # 1. Redimensionner si trop grand
+            if width > 2048 or height > 2048:
+                optimizations.append({
+                    'image_id': img_id,
+                    'type': 'resize',
+                    'action': 'Redimensionner à 2048x2048 max',
+                    'savings': 'Jusqu\'à 75% de réduction'
+                })
+                
+            # 2. Compression
+            file_size = os.path.getsize(path)
+            if file_size > 1024 * 1024:  # > 1MB
+                optimizations.append({
+                    'image_id': img_id,
+                    'type': 'compress',
+                    'action': 'Compresser avec qualité 85%',
+                    'savings': 'Jusqu\'à 50% de réduction'
+                })
+        
+        conn.close()
+        
+        return optimizations
+        
+    def export_dataset(self, dataset_id, format_type='coco'):
+        """Exporte un dataset dans un format spécifique"""
+        stats = self.get_dataset_stats(dataset_id)
+        if not stats:
+            return None
+            
+        export_path = os.path.join(self.base_path, f"{stats['name']}_export_{format_type}")
+        os.makedirs(export_path, exist_ok=True)
+        
+        if format_type == 'coco':
+            return self._export_coco_format(dataset_id, export_path)
+        elif format_type == 'yolo':
+            return self._export_yolo_format(dataset_id, export_path)
+        elif format_type == 'pascal_voc':
+            return self._export_pascal_voc_format(dataset_id, export_path)
+        else:
+            raise ValueError(f"Format {format_type} non supporté")
+            
+    def _export_coco_format(self, dataset_id, export_path):
+        """Exporte au format COCO"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        # Structure COCO
+        coco_data = {
+            'images': [],
+            'annotations': [],
+            'categories': []
+        }
+        
+        # Catégories
+        cursor.execute('''
+            SELECT DISTINCT class_name 
+            FROM annotations 
+            WHERE image_id IN (SELECT id FROM images WHERE dataset_id = ?)
+        ''', (dataset_id,))
+        
+        classes = [row[0] for row in cursor.fetchall()]
+        for i, class_name in enumerate(classes):
+            coco_data['categories'].append({
+                'id': i + 1,
+                'name': class_name,
+                'supercategory': 'object'
+            })
+        
+        # Images et annotations
+        cursor.execute('''
+            SELECT id, filename, width, height 
+            FROM images WHERE dataset_id = ?
+        ''', (dataset_id,))
+        
+        for img_id, filename, width, height in cursor.fetchall():
+            coco_data['images'].append({
+                'id': img_id,
+                'file_name': filename,
+                'width': width,
+                'height': height
+            })
+            
+            # Annotations pour cette image
+            cursor.execute('''
+                SELECT class_name, x1, y1, x2, y2, confidence
+                FROM annotations WHERE image_id = ?
+            ''', (img_id,))
+            
+            for class_name, x1, y1, x2, y2, confidence in cursor.fetchall():
+                class_id = classes.index(class_name) + 1
+                coco_data['annotations'].append({
+                    'id': len(coco_data['annotations']) + 1,
+                    'image_id': img_id,
+                    'category_id': class_id,
+                    'bbox': [x1, y1, x2 - x1, y2 - y1],
+                    'area': (x2 - x1) * (y2 - y1),
+                    'iscrowd': 0,
+                    'score': confidence
+                })
+        
+        # Sauvegarder
+        with open(os.path.join(export_path, 'annotations.json'), 'w') as f:
+            json.dump(coco_data, f, indent=2)
+            
+        conn.close()
+        
+        return export_path
+        
+    def get_all_datasets(self):
+        """Retourne tous les datasets"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT id, name, type, status, created_at,
+                   (SELECT COUNT(*) FROM images WHERE dataset_id = datasets.id) as num_images
+            FROM datasets
+            ORDER BY created_at DESC
+        ''')
+        
+        datasets = []
+        for row in cursor.fetchall():
+            datasets.append({
+                'id': row[0],
+                'name': row[1],
+                'type': row[2],
+                'status': row[3],
+                'created_at': row[4],
+                'num_images': row[5]
+            })
+            
+        conn.close()
+        
+        return datasets
+        
+    def delete_dataset(self, dataset_id):
+        """Supprime un dataset"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        # Récupérer le chemin
+        cursor.execute('SELECT path FROM datasets WHERE id = ?', (dataset_id,))
+        result = cursor.fetchone()
+        
+        if result:
+            dataset_path = result[0]
+            
+            # Supprimer les fichiers
+            if os.path.exists(dataset_path):
+                shutil.rmtree(dataset_path)
+                
+            # Supprimer de la DB
+            cursor.execute('DELETE FROM annotations WHERE image_id IN (SELECT id FROM images WHERE dataset_id = ?)', (dataset_id,))
+            cursor.execute('DELETE FROM images WHERE dataset_id = ?', (dataset_id,))
+            cursor.execute('DELETE FROM datasets WHERE id = ?', (dataset_id,))
+            
+            conn.commit()
+            
+        conn.close()
+
+if __name__ == '__main__':
+    manager = DatasetManager()
+    
+    # Test
+    print("=== GameVision AI Dataset Manager ===")
+    print("Datasets populaires:")
+    
+    for key, dataset in manager.get_popular_datasets().items():
+        print(f"- {dataset['name']}: {dataset['description']}")
+`,
+
+            'gamification.py': `#!/usr/bin/env python3
+"""
+GameVision AI - Système de Gamification
+Système complet de progression, badges et récompenses
+"""
+
+import json
+import sqlite3
+import os
+import time
+from datetime import datetime, timedelta
+import random
+
+class GamificationSystem:
+    def __init__(self, db_path='gamification.db'):
+        self.db_path = db_path
+        self.init_database()
+        
+    def init_database(self):
+        """Initialise la base de données de gamification"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        # Table des utilisateurs
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                level INTEGER DEFAULT 1,
+                xp INTEGER DEFAULT 0,
+                total_xp INTEGER DEFAULT 0,
+                coins INTEGER DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                last_login DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Table des badges
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS badges (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT UNIQUE NOT NULL,
+                description TEXT,
+                icon TEXT,
+                category TEXT,
+                rarity TEXT DEFAULT 'common',
+                requirement_type TEXT,
+                requirement_value INTEGER,
+                xp_reward INTEGER DEFAULT 0,
+                coin_reward INTEGER DEFAULT 0
+            )
+        ''')
+        
+        # Table des badges utilisateurs
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS user_badges (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                badge_id INTEGER,
+                earned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users (id),
+                FOREIGN KEY (badge_id) REFERENCES badges (id)
+            )
+        ''')
+        
+        # Table des activités
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS activities (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                activity_type TEXT,
+                description TEXT,
+                xp_gained INTEGER DEFAULT 0,
+                coins_gained INTEGER DEFAULT 0,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users (id)
+            )
+        ''')
+        
+        # Table des défis
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS challenges (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                description TEXT,
+                type TEXT,
+                target_value INTEGER,
+                xp_reward INTEGER,
+                coin_reward INTEGER,
+                start_date DATETIME,
+                end_date DATETIME,
+                is_active BOOLEAN DEFAULT 1
+            )
+        ''')
+        
+        # Table des défis utilisateurs
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS user_challenges (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                challenge_id INTEGER,
+                progress INTEGER DEFAULT 0,
+                completed BOOLEAN DEFAULT 0,
+                completed_at DATETIME,
+                FOREIGN KEY (user_id) REFERENCES users (id),
+                FOREIGN KEY (challenge_id) REFERENCES challenges (id)
+            )
+        ''')
+        
+        conn.commit()
+        conn.close()
+        
+        # Initialiser les badges et défis par défaut
+        self.init_default_badges()
+        self.init_daily_challenges()
+        
+    def init_default_badges(self):
+        """Initialise les badges par défaut"""
+        default_badges = [
+            # Badges de débutant
+            {
+                'name': 'Premier Pas',
+                'description': 'Première détection d\'objet',
+                'icon': '👶',
+                'category': 'beginners',
+                'rarity': 'common',
+                'requirement_type': 'detections',
+                'requirement_value': 1,
+                'xp_reward': 10,
+                'coin_reward': 5
+            },
+            {
+                'name': 'Explorateur',
+                'description': '10 détections réalisées',
+                'icon': '🔍',
+                'category': 'beginners',
+                'rarity': 'common',
+                'requirement_type': 'detections',
+                'requirement_value': 10,
+                'xp_reward': 50,
+                'coin_reward': 25
+            },
+            
+            # Badges de progression
+            {
+                'name': 'Détecteur Expérimenté',
+                'description': '100 détections réalisées',
+                'icon': '🎯',
+                'category': 'progression',
+                'rarity': 'uncommon',
+                'requirement_type': 'detections',
+                'requirement_value': 100,
+                'xp_reward': 200,
+                'coin_reward': 100
+            },
+            {
+                'name': 'Maître Détecteur',
+                'description': '1000 détections réalisées',
+                'icon': '🏆',
+                'category': 'progression',
+                'rarity': 'rare',
+                'requirement_type': 'detections',
+                'requirement_value': 1000,
+                'xp_reward': 500,
+                'coin_reward': 250
+            },
+            
+            # Badges de formation
+            {
+                'name': 'Formateur',
+                'description': 'Premier modèle entraîné',
+                'icon': '🧠',
+                'category': 'training',
+                'rarity': 'uncommon',
+                'requirement_type': 'models_trained',
+                'requirement_value': 1,
+                'xp_reward': 100,
+                'coin_reward': 50
+            },
+            {
+                'name': 'Maître Formateur',
+                'description': '10 modèles entraînés',
+                'icon': '🎓',
+                'category': 'training',
+                'rarity': 'rare',
+                'requirement_type': 'models_trained',
+                'requirement_value': 10,
+                'xp_reward': 300,
+                'coin_reward': 150
+            },
+            
+            # Badges de précision
+            {
+                'name': 'Oeil de Lynx',
+                'description': 'Détection avec 95% de précision',
+                'icon': '👁️',
+                'category': 'precision',
+                'rarity': 'rare',
+                'requirement_type': 'accuracy',
+                'requirement_value': 95,
+                'xp_reward': 200,
+                'coin_reward': 100
+            },
+            {
+                'name': 'Perfection',
+                'description': 'Détection avec 99% de précision',
+                'icon': '⭐',
+                'category': 'precision',
+                'rarity': 'epic',
+                'requirement_type': 'accuracy',
+                'requirement_value': 99,
+                'xp_reward': 500,
+                'coin_reward': 300
+            },
+            
+            # Badges de vitesse
+            {
+                'name': 'Éclair',
+                'description': 'Détection en moins de 100ms',
+                'icon': '⚡',
+                'category': 'speed',
+                'rarity': 'uncommon',
+                'requirement_type': 'speed',
+                'requirement_value': 100,
+                'xp_reward': 150,
+                'coin_reward': 75
+            },
+            
+            # Badges spéciaux
+            {
+                'name': 'Créateur',
+                'description': 'Premier dataset créé',
+                'icon': '🎨',
+                'category': 'creation',
+                'rarity': 'uncommon',
+                'requirement_type': 'datasets_created',
+                'requirement_value': 1,
+                'xp_reward': 100,
+                'coin_reward': 50
+            },
+            {
+                'name': 'Hackeur',
+                'description': 'Premier cheat créé',
+                'icon': '💻',
+                'category': 'gaming',
+                'rarity': 'rare',
+                'requirement_type': 'cheats_created',
+                'requirement_value': 1,
+                'xp_reward': 200,
+                'coin_reward': 100
+            }
+        ]
+        
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        for badge in default_badges:
+            cursor.execute('''
+                INSERT OR IGNORE INTO badges 
+                (name, description, icon, category, rarity, requirement_type, requirement_value, xp_reward, coin_reward)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                badge['name'], badge['description'], badge['icon'], badge['category'],
+                badge['rarity'], badge['requirement_type'], badge['requirement_value'],
+                badge['xp_reward'], badge['coin_reward']
+            ))
+        
+        conn.commit()
+        conn.close()
+        
+    def init_daily_challenges(self):
+        """Initialise les défis quotidiens"""
+        daily_challenges = [
+            {
+                'name': 'Détecteur Quotidien',
+                'description': 'Réalise 20 détections aujourd\'hui',
+                'type': 'daily',
+                'target_value': 20,
+                'xp_reward': 100,
+                'coin_reward': 50
+            },
+            {
+                'name': 'Précision Parfaite',
+                'description': 'Atteins 90% de précision sur 10 détections',
+                'type': 'daily',
+                'target_value': 90,
+                'xp_reward': 150,
+                'coin_reward': 75
+            },
+            {
+                'name': 'Marathon',
+                'description': 'Utilise l\'application pendant 30 minutes',
+                'type': 'daily',
+                'target_value': 30,
+                'xp_reward': 80,
+                'coin_reward': 40
+            }
+        ]
+        
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        tomorrow = today + timedelta(days=1)
+        
+        for challenge in daily_challenges:
+            cursor.execute('''
+                INSERT OR IGNORE INTO challenges 
+                (name, description, type, target_value, xp_reward, coin_reward, start_date, end_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                challenge['name'], challenge['description'], challenge['type'],
+                challenge['target_value'], challenge['xp_reward'], challenge['coin_reward'],
+                today, tomorrow
+            ))
+        
+        conn.commit()
+        conn.close()
+        
+    def create_user(self, username):
+        """Crée un nouvel utilisateur"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute('''
+                INSERT INTO users (username) VALUES (?)
+            ''', (username,))
+            
+            user_id = cursor.lastrowid
+            
+            # Initialiser les défis actifs pour l'utilisateur
+            cursor.execute('''
+                INSERT INTO user_challenges (user_id, challenge_id, progress)
+                SELECT ?, id, 0 FROM challenges WHERE is_active = 1
+            ''', (user_id,))
+            
+            conn.commit()
+            
+            return user_id
+            
+        except sqlite3.IntegrityError:
+            return None
+        finally:
+            conn.close()
+            
+    def get_user_profile(self, user_id):
+        """Récupère le profil complet d'un utilisateur"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        # Infos utilisateur
+        cursor.execute('''
+            SELECT username, level, xp, total_xp, coins, created_at, last_login
+            FROM users WHERE id = ?
+        ''', (user_id,))
+        
+        user_data = cursor.fetchone()
+        if not user_data:
+            return None
+        
+        # Badges obtenus
+        cursor.execute('''
+            SELECT b.name, b.description, b.icon, b.rarity, ub.earned_at
+            FROM user_badges ub
+            JOIN badges b ON ub.badge_id = b.id
+            WHERE ub.user_id = ?
+            ORDER BY ub.earned_at DESC
+        ''', (user_id,))
+        
+        badges = cursor.fetchall()
+        
+        # Défis en cours
+        cursor.execute('''
+            SELECT c.name, c.description, c.target_value, uc.progress, c.xp_reward, c.coin_reward
+            FROM user_challenges uc
+            JOIN challenges c ON uc.challenge_id = c.id
+            WHERE uc.user_id = ? AND uc.completed = 0 AND c.is_active = 1
+        ''', (user_id,))
+        
+        active_challenges = cursor.fetchall()
+        
+        # Activités récentes
+        cursor.execute('''
+            SELECT activity_type, description, xp_gained, coins_gained, timestamp
+            FROM activities
+            WHERE user_id = ?
+            ORDER BY timestamp DESC
+            LIMIT 10
+        ''', (user_id,))
+        
+        recent_activities = cursor.fetchall()
+        
+        conn.close()
+        
+        return {
+            'username': user_data[0],
+            'level': user_data[1],
+            'xp': user_data[2],
+            'total_xp': user_data[3],
+            'coins': user_data[4],
+            'created_at': user_data[5],
+            'last_login': user_data[6],
+            'badges': [
+                {
+                    'name': badge[0],
+                    'description': badge[1],
+                    'icon': badge[2],
+                    'rarity': badge[3],
+                    'earned_at': badge[4]
+                } for badge in badges
+            ],
+            'active_challenges': [
+                {
+                    'name': challenge[0],
+                    'description': challenge[1],
+                    'target_value': challenge[2],
+                    'progress': challenge[3],
+                    'xp_reward': challenge[4],
+                    'coin_reward': challenge[5],
+                    'percentage': (challenge[3] / challenge[2]) * 100
+                } for challenge in active_challenges
+            ],
+            'recent_activities': [
+                {
+                    'type': activity[0],
+                    'description': activity[1],
+                    'xp_gained': activity[2],
+                    'coins_gained': activity[3],
+                    'timestamp': activity[4]
+                } for activity in recent_activities
+            ]
+        }
+        
+    def add_xp(self, user_id, amount, activity_type, description=""):
+        """Ajoute de l'XP à un utilisateur"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        # Calculer les coins (1 XP = 0.1 coins)
+        coins_gained = int(amount * 0.1)
+        
+        # Mettre à jour l'utilisateur
+        cursor.execute('''
+            UPDATE users 
+            SET xp = xp + ?, total_xp = total_xp + ?, coins = coins + ?
+            WHERE id = ?
+        ''', (amount, amount, coins_gained, user_id))
+        
+        # Enregistrer l'activité
+        cursor.execute('''
+            INSERT INTO activities (user_id, activity_type, description, xp_gained, coins_gained)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (user_id, activity_type, description, amount, coins_gained))
+        
+        # Vérifier si l'utilisateur monte de niveau
+        cursor.execute('SELECT level, xp FROM users WHERE id = ?', (user_id,))
+        current_level, current_xp = cursor.fetchone()
+        
+        new_level = self.calculate_level(current_xp)
+        
+        if new_level > current_level:
+            # Monter de niveau
+            cursor.execute('UPDATE users SET level = ?, xp = ? WHERE id = ?', 
+                         (new_level, current_xp - self.xp_for_level(new_level), user_id))
+            
+            # Bonus de niveau
+            level_bonus = new_level * 50
+            cursor.execute('UPDATE users SET coins = coins + ? WHERE id = ?', (level_bonus, user_id))
+            
+            cursor.execute('''
+                INSERT INTO activities (user_id, activity_type, description, xp_gained, coins_gained)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (user_id, 'level_up', f'Niveau {new_level} atteint!', 0, level_bonus))
+        
+        conn.commit()
+        conn.close()
+        
+        # Vérifier les badges
+        self.check_badges(user_id)
+        
+        return new_level > current_level
+        
+    def calculate_level(self, total_xp):
+        """Calcule le niveau basé sur l'XP total"""
+        # Formule : Level = floor(sqrt(total_xp / 100))
+        return int((total_xp / 100) ** 0.5) + 1
+        
+    def xp_for_level(self, level):
+        """XP nécessaire pour atteindre un niveau"""
+        return ((level - 1) ** 2) * 100
+        
+    def check_badges(self, user_id):
+        """Vérifie et attribue les badges"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        # Récupérer les statistiques utilisateur
+        stats = self.get_user_stats(user_id)
+        
+        # Vérifier tous les badges
+        cursor.execute('SELECT * FROM badges')
+        badges = cursor.fetchall()
+        
+        for badge in badges:
+            badge_id = badge[0]
+            requirement_type = badge[5]
+            requirement_value = badge[6]
+            
+            # Vérifier si l'utilisateur a déjà ce badge
+            cursor.execute('''
+                SELECT COUNT(*) FROM user_badges 
+                WHERE user_id = ? AND badge_id = ?
+            ''', (user_id, badge_id))
+            
+            if cursor.fetchone()[0] > 0:
+                continue  # Badge déjà obtenu
+            
+            # Vérifier les conditions
+            earned = False
+            
+            if requirement_type == 'detections' and stats['detections'] >= requirement_value:
+                earned = True
+            elif requirement_type == 'models_trained' and stats['models_trained'] >= requirement_value:
+                earned = True
+            elif requirement_type == 'accuracy' and stats['best_accuracy'] >= requirement_value:
+                earned = True
+            elif requirement_type == 'speed' and stats['best_speed'] <= requirement_value:
+                earned = True
+            elif requirement_type == 'datasets_created' and stats['datasets_created'] >= requirement_value:
+                earned = True
+            elif requirement_type == 'cheats_created' and stats['cheats_created'] >= requirement_value:
+                earned = True
+            
+            if earned:
+                # Attribuer le badge
+                cursor.execute('''
+                    INSERT INTO user_badges (user_id, badge_id)
+                    VALUES (?, ?)
+                ''', (user_id, badge_id))
+                
+                # Donner les récompenses
+                xp_reward = badge[7]
+                coin_reward = badge[8]
+                
+                cursor.execute('''
+                    UPDATE users 
+                    SET xp = xp + ?, total_xp = total_xp + ?, coins = coins + ?
+                    WHERE id = ?
+                ''', (xp_reward, xp_reward, coin_reward, user_id))
+                
+                cursor.execute('''
+                    INSERT INTO activities (user_id, activity_type, description, xp_gained, coins_gained)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (user_id, 'badge_earned', f'Badge "{badge[1]}" obtenu!', xp_reward, coin_reward))
+        
+        conn.commit()
+        conn.close()
+        
+    def get_user_stats(self, user_id):
+        """Récupère les statistiques utilisateur pour les badges"""
+        # Simuler les stats (dans une vraie app, récupérer depuis la DB)
+        return {
+            'detections': random.randint(0, 100),
+            'models_trained': random.randint(0, 5),
+            'best_accuracy': random.randint(70, 99),
+            'best_speed': random.randint(50, 200),
+            'datasets_created': random.randint(0, 3),
+            'cheats_created': random.randint(0, 2)
+        }
+        
+    def get_leaderboard(self, limit=10):
+        """Récupère le classement"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT username, level, total_xp, 
+                   (SELECT COUNT(*) FROM user_badges WHERE user_id = users.id) as badges_count
+            FROM users
+            ORDER BY total_xp DESC
+            LIMIT ?
+        ''', (limit,))
+        
+        leaderboard = []
+        for i, row in enumerate(cursor.fetchall()):
+            leaderboard.append({
+                'rank': i + 1,
+                'username': row[0],
+                'level': row[1],
+                'total_xp': row[2],
+                'badges_count': row[3]
+            })
+        
+        conn.close()
+        
+        return leaderboard
+        
+    def record_activity(self, user_id, activity_type, details=None):
+        """Enregistre une activité et donne de l'XP"""
+        xp_rewards = {
+            'detection': 5,
+            'training': 50,
+            'dataset_creation': 100,
+            'cheat_creation': 75,
+            'login': 10,
+            'daily_challenge': 100
+        }
+        
+        xp_amount = xp_rewards.get(activity_type, 1)
+        description = f"Activité: {activity_type}"
+        
+        if details:
+            description += f" - {details}"
+        
+        level_up = self.add_xp(user_id, xp_amount, activity_type, description)
+        
+        return {
+            'xp_gained': xp_amount,
+            'level_up': level_up,
+            'description': description
+        }
+
+if __name__ == '__main__':
+    # Test du système
+    game = GamificationSystem()
+    
+    # Créer un utilisateur de test
+    user_id = game.create_user('TestUser')
+    print(f"Utilisateur créé: {user_id}")
+    
+    # Simuler des activités
+    for i in range(5):
+        result = game.record_activity(user_id, 'detection', f'Détection #{i+1}')
+        print(f"Activité {i+1}: {result}")
+    
+    # Profil utilisateur
+    profile = game.get_user_profile(user_id)
+    print(f"\\nProfil utilisateur:")
+    print(f"- Niveau: {profile['level']}")
+    print(f"- XP: {profile['xp']}")
+    print(f"- Badges: {len(profile['badges'])}")
+`,
+
+            'cheat_generator.py': `#!/usr/bin/env python3
+"""
+GameVision AI - Générateur de Cheats
+Création automatique de cheats basés sur la computer vision
+"""
+
+import cv2
+import numpy as np
+import pyautogui
+import time
+import threading
+import json
+import os
+from datetime import datetime
+import keyboard
+import mouse
+
+class CheatGenerator:
+    def __init__(self):
+        self.is_running = False
+        self.detection_thread = None
+        self.cheats = {}
+        self.load_cheats()
+        
+    def load_cheats(self):
+        """Charge les cheats sauvegardés"""
+        if os.path.exists('cheats.json'):
+            with open('cheats.json', 'r') as f:
+                self.cheats = json.load(f)
+        else:
+            self.cheats = {}
+            
+    def save_cheats(self):
+        """Sauvegarde les cheats"""
+        with open('cheats.json', 'w') as f:
+            json.dump(self.cheats, f, indent=2)
+            
+    def create_aimbot(self, target_color_range, sensitivity=0.8):
+        """Crée un aimbot basé sur la détection de couleur"""
+        cheat_config = {
+            'name': 'Aimbot',
+            'type': 'aimbot',
+            'target_color_range': target_color_range,
+            'sensitivity': sensitivity,
+            'hotkey': 'ctrl+shift+a',
+            'created_at': datetime.now().isoformat()
+        }
+        
+        self.cheats['aimbot'] = cheat_config
+        self.save_cheats()
+        
+        return cheat_config
+        
+    def create_object_tracker(self, object_type, action_type, action_params):
+        """Crée un tracker d'objet avec action automatique"""
+        cheat_config = {
+            'name': f'{object_type} Tracker',
+            'type': 'object_tracker',
+            'object_type': object_type,
+            'action_type': action_type,
+            'action_params': action_params,
+            'hotkey': 'ctrl+shift+t',
+            'created_at': datetime.now().isoformat()
+        }
+        
+        cheat_id = f"tracker_{object_type}_{int(time.time())}"
+        self.cheats[cheat_id] = cheat_config
+        self.save_cheats()
+        
+        return cheat_config
+        
+    def create_auto_clicker(self, target_image, click_offset=(0, 0)):
+        """Crée un auto-clicker basé sur reconnaissance d'image"""
+        cheat_config = {
+            'name': 'Auto Clicker',
+            'type': 'auto_clicker',
+            'target_image': target_image,
+            'click_offset': click_offset,
+            'hotkey': 'ctrl+shift+c',
+            'created_at': datetime.now().isoformat()
+        }
+        
+        self.cheats['auto_clicker'] = cheat_config
+        self.save_cheats()
+        
+        return cheat_config
+        
+    def create_resource_monitor(self, resource_indicators):
+        """Crée un moniteur de ressources"""
+        cheat_config = {
+            'name': 'Resource Monitor',
+            'type': 'resource_monitor',
+            'resource_indicators': resource_indicators,
+            'hotkey': 'ctrl+shift+r',
+            'created_at': datetime.now().isoformat()
+        }
+        
+        self.cheats['resource_monitor'] = cheat_config
+        self.save_cheats()
+        
+        return cheat_config
+        
+    def start_aimbot(self):
+        """Démarre l'aimbot"""
+        if 'aimbot' not in self.cheats:
+            return False
+            
+        config = self.cheats['aimbot']
+        target_color_range = config['target_color_range']
+        sensitivity = config['sensitivity']
+        
+        def aimbot_loop():
+            while self.is_running:
+                try:
+                    # Capture d'écran
+                    screenshot = pyautogui.screenshot()
+                    frame = np.array(screenshot)
+                    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                    
+                    # Détection de couleur
+                    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+                    
+                    # Masque de couleur
+                    lower_bound = np.array(target_color_range['lower'])
+                    upper_bound = np.array(target_color_range['upper'])
+                    mask = cv2.inRange(hsv, lower_bound, upper_bound)
+                    
+                    # Trouver les contours
+                    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                    
+                    if contours:
+                        # Prendre le plus gros contour
+                        largest_contour = max(contours, key=cv2.contourArea)
+                        
+                        # Calculer le centre
+                        M = cv2.moments(largest_contour)
+                        if M["m00"] != 0:
+                            cx = int(M["m10"] / M["m00"])
+                            cy = int(M["m01"] / M["m00"])
+                            
+                            # Obtenir la position actuelle de la souris
+                            current_x, current_y = pyautogui.position()
+                            
+                            # Calculer le déplacement
+                            dx = (cx - current_x) * sensitivity
+                            dy = (cy - current_y) * sensitivity
+                            
+                            # Déplacer la souris
+                            pyautogui.moveRel(dx, dy)
+                    
+                    time.sleep(0.01)  # 100 FPS
+                    
+                except Exception as e:
+                    print(f"Erreur aimbot: {e}")
+                    time.sleep(0.1)
+        
+        self.detection_thread = threading.Thread(target=aimbot_loop)
+        self.detection_thread.daemon = True
+        self.detection_thread.start()
+        
+        return True
+        
+    def start_object_tracker(self, cheat_id):
+        """Démarre un tracker d'objet"""
+        if cheat_id not in self.cheats:
+            return False
+            
+        config = self.cheats[cheat_id]
+        object_type = config['object_type']
+        action_type = config['action_type']
+        action_params = config['action_params']
+        
+        def tracker_loop():
+            while self.is_running:
+                try:
+                    # Capture d'écran
+                    screenshot = pyautogui.screenshot()
+                    frame = np.array(screenshot)
+                    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                    
+                    # Simuler la détection d'objet
+                    objects = self.detect_objects(frame, object_type)
+                    
+                    for obj in objects:
+                        # Exécuter l'action
+                        self.execute_action(action_type, action_params, obj)
+                    
+                    time.sleep(0.1)  # 10 FPS
+                    
+                except Exception as e:
+                    print(f"Erreur tracker: {e}")
+                    time.sleep(0.1)
+        
+        self.detection_thread = threading.Thread(target=tracker_loop)
+        self.detection_thread.daemon = True
+        self.detection_thread.start()
+        
+        return True
+        
+    def detect_objects(self, frame, object_type):
+        """Détecte des objets dans une frame"""
+        # Simuler la détection (remplacer par vraie détection)
+        objects = []
+        
+        if object_type == 'enemy':
+            # Simuler détection d'ennemis
+            objects = [
+                {'x': 100, 'y': 200, 'confidence': 0.9},
+                {'x': 300, 'y': 150, 'confidence': 0.8}
+            ]
+        elif object_type == 'powerup':
+            # Simuler détection de power-ups
+            objects = [
+                {'x': 250, 'y': 300, 'confidence': 0.95}
+            ]
+        elif object_type == 'resource':
+            # Simuler détection de ressources
+            objects = [
+                {'x': 400, 'y': 100, 'confidence': 0.85}
+            ]
+        
+        return objects
+        
+    def execute_action(self, action_type, action_params, detected_object):
+        """Exécute une action basée sur la détection"""
+        if action_type == 'click':
+            pyautogui.click(detected_object['x'], detected_object['y'])
+            
+        elif action_type == 'key_press':
+            pyautogui.press(action_params['key'])
+            
+        elif action_type == 'key_sequence':
+            for key in action_params['sequence']:
+                pyautogui.press(key)
+                time.sleep(0.1)
+                
+        elif action_type == 'mouse_drag':
+            pyautogui.drag(
+                action_params['dx'], 
+                action_params['dy'], 
+                duration=action_params.get('duration', 0.1)
+            )
+            
+        elif action_type == 'combo':
+            # Exécuter une combinaison d'actions
+            for sub_action in action_params['actions']:
+                self.execute_action(sub_action['type'], sub_action['params'], detected_object)
+                
+    def create_macro(self, name, actions):
+        """Crée une macro (séquence d'actions)"""
+        macro_config = {
+            'name': name,
+            'type': 'macro',
+            'actions': actions,
+            'hotkey': f'ctrl+shift+{len(self.cheats)}',
+            'created_at': datetime.now().isoformat()
+        }
+        
+        macro_id = f"macro_{name.lower().replace(' ', '_')}"
+        self.cheats[macro_id] = macro_config
+        self.save_cheats()
+        
+        return macro_config
+        
+    def execute_macro(self, macro_id):
+        """Exécute une macro"""
+        if macro_id not in self.cheats:
+            return False
+            
+        config = self.cheats[macro_id]
+        actions = config['actions']
+        
+        for action in actions:
+            if action['type'] == 'wait':
+                time.sleep(action['duration'])
+            elif action['type'] == 'click':
+                pyautogui.click(action['x'], action['y'])
+            elif action['type'] == 'key':
+                pyautogui.press(action['key'])
+            elif action['type'] == 'type':
+                pyautogui.write(action['text'])
+            elif action['type'] == 'scroll':
+                pyautogui.scroll(action['amount'])
+                
+        return True
+        
+    def setup_hotkeys(self):
+        """Configure les raccourcis clavier"""
+        for cheat_id, config in self.cheats.items():
+            hotkey = config.get('hotkey')
+            if hotkey:
+                if config['type'] == 'aimbot':
+                    keyboard.add_hotkey(hotkey, self.toggle_aimbot)
+                elif config['type'] == 'object_tracker':
+                    keyboard.add_hotkey(hotkey, lambda: self.toggle_tracker(cheat_id))
+                elif config['type'] == 'macro':
+                    keyboard.add_hotkey(hotkey, lambda: self.execute_macro(cheat_id))
+                    
+    def toggle_aimbot(self):
+        """Active/désactive l'aimbot"""
+        if self.is_running:
+            self.stop_all_cheats()
+        else:
+            self.is_running = True
+            self.start_aimbot()
+            
+    def toggle_tracker(self, cheat_id):
+        """Active/désactive un tracker"""
+        if self.is_running:
+            self.stop_all_cheats()
+        else:
+            self.is_running = True
+            self.start_object_tracker(cheat_id)
+            
+    def stop_all_cheats(self):
+        """Arrête tous les cheats"""
+        self.is_running = False
+        if self.detection_thread:
+            self.detection_thread.join(timeout=1)
+            
+    def get_cheat_templates(self):
+        """Retourne les templates de cheats disponibles"""
+        return {
+            'aimbot': {
+                'name': 'Aimbot',
+                'description': 'Vise automatiquement sur les cibles',
+                'params': ['target_color_range', 'sensitivity'],
+                'difficulty': 'Moyen'
+            },
+            'auto_clicker': {
+                'name': 'Auto Clicker',
+                'description': 'Clique automatiquement sur des éléments',
+                'params': ['target_image', 'click_interval'],
+                'difficulty': 'Facile'
+            },
+            'resource_farmer': {
+                'name': 'Resource Farmer',
+                'description': 'Collecte automatiquement des ressources',
+                'params': ['resource_type', 'collection_area'],
+                'difficulty': 'Moyen'
+            },
+            'combo_executor': {
+                'name': 'Combo Executor',
+                'description': 'Exécute des combos complexes',
+                'params': ['key_sequence', 'timing'],
+                'difficulty': 'Difficile'
+            },
+            'map_revealer': {
+                'name': 'Map Revealer',
+                'description': 'Révèle les éléments cachés',
+                'params': ['detection_area', 'reveal_method'],
+                'difficulty': 'Avancé'
+            }
+        }
+        
+    def generate_cheat_code(self, cheat_config):
+        """Génère le code Python pour un cheat"""
+        code = f'''#!/usr/bin/env python3
+"""
+Cheat généré par GameVision AI
+Nom: {cheat_config['name']}
+Type: {cheat_config['type']}
+Créé le: {cheat_config['created_at']}
+"""
+
+import cv2
+import numpy as np
+import pyautogui
+import time
+import threading
+
+class {cheat_config['name'].replace(' ', '')}Cheat:
+    def __init__(self):
+        self.is_running = False
+        self.thread = None
+        
+    def start(self):
+        """Démarre le cheat"""
+        if self.is_running:
+            return
+            
+        self.is_running = True
+        self.thread = threading.Thread(target=self.run)
+        self.thread.daemon = True
+        self.thread.start()
+        
+    def stop(self):
+        """Arrête le cheat"""
+        self.is_running = False
+        if self.thread:
+            self.thread.join()
+            
+    def run(self):
+        """Boucle principale du cheat"""
+        while self.is_running:
+            try:
+                # Capture d'écran
+                screenshot = pyautogui.screenshot()
+                frame = np.array(screenshot)
+                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                
+                # Logique du cheat
+                self.execute_cheat_logic(frame)
+                
+                time.sleep(0.01)  # 100 FPS
+                
+            except Exception as e:
+                print(f"Erreur cheat: {{e}}")
+                time.sleep(0.1)
+                
+    def execute_cheat_logic(self, frame):
+        """Logique spécifique du cheat"""
+        # Configuration du cheat
+        config = {json.dumps(cheat_config, indent=8)}
+        
+        # Ici, implémenter la logique spécifique
+        pass
+
+if __name__ == '__main__':
+    cheat = {cheat_config['name'].replace(' ', '')}Cheat()
+    
+    print("Cheat {cheat_config['name']} démarré")
+    print("Appuyez sur Ctrl+C pour arrêter")
+    
+    try:
+        cheat.start()
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        cheat.stop()
+        print("Cheat arrêté")
+'''
+        
+        return code
+        
+    def export_cheat(self, cheat_id, export_path):
+        """Exporte un cheat vers un fichier"""
+        if cheat_id not in self.cheats:
+            return False
+            
+        config = self.cheats[cheat_id]
+        code = self.generate_cheat_code(config)
+        
+        filename = f"{config['name'].replace(' ', '_').lower()}_cheat.py"
+        filepath = os.path.join(export_path, filename)
+        
+        with open(filepath, 'w') as f:
+            f.write(code)
+            
+        return filepath
+
+if __name__ == '__main__':
+    generator = CheatGenerator()
+    
+    # Exemple de création d'aimbot
+    aimbot_config = generator.create_aimbot(
+        target_color_range={
+            'lower': [0, 100, 100],
+            'upper': [10, 255, 255]
+        },
+        sensitivity=0.8
+    )
+    
+    print("Aimbot créé:", aimbot_config)
+    
+    # Exemple de macro
+    macro_config = generator.create_macro(
+        "Combo Attack",
+        [
+            {'type': 'key', 'key': 'space'},
+            {'type': 'wait', 'duration': 0.1},
+            {'type': 'key', 'key': 'ctrl'},
+            {'type': 'wait', 'duration': 0.1},
+            {'type': 'click', 'x': 400, 'y': 300}
+        ]
+    )
+    
+    print("Macro créée:", macro_config)
+`,
+
+            'templates/index.html': `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameVision AI - Interface Principale</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.2/dist/socket.io.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <nav class="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">
+                <i class="fas fa-robot mr-2"></i>GameVision AI
+            </h1>
+            <div class="flex space-x-4">
+                <button onclick="toggleCamera()" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded">
+                    <i class="fas fa-camera mr-2"></i>Caméra
+                </button>
+                <button onclick="toggleScreen()" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded">
+                    <i class="fas fa-desktop mr-2"></i>Écran
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Vidéo principale -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-bold mb-4">Détection en Temps Réel</h2>
+                    <div class="relative">
+                        <video id="videoFeed" class="w-full h-96 bg-black rounded" autoplay playsinline muted></video>
+                        <canvas id="detectionCanvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+                    </div>
+                    <div class="mt-4 flex space-x-2">
+                        <button onclick="startDetection()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                            <i class="fas fa-play mr-2"></i>Démarrer
+                        </button>
+                        <button onclick="stopDetection()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+                            <i class="fas fa-stop mr-2"></i>Arrêter
+                        </button>
+                        <button onclick="takeScreenshot()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                            <i class="fas fa-camera mr-2"></i>Capture
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panneau de contrôle -->
+            <div>
+                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                    <h2 class="text-xl font-bold mb-4">Hardware</h2>
+                    <div id="hardwareInfo" class="space-y-2 text-sm">
+                        <div class="text-gray-500">Chargement...</div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                    <h2 class="text-xl font-bold mb-4">Détections</h2>
+                    <div id="detectionsList" class="space-y-2 text-sm max-h-64 overflow-y-auto">
+                        <div class="text-gray-500">Aucune détection</div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-bold mb-4">Statistiques</h2>
+                    <canvas id="statsChart" style="height: 200px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglets -->
+        <div class="mt-8">
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex space-x-8">
+                    <button onclick="showTab('datasets')" class="tab-button py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        <i class="fas fa-database mr-2"></i>Datasets
+                    </button>
+                    <button onclick="showTab('training')" class="tab-button py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        <i class="fas fa-brain mr-2"></i>Entraînement
+                    </button>
+                    <button onclick="showTab('cheats')" class="tab-button py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        <i class="fas fa-code mr-2"></i>Cheats
+                    </button>
+                    <button onclick="showTab('gamification')" class="tab-button py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        <i class="fas fa-trophy mr-2"></i>Progression
+                    </button>
+                </nav>
+            </div>
+
+            <div id="tabContent" class="mt-6">
+                <!-- Contenu des onglets sera injecté ici -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let socket;
+        let videoStream;
+        let detectionRunning = false;
+        let currentTab = 'datasets';
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSocket();
+            loadHardwareInfo();
+            showTab('datasets');
+        });
+        
+        function initializeSocket() {
+            socket = io();
+            
+            socket.on('connect', function() {
+                console.log('Connecté au serveur');
+            });
+            
+            socket.on('detection_result', function(data) {
+                updateDetections(data);
+            });
+        }
+        
+        async function loadHardwareInfo() {
+            try {
+                const response = await fetch('/api/hardware');
+                const data = await response.json();
+                displayHardwareInfo(data);
+            } catch (error) {
+                console.error('Erreur hardware:', error);
+            }
+        }
+        
+        function displayHardwareInfo(data) {
+            const container = document.getElementById('hardwareInfo');
+            container.innerHTML = \`
+                <div class="mb-2">
+                    <strong>CPU:</strong> \${data.cpu.name}<br>
+                    <small>\${data.cpu.cores} cores, \${data.cpu.usage}% utilisé</small>
+                </div>
+                <div class="mb-2">
+                    <strong>RAM:</strong> \${(data.ram.used / 1024 / 1024 / 1024).toFixed(1)}GB / \${(data.ram.total / 1024 / 1024 / 1024).toFixed(1)}GB<br>
+                    <small>\${data.ram.percentage}% utilisé</small>
+                </div>
+                <div class="mb-2">
+                    <strong>GPU:</strong> \${data.gpu[0] ? data.gpu[0].name : 'Non détecté'}<br>
+                    \${data.gpu[0] ? \`<small>\${data.gpu[0].memory_used}MB / \${data.gpu[0].memory_total}MB</small>\` : ''}
+                </div>
+            \`;
+        }
+        
+        async function toggleCamera() {
+            try {
+                const video = document.getElementById('videoFeed');
+                
+                if (videoStream) {
+                    videoStream.getTracks().forEach(track => track.stop());
+                    videoStream = null;
+                    video.srcObject = null;
+                    return;
+                }
+                
+                videoStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: 640, height: 480 },
+                    audio: false
+                });
+                
+                video.srcObject = videoStream;
+            } catch (error) {
+                console.error('Erreur caméra:', error);
+                alert('Impossible d\'accéder à la caméra');
+            }
+        }
+        
+        async function toggleScreen() {
+            try {
+                const video = document.getElementById('videoFeed');
+                
+                if (videoStream) {
+                    videoStream.getTracks().forEach(track => track.stop());
+                    videoStream = null;
+                    video.srcObject = null;
+                    return;
+                }
+                
+                videoStream = await navigator.mediaDevices.getDisplayMedia({
+                    video: { width: 1280, height: 720 },
+                    audio: false
+                });
+                
+                video.srcObject = videoStream;
+            } catch (error) {
+                console.error('Erreur capture écran:', error);
+                alert('Impossible de capturer l\'écran');
+            }
+        }
+        
+        function startDetection() {
+            if (!videoStream) {
+                alert('Veuillez d\'abord activer la caméra ou la capture d\'écran');
+                return;
+            }
+            
+            detectionRunning = true;
+            socket.emit('start_detection');
+            
+            // Simuler la détection (remplacer par vraie détection)
+            setInterval(function() {
+                if (detectionRunning) {
+                    const fakeDetection = {
+                        objects: [
+                            { name: 'person', confidence: 0.95, bbox: [100, 100, 200, 300] },
+                            { name: 'car', confidence: 0.88, bbox: [300, 150, 450, 250] }
+                        ],
+                        processing_time: 0.1
+                    };
+                    updateDetections(fakeDetection);
+                }
+            }, 1000);
+        }
+        
+        function stopDetection() {
+            detectionRunning = false;
+        }
+        
+        function updateDetections(data) {
+            const container = document.getElementById('detectionsList');
+            const detectionHTML = data.objects.map(obj => \`
+                <div class="bg-gray-50 p-2 rounded mb-2">
+                    <strong>\${obj.name}</strong> (\${(obj.confidence * 100).toFixed(1)}%)
+                </div>
+            \`).join('');
+            
+            container.innerHTML = detectionHTML;
+            
+            // Dessiner les bounding boxes
+            drawBoundingBoxes(data.objects);
+        }
+        
+        function drawBoundingBoxes(objects) {
+            const video = document.getElementById('videoFeed');
+            const canvas = document.getElementById('detectionCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Ajuster la taille du canvas
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Effacer le canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Dessiner les détections
+            objects.forEach(obj => {
+                const [x, y, w, h] = obj.bbox;
+                
+                ctx.strokeStyle = '#00FF00';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(x, y, w - x, h - y);
+                
+                ctx.fillStyle = '#00FF00';
+                ctx.font = '16px Arial';
+                ctx.fillText(\`\${obj.name} (\${(obj.confidence * 100).toFixed(1)}%)\`, x, y - 10);
+            });
+        }
+        
+        function showTab(tabName) {
+            currentTab = tabName;
+            
+            // Mettre à jour les boutons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('border-blue-500', 'text-blue-600');
+                btn.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            event.target.classList.remove('border-transparent', 'text-gray-500');
+            event.target.classList.add('border-blue-500', 'text-blue-600');
+            
+            // Charger le contenu
+            loadTabContent(tabName);
+        }
+        
+        function loadTabContent(tabName) {
+            const container = document.getElementById('tabContent');
+            
+            switch (tabName) {
+                case 'datasets':
+                    container.innerHTML = \`
+                        <div class="bg-white rounded-lg shadow-lg p-6">
+                            <h3 class="text-lg font-bold mb-4">Gestionnaire de Datasets</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div class="border rounded-lg p-4">
+                                    <h4 class="font-semibold">COCO 2017</h4>
+                                    <p class="text-sm text-gray-600">Dataset de détection d'objets</p>
+                                    <button class="mt-2 bg-blue-500 text-white px-3 py-1 rounded text-sm">Télécharger</button>
+                                </div>
+                                <div class="border rounded-lg p-4">
+                                    <h4 class="font-semibold">Open Images</h4>
+                                    <p class="text-sm text-gray-600">Dataset Google 600 classes</p>
+                                    <button class="mt-2 bg-blue-500 text-white px-3 py-1 rounded text-sm">Télécharger</button>
+                                </div>
+                                <div class="border rounded-lg p-4">
+                                    <h4 class="font-semibold">Custom Dataset</h4>
+                                    <p class="text-sm text-gray-600">Créer un dataset personnalisé</p>
+                                    <button class="mt-2 bg-green-500 text-white px-3 py-1 rounded text-sm">Créer</button>
+                                </div>
+                            </div>
+                        </div>
+                    \`;
+                    break;
+                    
+                case 'training':
+                    container.innerHTML = \`
+                        <div class="bg-white rounded-lg shadow-lg p-6">
+                            <h3 class="text-lg font-bold mb-4">Entraînement de Modèles</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="font-semibold mb-2">Nouveau Modèle</h4>
+                                    <form onsubmit="startTraining(event)">
+                                        <div class="mb-4">
+                                            <label class="block text-sm font-medium mb-1">Nom du modèle</label>
+                                            <input type="text" class="w-full p-2 border rounded" placeholder="Mon modèle">
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="block text-sm font-medium mb-1">Dataset</label>
+                                            <select class="w-full p-2 border rounded">
+                                                <option>COCO 2017</option>
+                                                <option>Custom Dataset</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="w-full bg-green-500 text-white py-2 rounded">
+                                            Commencer l'entraînement
+                                        </button>
+                                    </form>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-2">Modèles Existants</h4>
+                                    <div class="space-y-2">
+                                        <div class="border rounded p-3">
+                                            <div class="flex justify-between items-center">
+                                                <span>Model_001</span>
+                                                <span class="text-sm text-green-500">Terminé</span>
+                                            </div>
+                                            <div class="text-xs text-gray-500">Précision: 87%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    \`;
+                    break;
+                    
+                case 'cheats':
+                    container.innerHTML = \`
+                        <div class="bg-white rounded-lg shadow-lg p-6">
+                            <h3 class="text-lg font-bold mb-4">Générateur de Cheats</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div class="border rounded-lg p-4">
+                                    <h4 class="font-semibold">Aimbot</h4>
+                                    <p class="text-sm text-gray-600">Vise automatiquement sur les cibles</p>
+                                    <button class="mt-2 bg-red-500 text-white px-3 py-1 rounded text-sm">Créer</button>
+                                </div>
+                                <div class="border rounded-lg p-4">
+                                    <h4 class="font-semibold">Auto Clicker</h4>
+                                    <p class="text-sm text-gray-600">Clique automatiquement</p>
+                                    <button class="mt-2 bg-red-500 text-white px-3 py-1 rounded text-sm">Créer</button>
+                                </div>
+                                <div class="border rounded-lg p-4">
+                                    <h4 class="font-semibold">Object Tracker</h4>
+                                    <p class="text-sm text-gray-600">Suit des objets spécifiques</p>
+                                    <button class="mt-2 bg-red-500 text-white px-3 py-1 rounded text-sm">Créer</button>
+                                </div>
+                            </div>
+                        </div>
+                    \`;
+                    break;
+                    
+                case 'gamification':
+                    container.innerHTML = \`
+                        <div class="bg-white rounded-lg shadow-lg p-6">
+                            <h3 class="text-lg font-bold mb-4">Progression & Badges</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="font-semibold mb-2">Niveau Actuel</h4>
+                                    <div class="text-3xl font-bold text-blue-600">Niveau 5</div>
+                                    <div class="bg-gray-200 rounded-full h-2 mt-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 65%"></div>
+                                    </div>
+                                    <div class="text-sm text-gray-600 mt-1">1,300 / 2,000 XP</div>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-2">Badges Récents</h4>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-2xl">🎯</span>
+                                            <div>
+                                                <div class="font-medium">Détecteur Expérimenté</div>
+                                                <div class="text-xs text-gray-500">100 détections</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-2xl">🧠</span>
+                                            <div>
+                                                <div class="font-medium">Formateur</div>
+                                                <div class="text-xs text-gray-500">Premier modèle</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    \`;
+                    break;
+            }
+        }
+        
+        function startTraining(event) {
+            event.preventDefault();
+            alert('Entraînement commencé! (Fonctionnalité en cours de développement)');
+        }
+        
+        function takeScreenshot() {
+            const video = document.getElementById('videoFeed');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            
+            const link = document.createElement('a');
+            link.download = 'gamevision_screenshot.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+</body>
+</html>
+`,
+
+            'requirements.txt': `flask==2.3.3
+flask-socketio==5.3.6
+opencv-python==4.8.1.78
+numpy==1.24.3
+tensorflow==2.13.0
+psutil==5.9.5
+GPUtil==1.4.0
+pyautogui==0.9.54
+keyboard==0.13.5
+mouse==0.7.1
+Pillow==10.0.0
+sqlite3
+platform
+threading
+json
+time
+datetime
+os
+sys
+shutil
+urllib
+zipfile
+tarfile
+hashlib
+random
+`,
+
+            'install.bat': `@echo off
+echo Installation de GameVision AI...
+echo.
+
+echo Verification de Python...
+python --version
+if errorlevel 1 (
+    echo Python n'est pas installe ou n'est pas dans le PATH
+    echo Veuillez installer Python 3.8+ depuis https://python.org
+    pause
+    exit /b 1
+)
+
+echo Installation des dependances...
+pip install -r requirements.txt
+
+echo.
+echo Installation terminee!
+echo.
+echo Pour demarrer l'application:
+echo python server.py
+echo.
+echo Puis ouvrez votre navigateur sur http://localhost:5000
+pause
+`,
+
+            'start.bat': `@echo off
+echo Demarrage de GameVision AI...
+echo.
+echo Serveur demarre sur http://localhost:5000
+echo Appuyez sur Ctrl+C pour arreter
+echo.
+python server.py
+pause
+`,
+
+            'README.md': `# GameVision AI - Application Complète
+
+## Description
+GameVision AI est une application révolutionnaire de computer vision qui combine détection d'objets, entraînement de modèles IA, création de cheats gaming, et système de gamification.
+
+## Fonctionnalités
+
+### 🎯 Détection d'Objets
+- Détection temps réel avec webcam et capture d'écran
+- Support de multiples modèles (COCO, custom)
+- Étiquetage automatique avec bounding boxes
+- Performance optimisée selon votre hardware
+
+### 🧠 Entraînement IA
+- Entraînement de modèles personnalisés
+- Interface simple pour débutants
+- Monitoring en temps réel des performances
+- Sauvegarde et chargement de modèles
+
+### 💾 Gestion Datasets
+- Téléchargement automatique de datasets populaires
+- Création de datasets personnalisés
+- Outils d'annotation intégrés
+- Optimisation d'espace intelligent
+
+### 🎮 Création de Cheats
+- Générateur d'aimbot basé sur computer vision
+- Auto-clickers intelligents
+- Système de macros avancé
+- Templates pour différents types de jeux
+
+### 🏆 Gamification
+- Système de niveaux et XP
+- Badges et achievements
+- Défis quotidiens
+- Leaderboards communautaires
+
+### ⚡ Optimisation Hardware
+- Détection automatique de votre configuration
+- Optimisation selon GPU/CPU disponible
+- Monitoring des performances
+- Gestion intelligente des ressources
+
+## Installation
+
+### Prérequis
+- Python 3.8+
+- Webcam (optionnel

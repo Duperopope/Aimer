@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMER PRO - Computer Vision AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.2/dist/socket.io.min.js"></script>
+    <style>
+        .cyber-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .cyber-dark {
+            background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460);
+        }
+
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .detection-box {
+            border: 2px solid;
+            position: absolute;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+        }
+
+        .hardware-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .level-progress {
+            background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6);
+            height: 8px;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .achievement-badge {
+            background: linear-gradient(45deg, #f59e0b, #ef4444);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .neon-text {
+            text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-online {
+            background-color: #10b981;
+        }
+
+        .status-offline {
+            background-color: #ef4444;
+        }
+
+        .status-warning {
+            background-color: #f59e0b;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Header -->
+    <header class="cyber-gradient p-4 border-b border-blue-500">
+        <div class="container mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <i class="fas fa-robot text-3xl text-blue-400 neon-text"></i>
+                <h1 class="text-2xl font-bold neon-text">AIMER PRO</h1>
+                <div class="flex items-center space-x-2">
+                    <div id="systemStatus" class="status-indicator status-offline"></div>
+                    <span class="text-sm" id="systemStatusText">Système Hors Ligne</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="achievement-badge">Level <span id="userLevel">1</span></div>
+                <div class="w-32 bg-gray-700 rounded-full h-2">
+                    <div class="level-progress" id="levelProgress" style="width: 0%"></div>
+                </div>
+                <span class="text-sm"><span id="userXP">0</span> XP</span>
+                <button id="loginBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">
+                    <i class="fas fa-user mr-2"></i>Connexion
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mx-auto p-4">
+        <!-- Hardware & Performance Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+            <!-- Hardware Monitor -->
+            <div class="hardware-card p-4 rounded-lg card-hover">
+                <h3 class="text-lg font-semibold mb-3 flex items-center">
+                    <i class="fas fa-microchip mr-2 text-blue-400"></i>
+                    Hardware Monitor
+                </h3>
+                <div id="hardwareInfo" class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span>CPU:</span>
+                        <span id="cpuUsage">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>RAM:</span>
+                        <span id="ramUsage">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>GPU:</span>
+                        <span id="gpuUsage">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Temp:</span>
+                        <span id="cpuTemp">-</span>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="text-xs text-gray-400 mb-1">Score IA</div>
+                    <div class="w-full bg-gray-700 rounded-full h-2">
+                        <div id="aiScore" class="bg-green-500 h-2 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <div class="text-xs text-center mt-1" id="aiScoreText">0%</div>
+                </div>
+            </div>
+
+            <!-- Performance Stats -->
+            <div class="hardware-card p-4 rounded-lg card-hover">
+                <h3 class="text-lg font-semibold mb-3 flex items-center">
+                    <i class="fas fa-chart-line mr-2 text-green-400"></i>
+                    Performance
+                </h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span>FPS:</span>
+                        <span id="fpsCounter" class="text-green-400">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Détections:</span>
+                        <span id="detectionCount" class="text-blue-400">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Temps:</span>
+                        <span id="processTime" class="text-yellow-400">0ms</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Modèle:</span>
+                        <span id="modelName" class="text-purple-400">Detectron2</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Progress -->
+            <div class="hardware-card p-4 rounded-lg card-hover">
+                <h3 class="text-lg font-semibold mb-3 flex items-center">
+                    <i class="fas fa-trophy mr-2 text-yellow-400"></i>
+                    Progression
+                </h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span>Niveau:</span>
+                        <span id="currentLevel" class="text-yellow-400">1</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>XP:</span>
+                        <span id="currentXP" class="text-blue-400">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Badges:</span>
+                        <span id="badgeCount" class="text-purple-400">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Rang:</span>
+                        <span id="userRank" class="text-green-400">#-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="hardware-card p-4 rounded-lg card-hover">
+                <h3 class="text-lg font-semibold mb-3 flex items-center">
+                    <i class="fas fa-bolt mr-2 text-red-400"></i>
+                    Actions Rapides
+                </h3>
+                <div class="space-y-2">
+                    <button id="quickDetectBtn"
+                        class="w-full bg-green-600 hover:bg-green-700 px-3 py-2 rounded text-sm">
+                        <i class="fas fa-play mr-2"></i>Détection
+                    </button>
+                    <button id="quickTrainBtn" class="w-full bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded text-sm">
+                        <i class="fas fa-brain mr-2"></i>Entraînement
+                    </button>
+                    <button id="quickDatasetBtn"
+                        class="w-full bg-purple-600 hover:bg-purple-700 px-3 py-2 rounded text-sm">
+                        <i class="fas fa-database mr-2"></i>Dataset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Interface -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Video Detection -->
+            <div class="lg:col-span-2 hardware-card p-6 rounded-lg card-hover">
+                <h2 class="text-xl font-bold mb-4 flex items-center">
+                    <i class="fas fa-eye mr-2 text-red-400"></i>
+                    Détection Temps Réel
+                </h2>
+
+                <!-- Source Selection -->
+                <div class="mb-4 flex space-x-2">
+                    <select id="videoSource" class="flex-1 bg-gray-700 border border-gray-600 rounded px-3 py-2">
+                        <option value="">Sélectionner une source</option>
+                        <option value="webcam">Webcam</option>
+                        <option value="screen">Capture d'écran</option>
+                        <option value="file">Fichier vidéo</option>
+                    </select>
+                    <button id="startDetectionBtn" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">
+                        <i class="fas fa-play mr-2"></i>Démarrer
+                    </button>
+                    <button id="stopDetectionBtn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">
+                        <i class="fas fa-stop mr-2"></i>Arrêter
+                    </button>
+                </div>
+
+                <!-- Video Display -->
+                <div class="relative bg-black rounded-lg overflow-hidden" style="height: 400px;">
+                    <video id="videoElement" class="w-full h-full object-cover" autoplay muted playsinline></video>
+                    <canvas id="detectionCanvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+
+                    <!-- Detection Overlay -->
+                    <div id="detectionOverlay" class="absolute inset-0 pointer-events-none">
+                        <!-- Les détections seront affichées ici -->
+                    </div>
+
+                    <!-- Status Overlay -->
+                    <div class="absolute top-4 left-4 bg-black bg-opacity-50 rounded px-3 py-2">
+                        <div class="flex items-center space-x-2">
+                            <div id="detectionStatus" class="status-indicator status-offline"></div>
+                            <span id="detectionStatusText" class="text-sm">Arrêté</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detection Controls -->
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Seuil de Confiance</label>
+                        <input type="range" id="confidenceSlider" min="0.1" max="1" step="0.1" value="0.5"
+                            class="w-full">
+                        <div class="flex justify-between text-xs text-gray-400">
+                            <span>10%</span>
+                            <span id="confidenceValue">50%</span>
+                            <span>100%</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Mode Visualisation</label>
+                        <select id="visualizationMode"
+                            class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2">
+                            <option value="bbox">Rectangles</option>
+                            <option value="mask">Masques</option>
+                            <option value="panoptic">Vision IA</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Actions</label>
+                        <div class="flex space-x-2">
+                            <button id="screenshotBtn"
+                                class="flex-1 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded text-sm">
+                                <i class="fas fa-camera mr-1"></i>Capture
+                            </button>
+                            <button id="recordBtn"
+                                class="flex-1 bg-purple-600 hover:bg-purple-700 px-3 py-2 rounded text-sm">
+                                <i class="fas fa-record-vinyl mr-1"></i>Record
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Side Panel -->
+            <div class="space-y-6">
+                <!-- Detection Results -->
+                <div class="hardware-card p-4 rounded-lg card-hover">
+                    <h3 class="text-lg font-semibold mb-3 flex items-center">
+                        <i class="fas fa-list mr-2 text-cyan-400"></i>
+                        Détections
+                    </h3>
+                    <div id="detectionResults" class="space-y-2 max-h-64 overflow-y-auto">
+                        <div class="text-gray-500 text-sm text-center py-4">Aucune détection</div>
+                    </div>
+                </div>
+
+                <!-- Recent Badges -->
+                <div class="hardware-card p-4 rounded-lg card-hover">
+                    <h3 class="text-lg font-semibold mb-3 flex items-center">
+                        <i class="fas fa-medal mr-2 text-yellow-400"></i>
+                        Badges Récents
+                    </h3>
+                    <div id="recentBadges" class="space-y-2">
+                        <div class="text-gray-500 text-sm text-center py-4">Aucun badge</div>
+                    </div>
+                </div>
+
+                <!-- Leaderboard -->
+                <div class="hardware-card p-4 rounded-lg card-hover">
+                    <h3 class="text-lg font-semibold mb-3 flex items-center">
+                        <i class="fas fa-crown mr-2 text-purple-400"></i>
+                        Classement
+                    </h3>
+                    <div id="leaderboard" class="space-y-2">
+                        <div class="text-gray-500 text-sm text-center py-4">Chargement...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Section -->
+        <div class="mt-8">
+            <div class="border-b border-gray-700">
+                <nav class="-mb-px flex space-x-8">
+                    <button onclick="showTab('datasets')"
+                        class="tab-button py-2 px-1 border-b-2 border-blue-500 text-blue-400 font-medium">
+                        <i class="fas fa-database mr-2"></i>Datasets
+                    </button>
+                    <button onclick="showTab('training')"
+                        class="tab-button py-2 px-1 border-b-2 border-transparent text-gray-400 hover:text-gray-300">
+                        <i class="fas fa-brain mr-2"></i>Entraînement
+                    </button>
+                    <button onclick="showTab('cheats')"
+                        class="tab-button py-2 px-1 border-b-2 border-transparent text-gray-400 hover:text-gray-300">
+                        <i class="fas fa-code mr-2"></i>Vision Cheats
+                    </button>
+                    <button onclick="showTab('analytics')"
+                        class="tab-button py-2 px-1 border-b-2 border-transparent text-gray-400 hover:text-gray-300">
+                        <i class="fas fa-chart-bar mr-2"></i>Analytics
+                    </button>
+                </nav>
+            </div>
+
+            <div id="tabContent" class="mt-6">
+                <!-- Tab content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-4">Connexion AIMER PRO</h3>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Nom d'utilisateur</label>
+                <input type="text" id="usernameInput"
+                    class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2" placeholder="Entrez votre nom">
+            </div>
+            <div class="flex space-x-3">
+                <button id="loginSubmitBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">
+                    Connexion
+                </button>
+                <button id="loginCancelBtn" class="flex-1 bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded">
+                    Annuler
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notifications" class="fixed top-4 right-4 z-50 space-y-2">
+        <!-- Notifications will be added here -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>

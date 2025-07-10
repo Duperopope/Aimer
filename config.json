@@ -1,0 +1,65 @@
+{
+  "general": {
+    "language": "Français",
+    "theme": "Sombre",
+    "auto_start": false,
+    "auto_update": true
+  },
+  "detectron2": {
+    "default_task": "detection",
+    "confidence_threshold": 0.5,
+    "models": {
+      "detection": "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml",
+      "instance_segmentation": "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml",
+      "panoptic_segmentation": "COCO-PanopticSegmentation/panoptic_fpn_R_50_3x.yaml",
+      "keypoint_detection": "COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x.yaml"
+    },
+    "device": "auto",
+    "batch_size": 1,
+    "default_model": "COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"
+  },
+  "app": {
+    "name": "AIMER PRO",
+    "version": "1.0.0",
+    "description": "Application de Détection Universelle avec Detectron2",
+    "license": "Apache 2.0",
+    "author": "© 2025"
+  },
+  "ui": {
+    "theme": "dark",
+    "language": "fr",
+    "window": {
+      "width": 1280,
+      "height": 720,
+      "resizable": true
+    },
+    "font": {
+      "family": "Inter",
+      "size": 10
+    }
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "logs/aimer.log",
+    "max_size_mb": 10,
+    "backup_count": 5
+  },
+  "performance": {
+    "gpu_optimization": true,
+    "memory_limit_gb": 4,
+    "max_concurrent_detections": 1
+  },
+  "paths": {
+    "models": "models/",
+    "datasets": "datasets/",
+    "exports": "exports/",
+    "screenshots": "screenshots/",
+    "logs": "logs/"
+  },
+  "api": {
+    "enabled": false,
+    "host": "localhost",
+    "port": 5000,
+    "cors": true
+  }
+}

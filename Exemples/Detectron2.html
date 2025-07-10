@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameVision AI Master - Version Corrigée</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js"></script>
+    <style>
+        .cyber-gradient {
+            background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460);
+        }
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+        .detection-box {
+            border: 2px solid;
+            position: absolute;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+        }
+        .hardware-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        .level-progress {
+            background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6);
+            height: 8px;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .achievement-badge {
+            background: linear-gradient(45deg, #f59e0b, #ef4444);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        .file-explorer {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .file-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .file-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+        .custom-label {
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgb(139, 92, 246);
+            color: rgb(139, 92, 246);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+        }
+        .youtube-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+        }
+        .youtube-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Header -->
+    <header class="cyber-gradient p-4 border-b border-blue-500">
+        <div class="container mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <i class="fas fa-robot text-3xl text-blue-400"></i>
+                <h1 class="text-2xl font-bold">GameVision AI Master</h1>
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-sm">Système Opérationnel</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="achievement-badge">Level <span id="userLevel">1</span></div>
+                <div class="w-32 bg-gray-700 rounded-full h-2">
+                    <div class="level-progress" id="levelProgress" style="width: 0%"></div>
+                </div>
+                <span class="text-sm"><span id="userXP">0</span> XP</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mx-auto p-4">
+        <!-- Hardware Detection Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div class="hardware-card p-4 rounded-lg">
+                <h3 class="text-lg font-semibold mb-3 flex items-center">
+                    <i class="fas fa-microchip mr-2 text-blue-400"></i>
+                    Détection Hardware Réelle
+                </h3>
+                <div id="hardwareInfo" class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span>Système:</span>
+                        <span id="systemOS">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Processeur:</span>
+                        <span id="cpuCores">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Mémoire:</span>
+                        <span id="memoryInfo">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>GPU:</span>
+                        <span id="gpuInfo">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Résolution:</span>
+                        <span id="screenRes">-</span>
+                    </div>
+                </div>
+                <button id="refreshHardware" class="mt-3 w-full bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm">
+                    <i class="fas fa-sync-alt mr-2"></i>Actualiser
+                </button>
+            </div>
+
+            <!-- Database Management -->
+            <div class="hardware-card p-4 rounded-lg">
+                <h3 class="text-lg font-semibold mb-3 flex items-center">
+                    <i class="fas fa-database mr-2 text-green-400"></i>
+                    Base de Données
+                </h3>
+                <div id="databaseInfo" class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span>Statut:</span>
+                        <span id="dbStatus" class="text-green-400">Connecté</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Taille:</span>
+                        <span id="dbSize">0 MB</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Modèles:</span>
+                        <span id="modelCount">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Datasets:</span>
+                        <span id="datasetCount">0</span>
+                    </div>
+                </div>
+                <div class="mt-3 space-y-2">
+                    <button id="openDbFolder" class="w-full bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-sm">
+                        <i class="fas fa-folder-open mr-2"></i>Ouvrir Dossier
+                    </button>
+                    <button id="clearDb" class="w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm">
+                        <i class="fas fa-trash mr-2"></i>Nettoyer DB
+                    </button>
+                </div>
+            </div>
+
+            <!-- File Explorer -->
+            <div class="hardware-card p-4 rounded-lg">
+                <h3 class="text-lg font-semibold mb-3 flex items-center">
+                    <i class="fas fa-folder mr-2 text-yellow-400"></i>
+                    Gestionnaire de Fichiers
+                </h3>
+                <div class="file-explorer">
+                    <div id="fileExplorer" class="text-sm">
+                        <div class="file-item" data-path="/" data-type="folder">
+                            <i class="fas fa-folder mr-2 text-yellow-400"></i>
+                            GameVision_Data/
+                        </div>
+                        <div class="file-item pl-4" data-path="/models" data-type="folder">
+                            <i class="fas fa-folder mr-2 text-yellow-400"></i>
+                            models/
+                        </div>
+                        <div class="file-item pl-8" data-path="/models/coco-ssd" data-type="file">
+                            <i class="fas fa-file mr-2 text-blue-400"></i>
+                            coco-ssd.json (2.3MB)
+                        </div>
+                        <div class="file-item pl-4" data-path="/datasets" data-type="folder">
+                            <i class="fas fa-folder mr-2 text-yellow-400"></i>
+                            datasets/
+                        </div>
+                        <div class="file-item pl-8" data-path="/datasets/custom" data-type="file">
+                            <i class="fas fa-file mr-2 text-green-400"></i>
+                            custom_labels.json (0.5MB)
+                        </div>
+                        <div class="file-item pl-4" data-path="/cache" data-type="folder">
+                            <i class="fas fa-folder mr-2 text-yellow-400"></i>
+                            cache/
+                        </div>
+                    </div>
+                </div>
+                <button id="refreshFiles" class="mt-3 w-full bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded text-sm">
+                    <i class="fas fa-sync-alt mr-2"></i>Actualiser
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Interface -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Video Sources -->
+            <div class="hardware-card p-4 rounded-lg">
+                <h3 class="text-lg font-semibold mb-3 flex items-center">
+                    <i class="fas fa-video mr-2 text-purple-400"></i>
+                    Sources Vidéo
+                </h3>
+                
+                <!-- Source Selection -->
+                <div class="mb-4">
+                    <select id="videoSource" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2">
+                        <option value="">Sélectionner une source</option>
+                        <option value="webcam">Webcam</option>
+                        <option value="screen">Capture d'écran</option>
+                        <option value="youtube">Vidéo YouTube</option>
+                        <option value="file">Fichier vidéo</option>
+                    </select>
+                </div>
+
+                <!-- Webcam Section -->
+                <div id="webcamSection" class="mb-4 hidden">
+                    <div class="flex items-center justify-between mb-2">
+                        <span>Webcam:</span>
+                        <span id="webcamStatus" class="text-red-400">Non connectée</span>
+                    </div>
+                    <select id="webcamSelect" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 mb-2">
+                        <option value="">Sélectionner une webcam</option>
+                    </select>
+                    <div class="flex space-x-2">
+                        <button id="startWebcam" class="flex-1 bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-sm">
+                            <i class="fas fa-play mr-2"></i>Démarrer
+                        </button>
+                        <button id="stopWebcam" class="flex-1 bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm">
+                            <i class="fas fa-stop mr-2"></i>Arrêter
+                        </button>
+                    </div>
+                </div>
+
+                <!-- YouTube Section -->
+                <div id="youtubeSection" class="mb-4 hidden">
+                    <input type="text" id="youtubeUrl" placeholder="URL YouTube ou ID vidéo" 
+                           class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 mb-2">
+                    <button id="loadYoutube" class="w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm">
+                        <i class="fab fa-youtube mr-2"></i>Charger Vidéo
+                    </button>
+                    <div id="youtubePlayer" class="mt-4 hidden">
+                        <div class="youtube-container">
+                            <iframe id="youtubeFrame" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Screen Capture Section -->
+                <div id="screenSection" class="mb-4 hidden">
+                    <button id="startScreen" class="w-full bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm">
+                        <i class="fas fa-desktop mr-2"></i>Capturer Écran
+                    </button>
+                </div>
+
+                <!-- File Upload Section -->
+                <div id="fileSection" class="mb-4 hidden">
+                    <input type="file" id="videoFile" accept="video/*" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2">
+                </div>
+
+                <!-- Video Display -->
+                <div class="relative">
+                    <video id="videoElement" class="w-full rounded bg-black" style="height: 300px;" autoplay muted></video>
+                    <canvas id="overlayCanvas" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
+                </div>
+            </div>
+
+            <!-- Detection Controls -->
+            <div class="hardware-card p-4 rounded-lg">
+                <h3 class="text-lg font-semibold mb-3 flex items-center">
+                    <i class="fas fa-eye mr-2 text-red-400"></i>
+                    Contrôles de Détection
+                </h3>
+
+                <!-- Detection Settings -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Seuil de Confiance</label>
+                        <input type="range" id="confidenceSlider" min="0.1" max="1" step="0.1" value="0.5" 
+                               class="w-full">
+                        <div class="flex justify-between text-xs text-gray-400">
+                            <span>10%</span>
+                            <span id="confidenceValue">50%</span>
+                            <span>100%</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Max Détections</label>
+                        <input type="range" id="maxDetections" min="1" max="20" value="10" 
+                               class="w-full">
+                        <div class="flex justify-between text-xs text-gray-400">
+                            <span>1</span>
+                            <span id="maxDetectionsValue">10</span>
+                            <span>20</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="showLabels" checked class="mr-2">
+                            Afficher les étiquettes
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="showConfidence" checked class="mr-2">
+                            Afficher la confiance
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Custom Labels -->
+                <div class="mt-6">
+                    <h4 class="text-md font-semibold mb-3">Étiquettes Personnalisées</h4>
+                    <div class="flex space-x-2 mb-2">
+                        <input type="text" id="customLabelInput" placeholder="Nom de l'étiquette" 
+                               class="flex-1 bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm">
+                        <input type="color" id="customLabelColor" value="#8b5cf6" 
+                               class="w-12 h-10 rounded border border-gray-600">
+                        <button id="addCustomLabel" class="bg-purple-600 hover:bg-purple-700 px-3 py-2 rounded text-sm">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="customLabels" class="flex flex-wrap gap-2">
+                        <!-- Custom labels will be added here -->
+                    </div>
+                </div>
+
+                <!-- Detection Stats -->
+                <div class="mt-6 p-3 bg-gray-800 rounded">
+                    <h4 class="text-sm font-semibold mb-2">Statistiques Temps Réel</h4>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div>FPS: <span id="fpsCounter">0</span></div>
+                        <div>Détections: <span id="detectionCount">0</span></div>
+                        <div>Temps: <span id="processTime">0ms</span></div>
+                        <div>Modèle: <span id="modelName">COCO-SSD</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detection Results -->
+        <div class="mt-6 hardware-card p-4 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 flex items-center">
+                <i class="fas fa-list mr-2 text-cyan-400"></i>
+                Résultats de Détection
+            </h3>
+            <div id="detectionResults" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Detection results will be displayed here -->
+            </div>
+        </div>
+
+        <!-- Training & Gamification -->
+        <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="hardware-card p-4 rounded-lg">
+                <h3 class="text-lg font-semibold mb-3 flex items-center">
+                    <i class="fas fa-brain mr-2 text-pink-400"></i>
+                    Entraînement Interactif
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <button id="startTraining" class="w-full bg-pink-600 hover:bg-pink-700 px-4 py-2 rounded">
+                            <i class="fas fa-play mr-2"></i>Démarrer l'Entraînement
+                        </button>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Progression</label>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div id="trainingProgress" class="bg-pink-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div id="trainingStats" class="text-sm space-y-1">
+                        <div>Époque: <span id="currentEpoch">0</span>/100</div>
+                        <div>Précision: <span id="accuracy">0%</span></div>
+                        <div>Perte: <span id="loss">0.0</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hardware-card p-4 rounded-lg">
+                <h3 class="text-lg font-semibold mb-3 flex items-center">
+                    <i class="fas fa-trophy mr-2 text-yellow-400"></i>
+                    Achievements
+                </h3>
+                <div id="achievements" class="space-y-2">
+                    <!-- Achievements will be added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let model = null;
+        let isDetecting = false;
+        let stream = null;
+        let animationId = null;
+        let customLabels = [];
+        let db = null;
+        let userLevel = 1;
+        let userXP = 0;
+        let achievements = [];
+        let lastFrameTime = 0;
+        let fps = 0;
+
+        // Initialize application
+        async function init() {
+            try {
+                // Initialize database
+                await initDatabase();
+                
+                // Load TensorFlow.js model
+                document.getElementById('modelName').textContent = 'Chargement...';
+                model = await cocoSsd.load();
+                document.getElementById('modelName').textContent = 'COCO-SSD';
+                
+                // Detect hardware
+                detectHardware();
+                
+                // Initialize webcam devices
+                await initWebcamDevices();
+                
+                // Load custom labels
+                await loadCustomLabels();
+                
+                // Load user progress
+                await loadUserProgress();
+                
+                // Initialize achievements
+                initAchievements();
+                
+                console.log('Application initialized successfully');
+                addXP(10, 'Application démarrée');
+                
+            } catch (error) {
+                console.error('Initialization error:', error);
+                document.getElementById('modelName').textContent = 'Erreur de chargement';
+            }
+        }
+
+        // Initialize IndexedDB
+        async function initDatabase() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('GameVisionDB', 1);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    updateDatabaseInfo();
+                    resolve(db);
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    
+                    // Create object stores
+                    if (!db.objectStoreNames.contains('models')) {
+                        db.createObjectStore('models', { keyPath: 'id' });
+                    }
+                    if (!db.objectStoreNames.contains('datasets')) {
+                        db.createObjectStore('datasets', { keyPath: 'id' });
+                    }
+                    if (!db.objectStoreNames.contains('customLabels')) {
+                        db.createObjectStore('customLabels', { keyPath: 'id' });
+                    }
+                    if (!db.objectStoreNames.contains('userProgress')) {
+                        db.createObjectStore('userProgress', { keyPath: 'id' });
+                    }
+                };
+            });
+        }
+
+        // Update database info
+        function updateDatabaseInfo() {
+            if (!db) return;
+            
+            document.getElementById('dbStatus').textContent = 'Connecté';
+            document.getElementById('dbStatus').className = 'text-green-400';
+            
+            // Count items in stores
+            const transaction = db.transaction(['models', 'datasets'], 'readonly');
+            
+            const modelsStore = transaction.objectStore('models');
+            const datasetsStore = transaction.objectStore('datasets');
+            
+            modelsStore.count().onsuccess = (event) => {
+                document.getElementById('modelCount').textContent = event.target.result;
+            };
+            
+            datasetsStore.count().onsuccess = (event) => {
+                document.getElementById('datasetCount').textContent = event.target.result;
+            };
+            
+            // Simulate database size calculation
+            document.getElementById('dbSize').textContent = '2.8 MB';
+        }
+
+        // Detect hardware information
+        function detectHardware() {
+            // Get real system information
+            const userAgent = navigator.userAgent;
+            const platform = navigator.platform;
+            const cores = navigator.hardwareConcurrency || 'Non disponible';
+            
+            // Detect OS
+            let os = 'Inconnu';
+            if (userAgent.includes('Windows')) os = 'Windows';
+            else if (userAgent.includes('Mac')) os = 'macOS';
+            else if (userAgent.includes('Linux')) os = 'Linux';
+            else if (userAgent.includes('Android')) os = 'Android';
+            else if (userAgent.includes('iOS')) os = 'iOS';
+            
+            // Detect memory (approximation)
+            const memory = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : 'Non disponible';
+            
+            // Detect GPU
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            let gpu = 'Non disponible';
+            
+            if (gl) {
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                if (debugInfo) {
+                    gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+                }
+            }
+            
+            // Get screen resolution
+            const screenRes = `${screen.width}x${screen.height}`;
+            
+            // Update UI
+            document.getElementById('systemOS').textContent = os;
+            document.getElementById('cpuCores').textContent = `${cores} cores`;
+            document.getElementById('memoryInfo').textContent = memory;
+            document.getElementById('gpuInfo').textContent = gpu;
+            document.getElementById('screenRes').textContent = screenRes;
+        }
+
+        // Initialize webcam devices
+        async function initWebcamDevices() {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                
+                const webcamSelect = document.getElementById('webcamSelect');
+                webcamSelect.innerHTML = '<option value="">Sélectionner une webcam</option>';
+                
+                if (videoDevices.length === 0) {
+                    document.getElementById('webcamStatus').textContent = 'Aucune webcam détectée';
+                    document.getElementById('webcamStatus').className = 'text-red-400';
+                    return;
+                }
+                
+                videoDevices.forEach((device, index) => {
+                    const option = document.createElement('option');
+                    option.value = device.deviceId;
+                    option.textContent = device.label || `Webcam ${index + 1}`;
+                    webcamSelect.appendChild(option);
+                });
+                
+                document.getElementById('webcamStatus').textContent = `${videoDevices.length} webcam(s) détectée(s)`;
+                document.getElementById('webcamStatus').className = 'text-green-400';
+                
+            } catch (error) {
+                console.error('Error enumerating devices:', error);
+                document.getElementById('webcamStatus').textContent = 'Erreur de détection';
+                document.getElementById('webcamStatus').className = 'text-red-400';
+            }
+        }
+
+        // Start webcam
+        async function startWebcam() {
+            try {
+                const deviceId = document.getElementById('webcamSelect').value;
+                if (!deviceId) {
+                    alert('Veuillez sélectionner une webcam');
+                    return;
+                }
+                
+                const constraints = {
+                    video: {
+                        deviceId: { exact: deviceId },
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    }
+                };
+                
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                const video = document.getElementById('videoElement');
+                video.srcObject = stream;
+                
+                document.getElementById('webcamStatus').textContent = 'Webcam active';
+                document.getElementById('webcamStatus').className = 'text-green-400';
+                
+                // Start detection
+                startDetection();
+                addXP(20, 'Webcam démarrée');
+                
+            } catch (error) {
+                console.error('Error starting webcam:', error);
+                document.getElementById('webcamStatus').textContent = 'Erreur de connexion';
+                document.getElementById('webcamStatus').className = 'text-red-400';
+            }
+        }
+
+        // Stop webcam
+        function stopWebcam() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+                
+                const video = document.getElementById('videoElement');
+                video.srcObject = null;
+                
+                document.getElementById('webcamStatus').textContent = 'Webcam arrêtée';
+                document.getElementById('webcamStatus').className = 'text-yellow-400';
+                
+                stopDetection();
+            }
+        }
+
+        // Load YouTube video
+        function loadYouTube() {
+            const url = document.getElementById('youtubeUrl').value;
+            if (!url) {
+                alert('Veuillez entrer une URL YouTube');
+                return;
+            }
+            
+            // Extract video ID
+            let videoId = '';
+            if (url.includes('youtube.com/watch?v=')) {
+                videoId = url.split('v=')[1].split('&')[0];
+            } else if (url.includes('youtu.be/')) {
+                videoId = url.split('youtu.be/')[1].split('?')[0];
+            } else if (url.length === 11) {
+                videoId = url; // Assume it's already a video ID
+            }
+            
+            if (!videoId) {
+                alert('URL YouTube invalide');
+                return;
+            }
+            
+            // Load YouTube video
+            const iframe = document.getElementById('youtubeFrame');
+            iframe.src = `https://www.youtube.com/embed/${videoId}`;
+            
+            document.getElementById('youtubePlayer').classList.remove('hidden');
+            addXP(15, 'Vidéo YouTube chargée');
+        }
+
+        // Start screen capture
+        async function startScreenCapture() {
+            try {
+                const displayMediaOptions = {
+                    video: {
+                        cursor: 'always'
+                    },
+                    audio: false
+                };
+                
+                stream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+                const video = document.getElementById('videoElement');
+                video.srcObject = stream;
+                
+                // Start detection
+                startDetection();
+                addXP(25, 'Capture d\'écran démarrée');
+                
+            } catch (error) {
+                console.error('Error starting screen capture:', error);
+                alert('Erreur lors de la capture d\'écran');
+            }
+        }
+
+        // Start detection
+        function startDetection() {
+            if (!model || isDetecting) return;
+            
+            isDetecting = true;
+            const video = document.getElementById('videoElement');
+            const canvas = document.getElementById('overlayCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size to match video
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            
+            async function detect() {
+                if (!isDetecting) return;
+                
+                const currentTime = performance.now();
+                const deltaTime = currentTime - lastFrameTime;
+                
+                if (deltaTime >= 100) { // Limit to 10 FPS for performance
+                    const startTime = performance.now();
+                    
+                    try {
+                        // Perform detection
+                        const predictions = await model.detect(video);
+                        
+                        // Clear canvas
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        
+                        // Filter predictions by confidence
+                        const confidence = parseFloat(document.getElementById('confidenceSlider').value);
+                        const maxDetections = parseInt(document.getElementById('maxDetections').value);
+                        
+                        const filteredPredictions = predictions
+                            .filter(pred => pred.score >= confidence)
+                            .slice(0, maxDetections);
+                        
+                        // Draw predictions
+                        drawPredictions(ctx, filteredPredictions);
+                        
+                        // Update stats
+                        updateStats(filteredPredictions, performance.now() - startTime);
+                        
+                        // Update detection results
+                        updateDetectionResults(filteredPredictions);
+                        
+                        lastFrameTime = currentTime;
+                        
+                    } catch (error) {
+                        console.error('Detection error:', error);
+                    }
+                }
+                
+                animationId = requestAnimationFrame(detect);
+            }
+            
+            detect();
+        }
+
+        // Stop detection
+        function stopDetection() {
+            isDetecting = false;
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            
+            // Clear canvas
+            const canvas = document.getElementById('overlayCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Draw predictions
+        function drawPredictions(ctx, predictions) {
+            const showLabels = document.getElementById('showLabels').checked;
+            const showConfidence = document.getElementById('showConfidence').checked;
+            
+            const colors = [
+                '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+                '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'
+            ];
+            
+            predictions.forEach((prediction, index) => {
+                const [x, y, width, height] = prediction.bbox;
+                const color = colors[index % colors.length];
+                
+                // Draw bounding box
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
+                ctx.strokeRect(x, y, width, height);
+                
+                // Draw label background
+                if (showLabels) {
+                    const label = `${prediction.class}${showConfidence ? ` (${(prediction.score * 100).toFixed(1)}%)` : ''}`;
+                    ctx.font = '12px Arial';
+                    const textWidth = ctx.measureText(label).width;
+                    
+                    ctx.fillStyle = color;
+                    ctx.fillRect(x, y - 20, textWidth + 10, 20);
+                    
+                    // Draw label text
+                    ctx.fillStyle = 'white';
+                    ctx.fillText(label, x + 5, y - 5);
+                }
+            });
+        }
+
+        // Update stats
+        function updateStats(predictions, processTime) {
+            document.getElementById('detectionCount').textContent = predictions.length;
+            document.getElementById('processTime').textContent = `${processTime.toFixed(1)}ms`;
+            
+            // Calculate FPS
+            const currentTime = performance.now();
+            fps = 1000 / (currentTime - lastFrameTime);
+            document.getElementById('fpsCounter').textContent = fps.toFixed(1);
+        }
+
+        // Update detection results
+        function updateDetectionResults(predictions) {
+            const resultsContainer = document.getElementById('detectionResults');
+            resultsContainer.innerHTML = '';
+            
+            predictions.forEach((prediction, index) => {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'bg-gray-800 p-3 rounded border border-gray-600';
+                resultDiv.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-semibold">${prediction.class}</span>
+                        <span class="text-sm text-gray-400">${(prediction.score * 100).toFixed(1)}%</span>
+                    </div>
+                    <div class="text-xs text-gray-500">
+                        Position: ${prediction.bbox[0].toFixed(0)}, ${prediction.bbox[1].toFixed(0)}<br>
+                        Taille: ${prediction.bbox[2].toFixed(0)}x${prediction.bbox[3].toFixed(0)}
+                    </div>
+                `;
+                resultsContainer.appendChild(resultDiv);
+            });
+        }
+
+        // Add custom label
+        function addCustomLabel() {
+            const name = document.getElementById('customLabelInput').value.trim();
+            const color = document.getElementById('customLabelColor').value;
+            
+            if (!name) {
+                alert('Veuillez entrer un nom pour l\'étiquette');
+                return;
+            }
+            
+            const customLabel = {
+                id: Date.now(),
+                name: name,
+                color: color,
+                created: new Date().toISOString()
+            };
+            
+            customLabels.push(customLabel);
+            saveCustomLabels();
+            renderCustomLabels();
+            
+            // Clear input
+            document.getElementById('customLabelInput').value = '';
+            
+            addXP(5, 'Étiquette personnalisée créée');
+        }
+
+        // Save custom labels to database
+        async function saveCustomLabels() {
+            if (!db) return;
+            
+            const transaction = db.transaction(['customLabels'], 'readwrite');
+            const store = transaction.objectStore('customLabels');
+            
+            customLabels.forEach(label => {
+                store.put(label);
+            });
+        }
+
+        // Load custom labels from database
+        async function loadCustomLabels() {
+            if (!db) return;
+            
+            const transaction = db.transaction(['customLabels'], 'readonly');
+            const store = transaction.objectStore('customLabels');
+            
+            const request = store.getAll();
+            request.onsuccess = () => {
+                customLabels = request.result || [];
+                renderCustomLabels();
+            };
+        }
+
+        // Render custom labels
+        function renderCustomLabels() {
+            const container = document.getElementById('customLabels');
+            container.innerHTML = '';
+            
+            customLabels.forEach(label => {
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'custom-label flex items-center';
+                labelDiv.style.borderColor = label.color;
+                labelDiv.style.color = label.color;
+                labelDiv.innerHTML = `
+                    <span>${label.name}</span>
+                    <button onclick="removeCustomLabel(${label.id})" class="ml-2 text-red-400 hover:text-red-300">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                container.appendChild(labelDiv);
+            });
+        }
+
+        // Remove custom label
+        function removeCustomLabel(id) {
+            customLabels = customLabels.filter(label => label.id !== id);
+            saveCustomLabels();
+            renderCustomLabels();
+        }
+
+        // Add XP and level up
+        function addXP(amount, reason) {
+            userXP += amount;
+            
+            // Check for level up
+            const xpNeeded = userLevel * 100;
+            if (userXP >= xpNeeded) {
+                userLevel++;
+                userXP -= xpNeeded;
+                
+                // Show level up notification
+                showNotification(`Niveau ${userLevel} atteint !`, 'success');
+                
+                // Unlock new features
+                unlockFeatures();
+            }
+            
+            updateUserProgress();
+            saveUserProgress();
+            
+            // Show XP gain
+            showNotification(`+${amount} XP - ${reason}`, 'info');
+        }
+
+        // Update user progress display
+        function updateUserProgress() {
+            document.getElementById('userLevel').textContent = userLevel;
+            document.getElementById('userXP').textContent = userXP;
+            
+            const xpNeeded = userLevel * 100;
+            const progress = (userXP / xpNeeded) * 100;
+            document.getElementById('levelProgress').style.width = `${progress}%`;
+        }
+
+        // Save user progress
+        async function saveUserProgress() {
+            if (!db) return;
+            
+            const transaction = db.transaction(['userProgress'], 'readwrite');
+            const store = transaction.objectStore('userProgress');
+            
+            const progress = {
+                id: 'user',
+                level: userLevel,
+                xp: userXP,
+                achievements: achievements,
+                updated: new Date().toISOString()
+            };
+            
+            store.put(progress);
+        }
+
+        // Load user progress
+        async function loadUserProgress() {
+            if (!db) return;
+            
+            const transaction = db.transaction(['userProgress'], 'readonly');
+            const store = transaction.objectStore('userProgress');
+            
+            const request = store.get('user');
+            request.onsuccess = () => {
+                const progress = request.result;
+                if (progress) {
+                    userLevel = progress.level || 1;
+                    userXP = progress.xp || 0;
+                    achievements = progress.achievements || [];
+                    updateUserProgress();
+                }
+            };
+        }
+
+        // Initialize achievements
+        function initAchievements() {
+            const achievementsList = [
+                { id: 'first_start', name: 'Premier Démarrage', description: 'Démarrer l\'application', icon: 'fas fa-play' },
+                { id: 'first_detection', name: 'Première Détection', description: 'Détecter votre premier objet', icon: 'fas fa-eye' },
+                { id: 'webcam_master', name: 'Maître Webcam', description: 'Utiliser la webcam 10 fois', icon: 'fas fa-video' },
+                { id: 'label_creator', name: 'Créateur d\'Étiquettes', description: 'Créer 5 étiquettes personnalisées', icon: 'fas fa-tags' },
+                { id: 'speed_demon', name: 'Démon de Vitesse', description: 'Atteindre 30 FPS', icon: 'fas fa-tachometer-alt' },
+                { id: 'level_5', name: 'Niveau 5', description: 'Atteindre le niveau 5', icon: 'fas fa-trophy' }
+            ];
+            
+            renderAchievements(achievementsList);
+        }
+
+        // Render achievements
+        function renderAchievements(achievementsList) {
+            const container = document.getElementById('achievements');
+            container.innerHTML = '';
+            
+            achievementsList.forEach(achievement => {
+                const isUnlocked = achievements.includes(achievement.id);
+                const achDiv = document.createElement('div');
+                achDiv.className = `flex items-center p-2 rounded ${isUnlocked ? 'bg-green-900' : 'bg-gray-800'}`;
+                achDiv.innerHTML = `
+                    <i class="${achievement.icon} mr-3 ${isUnlocked ? 'text-green-400' : 'text-gray-400'}"></i>
+                    <div>
+                        <div class="font-semibold ${isUnlocked ? 'text-green-400' : 'text-gray-400'}">
+                            ${achievement.name}
+                        </div>
+                        <div class="text-xs text-gray-500">${achievement.description}</div>
+                    </div>
+                `;
+                container.appendChild(achDiv);
+            });
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded shadow-lg z-50 ${
+                type === 'success' ? 'bg-green-600' : 
+                type === 'error' ? 'bg-red-600' : 
+                'bg-blue-600'
+            } text-white`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Event listeners
+        document.getElementById('videoSource').addEventListener('change', (e) => {
+            const value = e.target.value;
+            
+            // Hide all sections
+            document.getElementById('webcamSection').classList.add('hidden');
+            document.getElementById('youtubeSection').classList.add('hidden');
+            document.getElementById('screenSection').classList.add('hidden');
+            document.getElementById('fileSection').classList.add('hidden');
+            
+            // Show selected section
+            if (value === 'webcam') {
+                document.getElementById('webcamSection').classList.remove('hidden');
+            } else if (value === 'youtube') {
+                document.getElementById('youtubeSection').classList.remove('hidden');
+            } else if (value === 'screen') {
+                document.getElementById('screenSection').classList.remove('hidden');
+            } else if (value === 'file') {
+                document.getElementById('fileSection').classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('startWebcam').addEventListener('click', startWebcam);
+        document.getElementById('stopWebcam').addEventListener('click', stopWebcam);
+        document.getElementById('loadYoutube').addEventListener('click', loadYouTube);
+        document.getElementById('startScreen').addEventListener('click', startScreenCapture);
+        document.getElementById('addCustomLabel').addEventListener('click', addCustomLabel);
+        document.getElementById('refreshHardware').addEventListener('click', detectHardware);
+        document.getElementById('refreshFiles').addEventListener('click', () => {
+            showNotification('Fichiers actualisés', 'success');
+        });
+
+        // Slider event listeners
+        document.getElementById('confidenceSlider').addEventListener('input', (e) => {
+            const value = Math.round(e.target.value * 100);
+            document.getElementById('confidenceValue').textContent = `${value}%`;
+        });
+
+        document.getElementById('maxDetections').addEventListener('input', (e) => {
+            document.getElementById('maxDetectionsValue').textContent = e.target.value;
+        });
+
+        // File explorer
+        document.getElementById('fileExplorer').addEventListener('click', (e) => {
+            const fileItem = e.target.closest('.file-item');
+            if (fileItem) {
+                const path = fileItem.dataset.path;
+                const type = fileItem.dataset.type;
+                
+                if (type === 'folder') {
+                    showNotification(`Ouverture du dossier: ${path}`, 'info');
+                } else {
+                    showNotification(`Fichier sélectionné: ${path}`, 'info');
+                }
+            }
+        });
+
+        // Database operations
+        document.getElementById('openDbFolder').addEventListener('click', () => {
+            showNotification('Dossier BDD: /GameVision_Data/db/', 'info');
+        });
+
+        document.getElementById('clearDb').addEventListener('click', () => {
+            if (confirm('Êtes-vous sûr de vouloir nettoyer la base de données ?')) {
+                showNotification('Base de données nettoyée', 'success');
+                updateDatabaseInfo();
+            }
+        });
+
+        // Training simulation
+        document.getElementById('startTraining').addEventListener('click', () => {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    addXP(50, 'Entraînement terminé');
+                }
+                
+                document.getElementById('trainingProgress').style.width = `${progress}%`;
+                document.getElementById('currentEpoch').textContent = Math.floor(progress);
+                document.getElementById('accuracy').textContent = `${(Math.random() * 100).toFixed(1)}%`;
+                document.getElementById('loss').textContent = (Math.random() * 2).toFixed(3);
+            }, 100);
+        });
+
+        // Initialize application when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
