@@ -34,3 +34,45 @@
 2025-07-10 15:48:46,965 | INFO | SettingsWidget | Paramètres chargés
 2025-07-10 15:48:46 | INFO | MainWindow | Fenêtre principale initialisée
 2025-07-10 15:48:46,995 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 15:52:54,342 | INFO | AIMER | Démarrage AIMER PRO - Mode GUI
+2025-07-10 15:52:57 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:52:57,246 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:52:57 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 15:52:57,325 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 15:52:57,659 | INFO | detectron2.checkpoint.detection_checkpoint | [DetectionCheckpointer] Loading from https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl ...
+2025-07-10 15:52:57,660 | INFO | iopath.common.file_io | URL https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl cached in C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl
+2025-07-10 15:52:57,660 | INFO | fvcore.common.checkpoint | [Checkpointer] Loading from C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl ...
+2025-07-10 15:52:57,703 | INFO | fvcore.common.checkpoint | Reading a file from 'Detectron2 Model Zoo'
+2025-07-10 15:52:57 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 15:52:57,731 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 15:52:57 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 15:52:57,732 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 15:52:57 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 15:52:57,737 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 15:52:57 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 15:52:57,764 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 15:53:05 | INFO | DetectionWidget | Appel de la fonctionnalité webcam (non implémentée)
+2025-07-10 15:53:05,846 | INFO | DetectionWidget | Appel de la fonctionnalité webcam (non implémentée)
+2025-07-10 15:53:13 | INFO | MainWindow | Fermeture de l'application
+2025-07-10 15:53:13,543 | INFO | MainWindow | Fermeture de l'application
+2025-07-10 15:53:20,504 | INFO | AIMER | Démarrage AIMER PRO - Mode GUI
+2025-07-10 15:53:23 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:53:23,403 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:53:23 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 15:53:23,475 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 15:53:23,813 | INFO | detectron2.checkpoint.detection_checkpoint | [DetectionCheckpointer] Loading from https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl ...
+2025-07-10 15:53:23,815 | INFO | iopath.common.file_io | URL https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl cached in C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl
+2025-07-10 15:53:23,815 | INFO | fvcore.common.checkpoint | [Checkpointer] Loading from C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl ...
+2025-07-10 15:53:23,858 | INFO | fvcore.common.checkpoint | Reading a file from 'Detectron2 Model Zoo'
+2025-07-10 15:53:23 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 15:53:23,883 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 15:53:23 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 15:53:23,884 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 15:53:23 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 15:53:23,892 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 15:53:23 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 15:53:23,917 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 15:53:26 | INFO | DetectionWidget | Appel de la fonctionnalité webcam (non implémentée)
+2025-07-10 15:53:26,579 | INFO | DetectionWidget | Appel de la fonctionnalité webcam (non implémentée)
+2025-07-10 15:53:29 | INFO | MainWindow | Fermeture de l'application
+2025-07-10 15:53:29,116 | INFO | MainWindow | Fermeture de l'application
