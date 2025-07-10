@@ -54,7 +54,7 @@ class DetectionWidget(QWidget):
         self.detector = None
         self.current_image = None
         self.detection_results = None
-
+        self.annotated_image = None  # Pour éviter l'erreur d'attribut
         self.create_ui()
         self.initialize_detector()
 
@@ -142,7 +142,13 @@ class DetectionWidget(QWidget):
 
         # Bouton de détection
         self.detect_btn = QPushButton("🎯 DÉTECTER")
-        self.detect_btn.clicked.connect(self.run_detection)
+        # Correction : vérifie que run_detection existe avant de connecter
+        if hasattr(self, "run_detection"):
+            self.detect_btn.clicked.connect(self.run_detection)
+        else:
+            self.logger.error(
+                "Méthode run_detection absente lors du connect du bouton détecter."
+            )
         self.detect_btn.setStyleSheet(
             """
             QPushButton {
@@ -447,223 +453,151 @@ class DetectionWidget(QWidget):
             self.logger.error(f"Erreur chargement image: {e}")
             QMessageBox.critical(self, "Erreur", f"Erreur chargement image:\n{e}")
 
-    def start_webcam(self):
-        """Démarre la capture webcam"""
-        self.logger.info("Appel de la fonctionnalité webcam (non implémentée)")
-        QMessageBox.information(
-            self, "Webcam", "Fonctionnalité webcam en développement"
-        )
+    class WebcamThread(QThread):
+        frame_ready = pyqtSignal(np.ndarray)
+        detection_info = pyqtSignal(dict)
+        error = pyqtSignal(str)
 
-    def capture_screen(self):
-        """Capture l'écran"""
-        try:
-            import mss
+        def __init__(self, detector, task, confidence, parent=None):
+            super().__init__(parent)
+            self.detector = detector
+            self.running = False
+            self.task = task
+            self.confidence = confidence
 
-            with mss.mss() as sct:
-                # Capturer l'écran principal
-                monitor = sct.monitors[1]
-                screenshot = sct.grab(monitor)
-
-                # Convertir en numpy array
-                img = np.array(screenshot)
-                img = cv2.cvtColor(img, cv2.COLOR_BGRA2RGB)
-
-                # Sauvegarder temporairement
-                temp_path = "temp_screenshot.png"
-                cv2.imwrite(temp_path, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
-
-                self.image_path_edit.setText(temp_path)
-                self.display_image(temp_path)
-
-                self.logger.info("Capture d'écran effectuée")
-
-        except Exception as e:
-            self.logger.error(f"Erreur capture écran: {e}")
-            QMessageBox.critical(self, "Erreur", f"Erreur capture écran:\n{e}")
-
-    def run_detection(self):
-        """Lance la détection sur l'image actuelle"""
-        if self.current_image is None:
-            QMessageBox.warning(self, "Erreur", "Aucune image chargée")
-            return
-
-        if not self.detector:
-            QMessageBox.critical(self, "Erreur", "Détecteur non initialisé")
-            return
-
-        try:
-            # Configuration
-            task = self.task_combo.currentText()
-            confidence = self.confidence_slider.value() / 100.0
-            device = self.device_combo.currentText()
-
-            # Reconfigurer le détecteur si nécessaire
-            if (
-                self.detector.task_type != task
-                or self.detector.confidence_threshold != confidence
-            ):
-
-                self.detector = UniversalDetector(
-                    task_type=task, confidence_threshold=confidence
-                )
-
-            # Lancer la détection
-            self.detect_btn.setText("🔄 Détection en cours...")
-            self.detect_btn.setEnabled(False)
-
-            import time
-
-            start_time = time.time()
-
-            result = self.detector.detect(self.current_image)
-
-            processing_time = time.time() - start_time
-
-            # Traiter les résultats
-            self.detection_results = result
-            self.display_results(result, processing_time)
-
-            # Dessiner les annotations
-            self.draw_annotations(result)
-
-        except Exception as e:
-            self.logger.error(f"Erreur détection: {e}")
-            QMessageBox.critical(self, "Erreur", f"Erreur détection:\n{e}")
-
-        finally:
-            self.detect_btn.setText("🎯 DÉTECTER")
-            self.detect_btn.setEnabled(True)
-
-    def display_results(self, result, processing_time):
-        """Affiche les résultats de détection"""
-        try:
-            if hasattr(result, "instances") and result.instances:
-                detections = result.to_dict()
-
-                results_text = f"=== RÉSULTATS DE DÉTECTION ===\n\n"
-                results_text += f"Objets détectés: {detections['count']}\n"
-                results_text += f"Temps de traitement: {processing_time:.2f}s\n\n"
-
-                results_text += "DÉTECTIONS:\n"
-                for i, detection in enumerate(detections["detections"], 1):
-                    results_text += f"{i}. {detection['class_name']}: {detection['confidence']:.1%}\n"
-                    bbox = detection["bbox"]
-                    results_text += f"   Position: ({bbox['x1']:.0f}, {bbox['y1']:.0f}) - ({bbox['x2']:.0f}, {bbox['y2']:.0f})\n"
-
-                self.results_text.setText(results_text)
-
-                # Mettre à jour les infos
-                self.info_objects.setText(str(detections["count"]))
-                self.info_processing_time.setText(f"{processing_time:.2f}s")
-
-            else:
-                self.results_text.setText("Aucun objet détecté")
-                self.info_objects.setText("0")
-                self.info_processing_time.setText(f"{processing_time:.2f}s")
-
-        except Exception as e:
-            self.logger.error(f"Erreur affichage résultats: {e}")
-            self.results_text.setText(f"Erreur affichage résultats: {e}")
-
-    def draw_annotations(self, result):
-        """Dessine les annotations sur l'image"""
-        try:
-            if not hasattr(result, "instances") or not result.instances:
+        def run(self):
+            self.running = True
+            cap = cv2.VideoCapture(0)
+            if not cap.isOpened():
+                self.error.emit("Impossible d'ouvrir la webcam")
                 return
+            while self.running:
+                ret, frame = cap.read()
+                if not ret:
+                    self.error.emit("Erreur de lecture webcam")
+                    break
+                try:
+                    # Détection
+                    result = self.detector.detect(frame)
+                    self.detection_info.emit(
+                        {
+                            "count": getattr(result, "instances", None)
+                            and len(result.instances)
+                            or 0,
+                            "time": (
+                                result.performance_metrics.get("inference_time_ms", 0)
+                                if hasattr(result, "performance_metrics")
+                                else 0
+                            ),
+                        }
+                    )
+                    # Dessiner les annotations si possible
+                    if hasattr(result, "to_dict"):
+                        detections = result.to_dict().get("detections", [])
+                        for i, detection in enumerate(detections):
+                            bbox = detection["bbox"]
+                            class_name = detection["class_name"]
+                            confidence = detection["confidence"]
+                            color = (0, 255, 0)
+                            cv2.rectangle(
+                                frame,
+                                (int(bbox["x1"]), int(bbox["y1"])),
+                                (int(bbox["x2"]), int(bbox["y2"])),
+                                color,
+                                2,
+                            )
+                            label = f"{class_name}: {confidence:.1%}"
+                            cv2.putText(
+                                frame,
+                                label,
+                                (int(bbox["x1"]), int(bbox["y1"]) - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX,
+                                0.6,
+                                (0, 255, 0),
+                                2,
+                            )
+                    self.frame_ready.emit(frame)
+                except Exception as e:
+                    self.error.emit(str(e))
+            cap.release()
 
-            # Copier l'image originale
-            annotated_image = self.current_image.copy()
+        def stop(self):
+            self.running = False
 
-            detections = result.to_dict()
-
-            # Couleurs pour les classes
-            colors = [
-                (255, 0, 0),
-                (0, 255, 0),
-                (0, 0, 255),
-                (255, 255, 0),
-                (255, 0, 255),
-                (0, 255, 255),
-                (128, 0, 0),
-                (0, 128, 0),
-                (0, 0, 128),
-                (128, 128, 0),
-                (128, 0, 128),
-                (0, 128, 128),
-            ]
-
-            for i, detection in enumerate(detections["detections"]):
-                bbox = detection["bbox"]
-                class_name = detection["class_name"]
-                confidence = detection["confidence"]
-
-                # Couleur pour cette détection
-                color = colors[i % len(colors)]
-
-                # Dessiner le rectangle
-                cv2.rectangle(
-                    annotated_image,
-                    (int(bbox["x1"]), int(bbox["y1"])),
-                    (int(bbox["x2"]), int(bbox["y2"])),
-                    color,
-                    2,
-                )
-
-                # Texte de label
-                label = f"{class_name}: {confidence:.1%}"
-
-                # Fond pour le texte
-                (text_width, text_height), _ = cv2.getTextSize(
-                    label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2
-                )
-
-                cv2.rectangle(
-                    annotated_image,
-                    (int(bbox["x1"]), int(bbox["y1"]) - text_height - 10),
-                    (int(bbox["x1"]) + text_width, int(bbox["y1"])),
-                    color,
-                    -1,
-                )
-
-                # Texte
-                cv2.putText(
-                    annotated_image,
-                    label,
-                    (int(bbox["x1"]), int(bbox["y1"]) - 5),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.6,
-                    (255, 255, 255),
-                    2,
-                )
-
-            # Afficher l'image annotée
-            height, width, channel = annotated_image.shape
-            bytes_per_line = 3 * width
-            rgb_image = cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB)
-
-            q_image = QImage(
-                rgb_image.tobytes(),
-                width,
-                height,
-                bytes_per_line,
-                QImage.Format.Format_RGB888,
+    def start_webcam(self):
+        """Démarre la capture webcam avec détection temps réel"""
+        if (
+            hasattr(self, "webcam_thread")
+            and self.webcam_thread
+            and self.webcam_thread.isRunning()
+        ):
+            QMessageBox.warning(
+                self, "Webcam", "La webcam est déjà en cours d'utilisation."
             )
-
-            # Redimensionner si nécessaire
-            max_size = 800
-            if width > max_size or height > max_size:
-                q_image = q_image.scaled(
-                    max_size, max_size, Qt.AspectRatioMode.KeepAspectRatio
+            return
+        # Configurer le détecteur selon l'UI
+        task = self.task_combo.currentText()
+        confidence = self.confidence_slider.value() / 100.0
+        try:
+            self.logger.info("Démarrage de la webcam avec détection temps réel")
+            self.webcam_thread = self.WebcamThread(self.detector, task, confidence)
+            self.webcam_thread.frame_ready.connect(self.display_webcam_frame)
+            self.webcam_thread.detection_info.connect(self.update_webcam_info)
+            self.webcam_thread.error.connect(self.handle_webcam_error)
+            self.webcam_thread.start()
+            # Correction : utiliser addWidget au lieu de insertWidget
+            if not hasattr(self, "stop_webcam_btn"):
+                self.stop_webcam_btn = QPushButton("Arrêter Webcam")
+                self.stop_webcam_btn.setStyleSheet(
+                    "background-color: #dc3545; color: white; font-weight: bold;"
                 )
+                self.stop_webcam_btn.clicked.connect(self.stop_webcam)
+                self.layout().itemAt(0).widget().layout().addWidget(
+                    self.stop_webcam_btn
+                )
+            self.stop_webcam_btn.setVisible(True)
+        except Exception as e:
+            self.logger.error(f"Erreur démarrage webcam: {e}")
+            QMessageBox.critical(self, "Webcam", f"Erreur démarrage webcam: {e}")
 
+    def stop_webcam(self):
+        """Arrête la capture webcam"""
+        try:
+            if hasattr(self, "webcam_thread") and self.webcam_thread:
+                self.webcam_thread.stop()
+                self.webcam_thread.wait()
+                self.logger.info("Arrêt de la webcam demandé par l'utilisateur")
+            if hasattr(self, "stop_webcam_btn"):
+                self.stop_webcam_btn.setVisible(False)
+        except Exception as e:
+            self.logger.error(f"Erreur arrêt webcam: {e}")
+
+    def display_webcam_frame(self, frame):
+        """Affiche une frame webcam dans l'UI"""
+        try:
+            rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            h, w, ch = rgb_image.shape
+            bytes_per_line = ch * w
+            q_image = QImage(
+                rgb_image.data, w, h, bytes_per_line, QImage.Format.Format_RGB888
+            )
             pixmap = QPixmap.fromImage(q_image)
             self.image_label.setPixmap(pixmap)
-
-            # Sauvegarder l'image annotée pour export
-            self.annotated_image = annotated_image
-
         except Exception as e:
-            self.logger.error(f"Erreur annotation: {e}")
+            self.logger.error(f"Erreur affichage frame webcam: {e}")
+
+    def update_webcam_info(self, info):
+        """Met à jour les infos de détection webcam"""
+        try:
+            self.info_objects.setText(str(info.get("count", "-")))
+            self.info_processing_time.setText(f"{info.get('time', 0):.1f}ms")
+        except Exception as e:
+            self.logger.error(f"Erreur update info webcam: {e}")
+
+    def handle_webcam_error(self, msg):
+        self.logger.error(f"Webcam: {msg}")
+        QMessageBox.critical(self, "Webcam", msg)
+        self.stop_webcam()
 
     def export_json(self):
         """Exporte les résultats en JSON"""
@@ -749,26 +683,42 @@ class DetectionWidget(QWidget):
 
     def save_annotated_image(self):
         """Sauvegarde l'image annotée"""
-        if not hasattr(self, "annotated_image"):
+        if self.annotated_image is None:
             QMessageBox.warning(self, "Erreur", "Aucune image annotée à sauvegarder")
             return
-
         file_path, _ = QFileDialog.getSaveFileName(
             self,
             "Sauvegarder Image Annotée",
             "image_annotee.png",
             "Images (*.png *.jpg *.jpeg)",
         )
-
         if file_path:
             try:
                 cv2.imwrite(file_path, self.annotated_image)
                 QMessageBox.information(
                     self, "Sauvegarde", f"Image sauvegardée: {file_path}"
                 )
-
             except Exception as e:
                 QMessageBox.critical(self, "Erreur", f"Erreur sauvegarde: {e}")
+
+    def capture_screen(self):
+        """Capture l'écran et l'affiche dans l'interface"""
+        try:
+            import mss
+
+            with mss.mss() as sct:
+                monitor = sct.monitors[1]
+                screenshot = sct.grab(monitor)
+                img = np.array(screenshot)
+                img = cv2.cvtColor(img, cv2.COLOR_BGRA2RGB)
+                temp_path = "temp_screenshot.png"
+                cv2.imwrite(temp_path, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
+                self.image_path_edit.setText(temp_path)
+                self.display_image(temp_path)
+                self.logger.info("Capture d'écran effectuée")
+        except Exception as e:
+            self.logger.error(f"Erreur capture écran: {e}")
+            QMessageBox.critical(self, "Erreur", f"Erreur capture écran:\n{e}")
 
 
 def main():

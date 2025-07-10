@@ -76,3 +76,116 @@
 2025-07-10 15:53:26,579 | INFO | DetectionWidget | Appel de la fonctionnalité webcam (non implémentée)
 2025-07-10 15:53:29 | INFO | MainWindow | Fermeture de l'application
 2025-07-10 15:53:29,116 | INFO | MainWindow | Fermeture de l'application
+2025-07-10 15:56:12,925 | INFO | AIMER | Démarrage AIMER PRO - Mode GUI
+2025-07-10 15:56:15 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:56:15,846 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:56:15,915 | ERROR | AIMER | Erreur GUI: 'DetectionWidget' object has no attribute 'capture_screen'
+2025-07-10 15:56:25,557 | INFO | AIMER | Démarrage AIMER PRO - Mode GUI
+2025-07-10 15:56:28 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:56:28,420 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:56:28,487 | ERROR | AIMER | Erreur GUI: 'DetectionWidget' object has no attribute 'capture_screen'
+2025-07-10 15:59:58,101 | INFO | AIMER | Démarrage AIMER PRO - Mode GUI
+2025-07-10 16:00:01 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 16:00:01,009 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 16:00:01 | ERROR | DetectionWidget | Méthode run_detection absente lors du connect du bouton détecter.
+2025-07-10 16:00:01,076 | ERROR | DetectionWidget | Méthode run_detection absente lors du connect du bouton détecter.
+2025-07-10 16:00:01 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 16:00:01,082 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 16:00:01,428 | INFO | detectron2.checkpoint.detection_checkpoint | [DetectionCheckpointer] Loading from https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl ...
+2025-07-10 16:00:01,429 | INFO | iopath.common.file_io | URL https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl cached in C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl
+2025-07-10 16:00:01,429 | INFO | fvcore.common.checkpoint | [Checkpointer] Loading from C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl ...
+2025-07-10 16:00:01,472 | INFO | fvcore.common.checkpoint | Reading a file from 'Detectron2 Model Zoo'
+2025-07-10 16:00:01 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 16:00:01,500 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 16:00:01 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 16:00:01,501 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 16:00:01 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 16:00:01,507 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 16:00:01 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 16:00:01,534 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 16:00:04 | INFO | DetectionWidget | Démarrage de la webcam avec détection temps réel
+2025-07-10 16:00:04,071 | INFO | DetectionWidget | Démarrage de la webcam avec détection temps réel
+2025-07-10 16:00:09 | INFO | UniversalDetector | Détection réussie: 0 objets en 1870.9ms
+2025-07-10 16:00:09,339 | INFO | UniversalDetector | Détection réussie: 0 objets en 1870.9ms
+2025-07-10 16:00:11 | INFO | UniversalDetector | Détection réussie: 0 objets en 1778.2ms
+2025-07-10 16:00:11,139 | INFO | UniversalDetector | Détection réussie: 0 objets en 1778.2ms
+2025-07-10 16:00:12 | INFO | UniversalDetector | Détection réussie: 0 objets en 1790.6ms
+2025-07-10 16:00:12,942 | INFO | UniversalDetector | Détection réussie: 0 objets en 1790.6ms
+2025-07-10 16:00:14 | INFO | UniversalDetector | Détection réussie: 0 objets en 1842.5ms
+2025-07-10 16:00:14,793 | INFO | UniversalDetector | Détection réussie: 0 objets en 1842.5ms
+2025-07-10 16:00:16 | INFO | UniversalDetector | Détection réussie: 1 objets en 1832.2ms
+2025-07-10 16:00:16,636 | INFO | UniversalDetector | Détection réussie: 1 objets en 1832.2ms
+2025-07-10 16:00:18 | INFO | UniversalDetector | Détection réussie: 1 objets en 1754.7ms
+2025-07-10 16:00:18,399 | INFO | UniversalDetector | Détection réussie: 1 objets en 1754.7ms
+2025-07-10 16:00:20 | INFO | UniversalDetector | Détection réussie: 1 objets en 1762.3ms
+2025-07-10 16:00:20,170 | INFO | UniversalDetector | Détection réussie: 1 objets en 1762.3ms
+2025-07-10 16:00:21 | INFO | UniversalDetector | Détection réussie: 2 objets en 1778.9ms
+2025-07-10 16:00:21,959 | INFO | UniversalDetector | Détection réussie: 2 objets en 1778.9ms
+2025-07-10 16:00:23 | INFO | UniversalDetector | Détection réussie: 1 objets en 1748.2ms
+2025-07-10 16:00:23,719 | INFO | UniversalDetector | Détection réussie: 1 objets en 1748.2ms
+2025-07-10 16:00:25 | INFO | UniversalDetector | Détection réussie: 1 objets en 1743.5ms
+2025-07-10 16:00:25,472 | INFO | UniversalDetector | Détection réussie: 1 objets en 1743.5ms
+2025-07-10 16:00:27 | INFO | UniversalDetector | Détection réussie: 1 objets en 1778.7ms
+2025-07-10 16:00:27,258 | INFO | UniversalDetector | Détection réussie: 1 objets en 1778.7ms
+2025-07-10 16:00:29 | INFO | UniversalDetector | Détection réussie: 1 objets en 1750.1ms
+2025-07-10 16:00:29,013 | INFO | UniversalDetector | Détection réussie: 1 objets en 1750.1ms
+2025-07-10 16:00:30 | INFO | UniversalDetector | Détection réussie: 1 objets en 1689.7ms
+2025-07-10 16:00:30,707 | INFO | UniversalDetector | Détection réussie: 1 objets en 1689.7ms
+2025-07-10 16:00:32 | INFO | UniversalDetector | Détection réussie: 2 objets en 1722.8ms
+2025-07-10 16:00:32,444 | INFO | UniversalDetector | Détection réussie: 2 objets en 1722.8ms
+2025-07-10 16:00:34 | INFO | UniversalDetector | Détection réussie: 1 objets en 1732.3ms
+2025-07-10 16:00:34,186 | INFO | UniversalDetector | Détection réussie: 1 objets en 1732.3ms
+2025-07-10 16:00:35 | INFO | UniversalDetector | Détection réussie: 1 objets en 1775.0ms
+2025-07-10 16:00:35,975 | INFO | UniversalDetector | Détection réussie: 1 objets en 1775.0ms
+2025-07-10 16:00:37 | INFO | UniversalDetector | Détection réussie: 3 objets en 1778.7ms
+2025-07-10 16:00:37,763 | INFO | UniversalDetector | Détection réussie: 3 objets en 1778.7ms
+2025-07-10 16:00:39 | INFO | UniversalDetector | Détection réussie: 0 objets en 1737.5ms
+2025-07-10 16:00:39,513 | INFO | UniversalDetector | Détection réussie: 0 objets en 1737.5ms
+2025-07-10 16:00:41 | INFO | UniversalDetector | Détection réussie: 0 objets en 1753.7ms
+2025-07-10 16:00:41,277 | INFO | UniversalDetector | Détection réussie: 0 objets en 1753.7ms
+2025-07-10 16:00:42 | INFO | UniversalDetector | Détection réussie: 7 objets en 1711.2ms
+2025-07-10 16:00:42,995 | INFO | UniversalDetector | Détection réussie: 7 objets en 1711.2ms
+2025-07-10 16:00:44 | INFO | UniversalDetector | Détection réussie: 4 objets en 1725.9ms
+2025-07-10 16:00:44,732 | INFO | UniversalDetector | Détection réussie: 4 objets en 1725.9ms
+2025-07-10 16:00:46 | INFO | UniversalDetector | Détection réussie: 5 objets en 1768.5ms
+2025-07-10 16:00:46,523 | INFO | UniversalDetector | Détection réussie: 5 objets en 1768.5ms
+2025-07-10 16:00:48 | INFO | UniversalDetector | Détection réussie: 6 objets en 1777.6ms
+2025-07-10 16:00:48,306 | INFO | UniversalDetector | Détection réussie: 6 objets en 1777.6ms
+2025-07-10 16:00:50 | INFO | UniversalDetector | Détection réussie: 6 objets en 1765.3ms
+2025-07-10 16:00:50,076 | INFO | UniversalDetector | Détection réussie: 6 objets en 1765.3ms
+2025-07-10 16:00:51 | INFO | UniversalDetector | Détection réussie: 6 objets en 1730.8ms
+2025-07-10 16:00:51,819 | INFO | UniversalDetector | Détection réussie: 6 objets en 1730.8ms
+2025-07-10 16:00:53 | INFO | UniversalDetector | Détection réussie: 6 objets en 1729.8ms
+2025-07-10 16:00:53,567 | INFO | UniversalDetector | Détection réussie: 6 objets en 1729.8ms
+2025-07-10 16:00:55 | INFO | UniversalDetector | Détection réussie: 5 objets en 1721.7ms
+2025-07-10 16:00:55,302 | INFO | UniversalDetector | Détection réussie: 5 objets en 1721.7ms
+2025-07-10 16:00:57 | INFO | UniversalDetector | Détection réussie: 4 objets en 1728.6ms
+2025-07-10 16:00:57,036 | INFO | UniversalDetector | Détection réussie: 4 objets en 1728.6ms
+2025-07-10 16:00:58 | INFO | UniversalDetector | Détection réussie: 4 objets en 1689.4ms
+2025-07-10 16:00:58,736 | INFO | UniversalDetector | Détection réussie: 4 objets en 1689.4ms
+2025-07-10 16:01:00 | INFO | UniversalDetector | Détection réussie: 5 objets en 1701.8ms
+2025-07-10 16:01:00,442 | INFO | UniversalDetector | Détection réussie: 5 objets en 1701.8ms
+2025-07-10 16:01:02 | INFO | UniversalDetector | Détection réussie: 5 objets en 1753.5ms
+2025-07-10 16:01:02,203 | INFO | UniversalDetector | Détection réussie: 5 objets en 1753.5ms
+2025-07-10 16:01:03 | INFO | UniversalDetector | Détection réussie: 7 objets en 1720.0ms
+2025-07-10 16:01:03,934 | INFO | UniversalDetector | Détection réussie: 7 objets en 1720.0ms
+2025-07-10 16:01:05 | INFO | UniversalDetector | Détection réussie: 3 objets en 1732.9ms
+2025-07-10 16:01:05,672 | INFO | UniversalDetector | Détection réussie: 3 objets en 1732.9ms
+2025-07-10 16:01:07 | INFO | UniversalDetector | Détection réussie: 5 objets en 1706.1ms
+2025-07-10 16:01:07,383 | INFO | UniversalDetector | Détection réussie: 5 objets en 1706.1ms
+2025-07-10 16:01:09 | INFO | UniversalDetector | Détection réussie: 5 objets en 1713.2ms
+2025-07-10 16:01:09,102 | INFO | UniversalDetector | Détection réussie: 5 objets en 1713.2ms
+2025-07-10 16:01:10 | INFO | UniversalDetector | Détection réussie: 1 objets en 1791.6ms
+2025-07-10 16:01:10,901 | INFO | UniversalDetector | Détection réussie: 1 objets en 1791.6ms
+2025-07-10 16:01:12 | INFO | UniversalDetector | Détection réussie: 0 objets en 1758.7ms
+2025-07-10 16:01:12,666 | INFO | UniversalDetector | Détection réussie: 0 objets en 1758.7ms
+2025-07-10 16:01:14 | INFO | UniversalDetector | Détection réussie: 0 objets en 1695.3ms
+2025-07-10 16:01:14,367 | INFO | UniversalDetector | Détection réussie: 0 objets en 1695.3ms
+2025-07-10 16:01:16 | INFO | UniversalDetector | Détection réussie: 0 objets en 1746.5ms
+2025-07-10 16:01:16,118 | INFO | UniversalDetector | Détection réussie: 0 objets en 1746.5ms
+2025-07-10 16:01:17 | INFO | UniversalDetector | Détection réussie: 0 objets en 1726.0ms
+2025-07-10 16:01:17,848 | INFO | UniversalDetector | Détection réussie: 0 objets en 1726.0ms
+2025-07-10 16:01:19 | INFO | UniversalDetector | Détection réussie: 0 objets en 1799.2ms
+2025-07-10 16:01:19,659 | INFO | UniversalDetector | Détection réussie: 0 objets en 1799.2ms
+2025-07-10 16:01:21 | INFO | UniversalDetector | Détection réussie: 5 objets en 1748.8ms
+2025-07-10 16:01:21,420 | INFO | UniversalDetector | Détection réussie: 5 objets en 1748.8ms
