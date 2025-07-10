@@ -21,4 +21,3 @@ storage_management.db
 datasets_management.db
 # ---- Logs --------------------------------------------
 logs/
-logs/aimer.log
