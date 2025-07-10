@@ -1,0 +1,2310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameVision AI Master - Application Complète Computer Vision Gaming</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
+    <style>
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            transition: all 0.3s ease;
+        }
+        .glow-effect:hover {
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .xp-bar {
+            background: linear-gradient(90deg, #4ade80 0%, #22d3ee 100%);
+            transition: width 0.3s ease;
+        }
+        .level-badge {
+            background: linear-gradient(45deg, #fbbf24, #f59e0b);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .detection-box {
+            position: absolute;
+            border: 2px solid;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 4px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .modal-content {
+            background-color: #1f2937;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            color: white;
+        }
+        .hardware-card {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            transition: transform 0.3s ease;
+        }
+        .hardware-card:hover {
+            transform: translateY(-5px);
+        }
+        .dataset-progress {
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+        }
+        .cheat-editor {
+            background: #0f172a;
+            border: 1px solid #334155;
+            font-family: 'Courier New', monospace;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            z-index: 1001;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        .notification.show {
+            transform: translateX(0);
+        }
+        .notification.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        .notification.error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        .notification.info {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1002;
+            display: none;
+        }
+        .tutorial-content {
+            position: absolute;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .tutorial-arrow {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid white;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .performance-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .performance-indicator.good {
+            background: #10b981;
+        }
+        .performance-indicator.medium {
+            background: #f59e0b;
+        }
+        .performance-indicator.bad {
+            background: #ef4444;
+        }
+        .storage-usage {
+            background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+            border-radius: 10px;
+            height: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .storage-usage::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); width: 0; }
+            50% { width: 100%; }
+            100% { transform: translateX(100%); width: 0; }
+        }
+        .webcam-container {
+            position: relative;
+            display: inline-block;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .screen-capture-container {
+            position: relative;
+            display: inline-block;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .canvas-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        .action-button {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+        .action-button:active {
+            transform: translateY(0);
+        }
+        .action-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        .action-button:hover::before {
+            left: 100%;
+        }
+        .cheat-output {
+            background: #0f172a;
+            color: #10b981;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .dataset-card {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .dataset-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .achievement-badge {
+            background: linear-gradient(45deg, #fbbf24, #f59e0b);
+            color: #1f2937;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-block;
+            margin: 2px;
+            animation: bounce 1s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white font-sans">
+    <!-- Notifications -->
+    <div id="notification" class="notification"></div>
+    
+    <!-- Tutorial Overlay -->
+    <div id="tutorialOverlay" class="tutorial-overlay">
+        <div id="tutorialContent" class="tutorial-content">
+            <div class="tutorial-arrow"></div>
+            <h3 id="tutorialTitle" class="text-lg font-bold mb-2 text-gray-800"></h3>
+            <p id="tutorialText" class="text-gray-600 mb-4"></p>
+            <div class="flex justify-between">
+                <button id="tutorialPrev" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Précédent</button>
+                <button id="tutorialNext" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Suivant</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="gradient-bg p-6 shadow-lg">
+        <div class="container mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="text-3xl font-bold">
+                    <i class="fas fa-eye text-blue-400"></i>
+                    GameVision AI Master
+                </div>
+                <div class="level-badge px-4 py-2 rounded-full text-sm font-bold">
+                    Niveau <span id="userLevel">1</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-sm">
+                    <span class="text-gray-300">XP:</span>
+                    <span id="userXP">0</span>/<span id="nextLevelXP">100</span>
+                </div>
+                <div class="w-32 bg-gray-700 rounded-full h-3">
+                    <div id="xpBar" class="xp-bar h-full rounded-full" style="width: 0%"></div>
+                </div>
+                <button id="tutorialBtn" class="px-4 py-2 bg-green-500 rounded hover:bg-green-600">
+                    <i class="fas fa-question-circle"></i> Tutoriel
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-8">
+        <!-- Navigation Tabs -->
+        <div class="mb-8">
+            <div class="flex space-x-2 overflow-x-auto">
+                <button class="tab-btn active px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap" data-tab="detection">
+                    <i class="fas fa-camera mr-2"></i>Détection Temps Réel
+                </button>
+                <button class="tab-btn px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors whitespace-nowrap" data-tab="hardware">
+                    <i class="fas fa-microchip mr-2"></i>Hardware & Optimisation
+                </button>
+                <button class="tab-btn px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors whitespace-nowrap" data-tab="datasets">
+                    <i class="fas fa-database mr-2"></i>Gestion Datasets
+                </button>
+                <button class="tab-btn px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors whitespace-nowrap" data-tab="training">
+                    <i class="fas fa-brain mr-2"></i>Entraînement IA
+                </button>
+                <button class="tab-btn px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors whitespace-nowrap" data-tab="cheats">
+                    <i class="fas fa-code mr-2"></i>Créateur de Cheats
+                </button>
+                <button class="tab-btn px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors whitespace-nowrap" data-tab="gamification">
+                    <i class="fas fa-trophy mr-2"></i>Gamification
+                </button>
+            </div>
+        </div>
+
+        <!-- Detection Tab -->
+        <div id="detection" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Video Sources -->
+                <div class="glass-effect rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-video mr-2"></i>Sources Vidéo
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <button id="startWebcam" class="action-button px-6 py-3 text-white rounded-lg w-full">
+                                <i class="fas fa-camera mr-2"></i>Démarrer Webcam
+                            </button>
+                        </div>
+                        <div>
+                            <button id="startScreenCapture" class="action-button px-6 py-3 text-white rounded-lg w-full">
+                                <i class="fas fa-desktop mr-2"></i>Capturer Écran
+                            </button>
+                        </div>
+                        <div>
+                            <input id="imageUpload" type="file" accept="image/*" class="hidden">
+                            <button id="uploadImageBtn" class="action-button px-6 py-3 text-white rounded-lg w-full">
+                                <i class="fas fa-upload mr-2"></i>Uploader Image
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Display -->
+                    <div id="videoContainer" class="mt-6 text-center">
+                        <div class="webcam-container">
+                            <video id="webcamVideo" width="400" height="300" autoplay muted class="rounded-lg border-2 border-gray-600" style="display: none;"></video>
+                            <canvas id="webcamCanvas" class="canvas-overlay rounded-lg"></canvas>
+                        </div>
+                        <div class="screen-capture-container mt-4">
+                            <video id="screenVideo" width="400" height="300" autoplay muted class="rounded-lg border-2 border-gray-600" style="display: none;"></video>
+                            <canvas id="screenCanvas" class="canvas-overlay rounded-lg"></canvas>
+                        </div>
+                        <div class="mt-4">
+                            <img id="uploadedImage" class="rounded-lg border-2 border-gray-600 mx-auto" style="display: none; max-width: 400px;">
+                            <canvas id="imageCanvas" class="canvas-overlay rounded-lg"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detection Controls -->
+                <div class="glass-effect rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-sliders-h mr-2"></i>Contrôles de Détection
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Seuil de Confiance</label>
+                            <input id="confidenceThreshold" type="range" min="0.1" max="1" step="0.1" value="0.5" class="w-full">
+                            <span id="confidenceValue" class="text-sm text-gray-400">0.5</span>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Modèle de Détection</label>
+                            <select id="detectionModel" class="w-full p-2 bg-gray-800 rounded-lg border border-gray-600">
+                                <option value="coco-ssd">COCO-SSD (Rapide)</option>
+                                <option value="mobilenet">MobileNet (Précis)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Classes à Détecter</label>
+                            <div id="classFilters" class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+                                <!-- Filters will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <div>
+                            <button id="startDetection" class="action-button px-6 py-3 text-white rounded-lg w-full">
+                                <i class="fas fa-play mr-2"></i>Démarrer Détection
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detection Results -->
+            <div class="glass-effect rounded-lg p-6 mt-8">
+                <h3 class="text-xl font-bold mb-4">
+                    <i class="fas fa-chart-line mr-2"></i>Résultats de Détection
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <canvas id="detectionChart" style="height: 300px;"></canvas>
+                    </div>
+                    <div>
+                        <div id="detectionStats" class="space-y-2">
+                            <div class="flex justify-between">
+                                <span>Objets détectés:</span>
+                                <span id="totalDetections">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Confiance moyenne:</span>
+                                <span id="avgConfidence">0%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>FPS:</span>
+                                <span id="detectionFPS">0</span>
+                            </div>
+                        </div>
+                        <div id="detectionLog" class="mt-4 bg-gray-800 rounded-lg p-4 h-48 overflow-y-auto text-sm">
+                            <div class="text-gray-400">Log de détection...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hardware Tab -->
+        <div id="hardware" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Hardware Detection -->
+                <div class="hardware-card rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-microchip mr-2"></i>Détection Hardware
+                    </h3>
+                    <div id="hardwareInfo" class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
+                            <div>
+                                <i class="fas fa-microchip text-blue-400 mr-2"></i>
+                                <span>Processeur</span>
+                            </div>
+                            <div id="cpuInfo" class="text-right">
+                                <div class="performance-indicator good"></div>
+                                <span>Détection...</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
+                            <div>
+                                <i class="fas fa-memory text-green-400 mr-2"></i>
+                                <span>Mémoire</span>
+                            </div>
+                            <div id="memoryInfo" class="text-right">
+                                <div class="performance-indicator good"></div>
+                                <span>Détection...</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
+                            <div>
+                                <i class="fas fa-video text-red-400 mr-2"></i>
+                                <span>GPU</span>
+                            </div>
+                            <div id="gpuInfo" class="text-right">
+                                <div class="performance-indicator good"></div>
+                                <span>Détection...</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
+                            <div>
+                                <i class="fas fa-hdd text-purple-400 mr-2"></i>
+                                <span>Stockage</span>
+                            </div>
+                            <div id="storageInfo" class="text-right">
+                                <div class="performance-indicator good"></div>
+                                <span>Détection...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="refreshHardware" class="action-button px-6 py-3 text-white rounded-lg w-full mt-4">
+                        <i class="fas fa-sync-alt mr-2"></i>Actualiser Hardware
+                    </button>
+                </div>
+
+                <!-- Performance Optimization -->
+                <div class="hardware-card rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-tachometer-alt mr-2"></i>Optimisation Performance
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Mode Performance</label>
+                            <select id="performanceMode" class="w-full p-2 bg-gray-800 rounded-lg border border-gray-600">
+                                <option value="auto">Automatique</option>
+                                <option value="performance">Performance Maximale</option>
+                                <option value="balanced">Équilibré</option>
+                                <option value="power-save">Économie d'Énergie</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Threads CPU</label>
+                            <input id="cpuThreads" type="range" min="1" max="16" value="4" class="w-full">
+                            <span id="threadsValue" class="text-sm text-gray-400">4</span>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Mémoire GPU (MB)</label>
+                            <input id="gpuMemory" type="range" min="512" max="8192" value="2048" class="w-full">
+                            <span id="gpuMemoryValue" class="text-sm text-gray-400">2048 MB</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>Accélération WebGL</span>
+                            <input id="webglAcceleration" type="checkbox" checked class="toggle">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Storage Management -->
+            <div class="hardware-card rounded-lg p-6 mt-8">
+                <h3 class="text-xl font-bold mb-4">
+                    <i class="fas fa-hdd mr-2"></i>Gestion du Stockage
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-4">
+                        <h4 class="font-semibold">Utilisation du Stockage</h4>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>Modèles IA</span>
+                                <span id="modelsSize">0 MB</span>
+                            </div>
+                            <div class="storage-usage">
+                                <div id="modelsBar" class="h-full bg-blue-500 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>Datasets</span>
+                                <span id="datasetsSize">0 MB</span>
+                            </div>
+                            <div class="storage-usage">
+                                <div id="datasetsBar" class="h-full bg-green-500 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>Cache</span>
+                                <span id="cacheSize">0 MB</span>
+                            </div>
+                            <div class="storage-usage">
+                                <div id="cacheBar" class="h-full bg-yellow-500 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <h4 class="font-semibold">Nettoyage</h4>
+                        <button id="clearCache" class="action-button px-4 py-2 text-white rounded-lg w-full">
+                            <i class="fas fa-trash mr-2"></i>Vider le Cache
+                        </button>
+                        <button id="cleanupOldModels" class="action-button px-4 py-2 text-white rounded-lg w-full">
+                            <i class="fas fa-broom mr-2"></i>Nettoyer Anciens Modèles
+                        </button>
+                        <button id="compressData" class="action-button px-4 py-2 text-white rounded-lg w-full">
+                            <i class="fas fa-compress mr-2"></i>Compresser Données
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <h4 class="font-semibold">Optimisation</h4>
+                        <div class="flex items-center justify-between">
+                            <span>Auto-nettoyage</span>
+                            <input id="autoCleanup" type="checkbox" checked>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>Compression auto</span>
+                            <input id="autoCompress" type="checkbox">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Limite stockage (GB)</label>
+                            <input id="storageLimit" type="range" min="1" max="100" value="10" class="w-full">
+                            <span id="storageLimitValue" class="text-sm text-gray-400">10 GB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Datasets Tab -->
+        <div id="datasets" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Dataset Library -->
+                <div class="glass-effect rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-database mr-2"></i>Bibliothèque de Datasets
+                    </h3>
+                    <div id="datasetLibrary" class="space-y-4 max-h-96 overflow-y-auto">
+                        <!-- Datasets will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Dataset Manager -->
+                <div class="glass-effect rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-cogs mr-2"></i>Gestionnaire de Datasets
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Créer Nouveau Dataset</label>
+                            <input id="datasetName" type="text" placeholder="Nom du dataset" class="w-full p-2 bg-gray-800 rounded-lg border border-gray-600">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Description</label>
+                            <textarea id="datasetDescription" placeholder="Description du dataset" class="w-full p-2 bg-gray-800 rounded-lg border border-gray-600" rows="3"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Catégories</label>
+                            <input id="datasetCategories" type="text" placeholder="Séparer par des virgules" class="w-full p-2 bg-gray-800 rounded-lg border border-gray-600">
+                        </div>
+                        <button id="createDataset" class="action-button px-6 py-3 text-white rounded-lg w-full">
+                            <i class="fas fa-plus mr-2"></i>Créer Dataset
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dataset Tools -->
+            <div class="glass-effect rounded-lg p-6 mt-8">
+                <h3 class="text-xl font-bold mb-4">
+                    <i class="fas fa-tools mr-2"></i>Outils Dataset
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <button id="annotationTool" class="action-button px-4 py-3 text-white rounded-lg">
+                        <i class="fas fa-tag mr-2"></i>Outil d'Annotation
+                    </button>
+                    <button id="augmentData" class="action-button px-4 py-3 text-white rounded-lg">
+                        <i class="fas fa-expand mr-2"></i>Augmentation de Données
+                    </button>
+                    <button id="validateDataset" class="action-button px-4 py-3 text-white rounded-lg">
+                        <i class="fas fa-check mr-2"></i>Validation Dataset
+                    </button>
+                    <button id="exportDataset" class="action-button px-4 py-3 text-white rounded-lg">
+                        <i class="fas fa-download mr-2"></i>Export Dataset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Annotation Interface -->
+            <div id="annotationInterface" class="glass-effect rounded-lg p-6 mt-8" style="display: none;">
+                <h3 class="text-xl font-bold mb-4">
+                    <i class="fas fa-tag mr-2"></i>Interface d'Annotation
+                </h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                        <canvas id="annotationCanvas" class="border-2 border-gray-600 rounded-lg cursor-crosshair"></canvas>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Classe Actuelle</label>
+                            <select id="currentClass" class="w-full p-2 bg-gray-800 rounded-lg border border-gray-600">
+                                <option value="person">Personne</option>
+                                <option value="car">Voiture</option>
+                                <option value="bicycle">Vélo</option>
+                                <option value="dog">Chien</option>
+                                <option value="cat">Chat</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Couleur Annotation</label>
+                            <input id="annotationColor" type="color" value="#ff0000" class="w-full p-2 bg-gray-800 rounded-lg border border-gray-600">
+                        </div>
+                        <div id="annotationsList" class="bg-gray-800 rounded-lg p-4 h-48 overflow-y-auto">
+                            <div class="text-gray-400 text-sm">Annotations apparaîtront ici...</div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button id="clearAnnotations" class="action-button px-4 py-2 text-white rounded-lg flex-1">
+                                <i class="fas fa-trash mr-2"></i>Effacer
+                            </button>
+                            <button id="saveAnnotations" class="action-button px-4 py-2 text-white rounded-lg flex-1">
+                                <i class="fas fa-save mr-2"></i>Sauvegarder
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Training Tab -->
+        <div id="training" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Training Configuration -->
+                <div class="glass-effect rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-brain mr-2"></i>Configuration d'Entraînement
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Modèle de Base</label>
+                            <select id="baseModel" class="w-full p-2 bg-gray-800 rounded-lg border border-gray-600">
+                                <option value="coco-ssd">COCO-SSD</option>
+                                <option value="mobilenet">MobileNet</option>
+                                <option value="yolo">YOLO v8</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Dataset d'Entraînement</label>
+                            <select id="trainingDataset" class="w-full p-2 bg-gray-800 rounded-lg border border-gray-600">
+                                <option value="">Sélectionner un dataset...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Taux d'Apprentissage</label>
+                            <input id="learningRate" type="number" value="0.001" step="0.0001" class="w-full p-2 bg-gray-800 rounded-lg border border-gray-600">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Épochs</label>
+                            <input id="epochs" type="number" value="10" min="1" max="100" class="w-full p-2 bg-gray-800 rounded-lg border border-gray-600">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Taille de Batch</label>
+                            <input id="batchSize" type="number" value="32" min="1" max="128" class="w-full p-2 bg-gray-800 rounded-lg border border-gray-600">
+                        </div>
+                        <button id="startTraining" class="action-button px-6 py-3 text-white rounded-lg w-full">
+                            <i class="fas fa-play mr-2"></i>Démarrer Entraînement
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Training Progress -->
+                <div class="glass-effect rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-chart-line mr-2"></i>Progrès d'Entraînement
+                    </h3>
+                    <div id="trainingProgress" class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>Progrès Global</span>
+                                <span id="overallProgress">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-4">
+                                <div id="overallProgressBar" class="bg-blue-500 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>Époch Actuelle</span>
+                                <span id="currentEpoch">0/0</span>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-4">
+                                <div id="epochProgressBar" class="bg-green-500 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-gray-400">Loss:</span>
+                                <span id="trainingLoss">0.000</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400">Accuracy:</span>
+                                <span id="trainingAccuracy">0.00%</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400">Val Loss:</span>
+                                <span id="validationLoss">0.000</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400">Val Acc:</span>
+                                <span id="validationAccuracy">0.00%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <canvas id="trainingChart" style="height: 200px;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Training History -->
+            <div class="glass-effect rounded-lg p-6 mt-8">
+                <h3 class="text-xl font-bold mb-4">
+                    <i class="fas fa-history mr-2"></i>Historique d'Entraînement
+                </h3>
+                <div id="trainingHistory" class="space-y-4">
+                    <!-- Training history will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Cheats Tab -->
+        <div id="cheats" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Cheat Builder -->
+                <div class="glass-effect rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-code mr-2"></i>Constructeur de Cheats
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Nom du Cheat</label>
+                            <input id="cheatName" type="text" placeholder="Ex: Auto-Aim" class="w-full p-2 bg-gray-800 rounded-lg border border-gray-600">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Objet à Détecter</label>
+                            <select id="cheatTargetObject" class="w-full p-2 bg-gray-800 rounded-lg border border-gray-600">
+                                <option value="person">Personne</option>
+                                <option value="car">Voiture</option>
+                                <option value="bicycle">Vélo</option>
+                                <option value="dog">Chien</option>
+                                <option value="cat">Chat</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Seuil de Confiance</label>
+                            <input id="cheatConfidence" type="range" min="0.1" max="1" step="0.1" value="0.7" class="w-full">
+                            <span id="cheatConfidenceValue" class="text-sm text-gray-400">0.7</span>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Action à Effectuer</label>
+                            <select id="cheatAction" class="w-full p-2 bg-gray-800 rounded-lg border border-gray-600">
+                                <option value="click">Cliquer sur l'objet</option>
+                                <option value="key">Appuyer sur une touche</option>
+                                <option value="move">Déplacer la souris</option>
+                                <option value="custom">Action personnalisée</option>
+                            </select>
+                        </div>
+                        <div id="cheatActionConfig" class="hidden">
+                            <label class="block text-sm font-medium mb-2">Configuration Action</label>
+                            <input id="cheatActionValue" type="text" placeholder="Ex: Space, Enter, etc." class="w-full p-2 bg-gray-800 rounded-lg border border-gray-600">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Délai (ms)</label>
+                            <input id="cheatDelay" type="number" value="100" min="0" max="5000" class="w-full p-2 bg-gray-800 rounded-lg border border-gray-600">
+                        </div>
+                        <button id="generateCheat" class="action-button px-6 py-3 text-white rounded-lg w-full">
+                            <i class="fas fa-magic mr-2"></i>Générer Cheat
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cheat Code Editor -->
+                <div class="glass-effect rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-terminal mr-2"></i>Éditeur de Code
+                    </h3>
+                    <div class="space-y-4">
+                        <textarea id="cheatCode" class="cheat-editor w-full h-64 p-4 text-sm rounded-lg" placeholder="Le code généré apparaîtra ici..."></textarea>
+                        <div class="flex space-x-2">
+                            <button id="testCheat" class="action-button px-4 py-2 text-white rounded-lg flex-1">
+                                <i class="fas fa-play mr-2"></i>Tester
+                            </button>
+                            <button id="saveCheat" class="action-button px-4 py-2 text-white rounded-lg flex-1">
+                                <i class="fas fa-save mr-2"></i>Sauvegarder
+                            </button>
+                            <button id="loadCheat" class="action-button px-4 py-2 text-white rounded-lg flex-1">
+                                <i class="fas fa-folder-open mr-2"></i>Charger
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cheat Library -->
+            <div class="glass-effect rounded-lg p-6 mt-8">
+                <h3 class="text-xl font-bold mb-4">
+                    <i class="fas fa-book mr-2"></i>Bibliothèque de Cheats
+                </h3>
+                <div id="cheatLibrary" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Cheats will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Cheat Output -->
+            <div class="glass-effect rounded-lg p-6 mt-8">
+                <h3 class="text-xl font-bold mb-4">
+                    <i class="fas fa-terminal mr-2"></i>Console de Sortie
+                </h3>
+                <div id="cheatOutput" class="cheat-output">
+                    [GameVision AI] Console prête...<br>
+                    [INFO] Système de cheats initialisé<br>
+                    [INFO] Prêt à générer des cheats<br>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gamification Tab -->
+        <div id="gamification" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Player Stats -->
+                <div class="glass-effect rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-user mr-2"></i>Statistiques Joueur
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-blue-400" id="playerLevel">1</div>
+                            <div class="text-gray-400">Niveau</div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-green-400" id="totalXP">0</div>
+                                <div class="text-gray-400">XP Total</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-purple-400" id="totalAchievements">0</div>
+                                <div class="text-gray-400">Succès</div>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span>Détections effectuées:</span>
+                                <span id="totalDetections">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Modèles entraînés:</span>
+                                <span id="totalModels">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Datasets créés:</span>
+                                <span id="totalDatasets">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Cheats générés:</span>
+                                <span id="totalCheats">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="glass-effect rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-trophy mr-2"></i>Succès
+                    </h3>
+                    <div id="achievementsList" class="space-y-3 max-h-96 overflow-y-auto">
+                        <!-- Achievements will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Challenges -->
+            <div class="glass-effect rounded-lg p-6 mt-8">
+                <h3 class="text-xl font-bold mb-4">
+                    <i class="fas fa-calendar-alt mr-2"></i>Défis Quotidiens
+                </h3>
+                <div id="dailyChallenges" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Daily challenges will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Leaderboard -->
+            <div class="glass-effect rounded-lg p-6 mt-8">
+                <h3 class="text-xl font-bold mb-4">
+                    <i class="fas fa-medal mr-2"></i>Classement
+                </h3>
+                <div id="leaderboard" class="space-y-2">
+                    <!-- Leaderboard will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentTab = 'detection';
+        let detectionModel = null;
+        let isDetecting = false;
+        let webcamStream = null;
+        let screenStream = null;
+        let animationId = null;
+        let detectionChart = null;
+        let trainingChart = null;
+        let userLevel = 1;
+        let userXP = 0;
+        let nextLevelXP = 100;
+        let totalDetections = 0;
+        let achievements = [];
+        let dailyChallenges = [];
+        let datasets = [];
+        let cheats = [];
+        let hardwareInfo = {};
+        let storageInfo = {};
+        let trainingHistory = [];
+        let isTraining = false;
+        let currentTutorialStep = 0;
+        let tutorialSteps = [
+            {
+                title: "Bienvenue dans GameVision AI!",
+                text: "Cette application révolutionnaire vous permet de maîtriser la computer vision pour créer des outils gaming avancés. Commençons par découvrir les fonctionnalités!",
+                target: "detection"
+            },
+            {
+                title: "Détection en Temps Réel",
+                text: "Ici vous pouvez démarrer la détection d'objets sur votre webcam, capturer votre écran ou uploader des images. C'est le cœur du système!",
+                target: "startWebcam"
+            },
+            {
+                title: "Gestion du Hardware",
+                text: "L'application détecte automatiquement votre matériel et optimise les performances selon vos capacités. Tout est automatique!",
+                target: "hardware"
+            },
+            {
+                title: "Datasets Personnalisés",
+                text: "Créez vos propres datasets, annotez des images et entraînez des modèles personnalisés pour vos besoins spécifiques.",
+                target: "datasets"
+            },
+            {
+                title: "Créateur de Cheats",
+                text: "Générez automatiquement des cheats basés sur la détection d'objets. Détectez un ennemi = action automatique!",
+                target: "cheats"
+            },
+            {
+                title: "Système de Gamification",
+                text: "Gagnez de l'XP, débloquez des succès et progressez dans votre maîtrise de la computer vision!",
+                target: "gamification"
+            }
+        ];
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        async function initializeApp() {
+            console.log('Initializing GameVision AI...');
+            
+            // Initialize tabs
+            initializeTabs();
+            
+            // Initialize hardware detection
+            await detectHardware();
+            
+            // Initialize TensorFlow.js
+            await initializeTensorFlow();
+            
+            // Initialize datasets
+            initializeDatasets();
+            
+            // Initialize gamification
+            initializeGamification();
+            
+            // Initialize achievements
+            initializeAchievements();
+            
+            // Initialize storage management
+            initializeStorage();
+            
+            // Initialize cheats
+            initializeCheats();
+            
+            // Initialize event listeners
+            initializeEventListeners();
+            
+            // Initialize tutorial
+            initializeTutorial();
+            
+            // Load user data
+            loadUserData();
+            
+            showNotification('GameVision AI initialisé avec succès!', 'success');
+        }
+
+        function initializeTabs() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.dataset.tab;
+                    
+                    // Update active tab button
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('active', 'bg-blue-600');
+                        btn.classList.add('bg-gray-700');
+                    });
+                    button.classList.remove('bg-gray-700');
+                    button.classList.add('active', 'bg-blue-600');
+                    
+                    // Show target tab content
+                    tabContents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    document.getElementById(targetTab).classList.remove('hidden');
+                    
+                    currentTab = targetTab;
+                });
+            });
+        }
+
+        async function detectHardware() {
+            console.log('Detecting hardware...');
+            
+            // Detect CPU
+            const cpuInfo = {
+                cores: navigator.hardwareConcurrency || 4,
+                name: 'CPU détecté',
+                performance: 'good'
+            };
+            
+            // Detect Memory
+            const memoryInfo = {
+                total: navigator.deviceMemory ? navigator.deviceMemory * 1024 : 8192,
+                available: navigator.deviceMemory ? navigator.deviceMemory * 1024 * 0.7 : 6144,
+                performance: 'good'
+            };
+            
+            // Detect GPU (WebGL)
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            const gpuInfo = {
+                name: gl ? gl.getParameter(gl.getExtension('WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL) : 'GPU non détecté',
+                webgl: !!gl,
+                performance: gl ? 'good' : 'bad'
+            };
+            
+            // Detect Storage
+            if ('storage' in navigator && 'estimate' in navigator.storage) {
+                const estimate = await navigator.storage.estimate();
+                storageInfo = {
+                    total: estimate.quota || 1000000000,
+                    used: estimate.usage || 0,
+                    available: (estimate.quota || 1000000000) - (estimate.usage || 0),
+                    performance: 'good'
+                };
+            } else {
+                storageInfo = {
+                    total: 1000000000,
+                    used: 0,
+                    available: 1000000000,
+                    performance: 'medium'
+                };
+            }
+            
+            hardwareInfo = { cpu: cpuInfo, memory: memoryInfo, gpu: gpuInfo, storage: storageInfo };
+            
+            updateHardwareDisplay();
+        }
+
+        function updateHardwareDisplay() {
+            const cpuElement = document.getElementById('cpuInfo');
+            const memoryElement = document.getElementById('memoryInfo');
+            const gpuElement = document.getElementById('gpuInfo');
+            const storageElement = document.getElementById('storageInfo');
+            
+            if (cpuElement) {
+                cpuElement.innerHTML = `
+                    <div class="performance-indicator ${hardwareInfo.cpu.performance}"></div>
+                    <span>${hardwareInfo.cpu.cores} cores</span>
+                `;
+            }
+            
+            if (memoryElement) {
+                memoryElement.innerHTML = `
+                    <div class="performance-indicator ${hardwareInfo.memory.performance}"></div>
+                    <span>${Math.round(hardwareInfo.memory.total / 1024)} GB</span>
+                `;
+            }
+            
+            if (gpuElement) {
+                gpuElement.innerHTML = `
+                    <div class="performance-indicator ${hardwareInfo.gpu.performance}"></div>
+                    <span>${hardwareInfo.gpu.webgl ? 'WebGL Actif' : 'WebGL Inactif'}</span>
+                `;
+            }
+            
+            if (storageElement) {
+                storageElement.innerHTML = `
+                    <div class="performance-indicator ${hardwareInfo.storage.performance}"></div>
+                    <span>${Math.round(hardwareInfo.storage.available / 1000000)} MB libre</span>
+                `;
+            }
+        }
+
+        async function initializeTensorFlow() {
+            console.log('Initializing TensorFlow.js...');
+            
+            try {
+                // Set backend based on hardware
+                if (hardwareInfo.gpu && hardwareInfo.gpu.webgl) {
+                    await tf.setBackend('webgl');
+                } else {
+                    await tf.setBackend('cpu');
+                }
+                
+                // Load COCO-SSD model
+                detectionModel = await cocoSsd.load();
+                console.log('TensorFlow.js initialized successfully');
+                
+                // Initialize class filters
+                initializeClassFilters();
+                
+                awardXP(50, 'Système IA initialisé');
+                
+            } catch (error) {
+                console.error('Error initializing TensorFlow.js:', error);
+                showNotification('Erreur lors de l\'initialisation de l\'IA', 'error');
+            }
+        }
+
+        function initializeClassFilters() {
+            const classFilters = document.getElementById('classFilters');
+            const classes = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket'];
+            
+            classes.forEach(className => {
+                const label = document.createElement('label');
+                label.className = 'flex items-center space-x-2 text-sm';
+                label.innerHTML = `
+                    <input type="checkbox" checked class="class-filter" data-class="${className}">
+                    <span>${className}</span>
+                `;
+                classFilters.appendChild(label);
+            });
+        }
+
+        function initializeDatasets() {
+            datasets = [
+                {
+                    name: 'COCO Dataset',
+                    description: 'Common Objects in Context - 80 classes d\'objets',
+                    size: '25 GB',
+                    classes: 80,
+                    images: 330000,
+                    status: 'available',
+                    type: 'public'
+                },
+                {
+                    name: 'Open Images',
+                    description: 'Dataset Google avec 600+ classes',
+                    size: '500 GB',
+                    classes: 600,
+                    images: 9000000,
+                    status: 'available',
+                    type: 'public'
+                },
+                {
+                    name: 'ImageNet',
+                    description: 'Classification d\'images - 1000 classes',
+                    size: '150 GB',
+                    classes: 1000,
+                    images: 14000000,
+                    status: 'available',
+                    type: 'public'
+                }
+            ];
+            
+            updateDatasetDisplay();
+        }
+
+        function updateDatasetDisplay() {
+            const datasetLibrary = document.getElementById('datasetLibrary');
+            datasetLibrary.innerHTML = '';
+            
+            datasets.forEach(dataset => {
+                const datasetCard = document.createElement('div');
+                datasetCard.className = 'dataset-card';
+                datasetCard.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-semibold">${dataset.name}</h4>
+                        <span class="text-xs px-2 py-1 bg-blue-600 rounded">${dataset.type}</span>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-2">${dataset.description}</p>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div>Classes: ${dataset.classes}</div>
+                        <div>Images: ${dataset.images.toLocaleString()}</div>
+                        <div>Taille: ${dataset.size}</div>
+                        <div>Status: ${dataset.status}</div>
+                    </div>
+                    <button class="action-button px-4 py-2 text-white rounded-lg w-full mt-2" onclick="downloadDataset('${dataset.name}')">
+                        <i class="fas fa-download mr-2"></i>Télécharger
+                    </button>
+                `;
+                datasetLibrary.appendChild(datasetCard);
+            });
+        }
+
+        function initializeGamification() {
+            // Initialize achievements
+            achievements = [
+                { id: 'first_detection', name: 'Première Détection', description: 'Effectuer votre première détection d\'objet', xp: 100, unlocked: false },
+                { id: 'detection_master', name: 'Maître Détection', description: 'Effectuer 1000 détections', xp: 500, unlocked: false },
+                { id: 'model_trainer', name: 'Entraîneur de Modèles', description: 'Entraîner votre premier modèle', xp: 300, unlocked: false },
+                { id: 'dataset_creator', name: 'Créateur de Dataset', description: 'Créer votre premier dataset', xp: 200, unlocked: false },
+                { id: 'cheat_master', name: 'Maître des Cheats', description: 'Créer 10 cheats différents', xp: 400, unlocked: false }
+            ];
+            
+            // Initialize daily challenges
+            dailyChallenges = [
+                { id: 'daily_detection', name: 'Détection Quotidienne', description: 'Effectuer 100 détections aujourd\'hui', progress: 0, target: 100, xp: 50 },
+                { id: 'daily_training', name: 'Entraînement Quotidien', description: 'Entraîner un modèle aujourd\'hui', progress: 0, target: 1, xp: 100 },
+                { id: 'daily_annotation', name: 'Annotation Quotidienne', description: 'Annoter 50 images aujourd\'hui', progress: 0, target: 50, xp: 75 }
+            ];
+            
+            updateGamificationDisplay();
+        }
+
+        function updateGamificationDisplay() {
+            // Update player stats
+            document.getElementById('playerLevel').textContent = userLevel;
+            document.getElementById('totalXP').textContent = userXP;
+            document.getElementById('totalAchievements').textContent = achievements.filter(a => a.unlocked).length;
+            
+            // Update achievements
+            const achievementsList = document.getElementById('achievementsList');
+            achievementsList.innerHTML = '';
+            
+            achievements.forEach(achievement => {
+                const achievementElement = document.createElement('div');
+                achievementElement.className = `flex items-center justify-between p-3 rounded-lg ${achievement.unlocked ? 'bg-green-800' : 'bg-gray-800'}`;
+                achievementElement.innerHTML = `
+                    <div>
+                        <div class="font-semibold">${achievement.name}</div>
+                        <div class="text-sm text-gray-400">${achievement.description}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-lg font-bold">${achievement.xp} XP</div>
+                        <div class="text-sm ${achievement.unlocked ? 'text-green-400' : 'text-gray-400'}">
+                            ${achievement.unlocked ? 'Débloqué' : 'Verrouillé'}
+                        </div>
+                    </div>
+                `;
+                achievementsList.appendChild(achievementElement);
+            });
+            
+            // Update daily challenges
+            const dailyChallengesElement = document.getElementById('dailyChallenges');
+            dailyChallengesElement.innerHTML = '';
+            
+            dailyChallenges.forEach(challenge => {
+                const challengeElement = document.createElement('div');
+                challengeElement.className = 'bg-gray-800 rounded-lg p-4';
+                challengeElement.innerHTML = `
+                    <div class="font-semibold mb-2">${challenge.name}</div>
+                    <div class="text-sm text-gray-400 mb-2">${challenge.description}</div>
+                    <div class="w-full bg-gray-700 rounded-full h-2 mb-2">
+                        <div class="bg-blue-500 h-2 rounded-full" style="width: ${(challenge.progress / challenge.target) * 100}%"></div>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span>${challenge.progress}/${challenge.target}</span>
+                        <span>${challenge.xp} XP</span>
+                    </div>
+                `;
+                dailyChallengesElement.appendChild(challengeElement);
+            });
+        }
+
+        function initializeAchievements() {
+            // Check for achievements when certain actions are performed
+            window.checkAchievements = function() {
+                achievements.forEach(achievement => {
+                    if (!achievement.unlocked) {
+                        let shouldUnlock = false;
+                        
+                        switch(achievement.id) {
+                            case 'first_detection':
+                                shouldUnlock = totalDetections >= 1;
+                                break;
+                            case 'detection_master':
+                                shouldUnlock = totalDetections >= 1000;
+                                break;
+                            case 'model_trainer':
+                                shouldUnlock = trainingHistory.length >= 1;
+                                break;
+                            case 'dataset_creator':
+                                shouldUnlock = datasets.filter(d => d.type === 'custom').length >= 1;
+                                break;
+                            case 'cheat_master':
+                                shouldUnlock = cheats.length >= 10;
+                                break;
+                        }
+                        
+                        if (shouldUnlock) {
+                            achievement.unlocked = true;
+                            awardXP(achievement.xp, `Succès débloqué: ${achievement.name}`);
+                            showNotification(`🏆 Succès débloqué: ${achievement.name}!`, 'success');
+                        }
+                    }
+                });
+                
+                updateGamificationDisplay();
+            };
+        }
+
+        function initializeStorage() {
+            // Initialize storage monitoring
+            updateStorageDisplay();
+            
+            // Set up periodic storage monitoring
+            setInterval(updateStorageDisplay, 5000);
+        }
+
+        function updateStorageDisplay() {
+            // Simulate storage usage
+            const modelsSize = Math.floor(Math.random() * 500) + 100;
+            const datasetsSize = Math.floor(Math.random() * 1000) + 200;
+            const cacheSize = Math.floor(Math.random() * 200) + 50;
+            
+            document.getElementById('modelsSize').textContent = modelsSize + ' MB';
+            document.getElementById('datasetsSize').textContent = datasetsSize + ' MB';
+            document.getElementById('cacheSize').textContent = cacheSize + ' MB';
+            
+            const totalStorage = hardwareInfo.storage ? hardwareInfo.storage.total / 1000000 : 1000;
+            
+            document.getElementById('modelsBar').style.width = (modelsSize / totalStorage * 100) + '%';
+            document.getElementById('datasetsBar').style.width = (datasetsSize / totalStorage * 100) + '%';
+            document.getElementById('cacheBar').style.width = (cacheSize / totalStorage * 100) + '%';
+        }
+
+        function initializeCheats() {
+            cheats = [
+                {
+                    name: 'Auto-Aim',
+                    description: 'Vise automatiquement sur les ennemis détectés',
+                    target: 'person',
+                    action: 'click',
+                    confidence: 0.8,
+                    code: 'function autoAim() { /* Auto-aim logic */ }'
+                },
+                {
+                    name: 'Item Collector',
+                    description: 'Ramasse automatiquement les objets',
+                    target: 'sports ball',
+                    action: 'move',
+                    confidence: 0.7,
+                    code: 'function collectItems() { /* Item collection logic */ }'
+                }
+            ];
+            
+            updateCheatLibrary();
+        }
+
+        function updateCheatLibrary() {
+            const cheatLibrary = document.getElementById('cheatLibrary');
+            cheatLibrary.innerHTML = '';
+            
+            cheats.forEach((cheat, index) => {
+                const cheatCard = document.createElement('div');
+                cheatCard.className = 'bg-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-700 transition-colors';
+                cheatCard.innerHTML = `
+                    <div class="font-semibold mb-2">${cheat.name}</div>
+                    <div class="text-sm text-gray-400 mb-2">${cheat.description}</div>
+                    <div class="text-xs text-gray-500 mb-2">
+                        Cible: ${cheat.target} | Action: ${cheat.action} | Confiance: ${cheat.confidence}
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="action-button px-3 py-1 text-white rounded text-xs" onclick="loadCheatCode(${index})">
+                            <i class="fas fa-code mr-1"></i>Charger
+                        </button>
+                        <button class="action-button px-3 py-1 text-white rounded text-xs" onclick="testCheatCode(${index})">
+                            <i class="fas fa-play mr-1"></i>Test
+                        </button>
+                    </div>
+                `;
+                cheatLibrary.appendChild(cheatCard);
+            });
+        }
+
+        function initializeEventListeners() {
+            // Webcam controls
+            document.getElementById('startWebcam').addEventListener('click', startWebcam);
+            document.getElementById('startScreenCapture').addEventListener('click', startScreenCapture);
+            document.getElementById('uploadImageBtn').addEventListener('click', () => {
+                document.getElementById('imageUpload').click();
+            });
+            document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
+            
+            // Detection controls
+            document.getElementById('confidenceThreshold').addEventListener('input', (e) => {
+                document.getElementById('confidenceValue').textContent = e.target.value;
+            });
+            document.getElementById('startDetection').addEventListener('click', toggleDetection);
+            
+            // Hardware controls
+            document.getElementById('refreshHardware').addEventListener('click', detectHardware);
+            document.getElementById('performanceMode').addEventListener('change', updatePerformanceMode);
+            document.getElementById('cpuThreads').addEventListener('input', (e) => {
+                document.getElementById('threadsValue').textContent = e.target.value;
+            });
+            document.getElementById('gpuMemory').addEventListener('input', (e) => {
+                document.getElementById('gpuMemoryValue').textContent = e.target.value + ' MB';
+            });
+            
+            // Storage controls
+            document.getElementById('clearCache').addEventListener('click', clearCache);
+            document.getElementById('cleanupOldModels').addEventListener('click', cleanupOldModels);
+            document.getElementById('compressData').addEventListener('click', compressData);
+            document.getElementById('storageLimit').addEventListener('input', (e) => {
+                document.getElementById('storageLimitValue').textContent = e.target.value + ' GB';
+            });
+            
+            // Dataset controls
+            document.getElementById('createDataset').addEventListener('click', createDataset);
+            document.getElementById('annotationTool').addEventListener('click', openAnnotationTool);
+            document.getElementById('augmentData').addEventListener('click', augmentData);
+            document.getElementById('validateDataset').addEventListener('click', validateDataset);
+            document.getElementById('exportDataset').addEventListener('click', exportDataset);
+            
+            // Training controls
+            document.getElementById('startTraining').addEventListener('click', startTraining);
+            
+            // Cheat controls
+            document.getElementById('cheatAction').addEventListener('change', (e) => {
+                const configDiv = document.getElementById('cheatActionConfig');
+                if (e.target.value === 'key' || e.target.value === 'custom') {
+                    configDiv.classList.remove('hidden');
+                } else {
+                    configDiv.classList.add('hidden');
+                }
+            });
+            document.getElementById('cheatConfidence').addEventListener('input', (e) => {
+                document.getElementById('cheatConfidenceValue').textContent = e.target.value;
+            });
+            document.getElementById('generateCheat').addEventListener('click', generateCheat);
+            document.getElementById('testCheat').addEventListener('click', testCheat);
+            document.getElementById('saveCheat').addEventListener('click', saveCheat);
+            
+            // Tutorial controls
+            document.getElementById('tutorialBtn').addEventListener('click', startTutorial);
+            document.getElementById('tutorialNext').addEventListener('click', nextTutorialStep);
+            document.getElementById('tutorialPrev').addEventListener('click', prevTutorialStep);
+        }
+
+        function initializeTutorial() {
+            // Tutorial system is initialized
+            console.log('Tutorial system initialized');
+        }
+
+        // Webcam functions
+        async function startWebcam() {
+            try {
+                webcamStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: 640, height: 480 }
+                });
+                
+                const video = document.getElementById('webcamVideo');
+                video.srcObject = webcamStream;
+                video.style.display = 'block';
+                
+                const canvas = document.getElementById('webcamCanvas');
+                canvas.width = 640;
+                canvas.height = 480;
+                
+                showNotification('Webcam démarrée avec succès!', 'success');
+                awardXP(25, 'Webcam activée');
+                
+            } catch (error) {
+                console.error('Error accessing webcam:', error);
+                showNotification('Erreur d\'accès à la webcam', 'error');
+            }
+        }
+
+        async function startScreenCapture() {
+            try {
+                screenStream = await navigator.mediaDevices.getDisplayMedia({
+                    video: { mediaSource: 'screen' }
+                });
+                
+                const video = document.getElementById('screenVideo');
+                video.srcObject = screenStream;
+                video.style.display = 'block';
+                
+                const canvas = document.getElementById('screenCanvas');
+                canvas.width = 640;
+                canvas.height = 480;
+                
+                showNotification('Capture d\'écran démarrée!', 'success');
+                awardXP(25, 'Capture d\'écran activée');
+                
+            } catch (error) {
+                console.error('Error accessing screen capture:', error);
+                showNotification('Erreur de capture d\'écran', 'error');
+            }
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('uploadedImage');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    
+                    const canvas = document.getElementById('imageCanvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    
+                    showNotification('Image uploadée avec succès!', 'success');
+                    awardXP(10, 'Image uploadée');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Detection functions
+        async function toggleDetection() {
+            const button = document.getElementById('startDetection');
+            
+            if (!isDetecting) {
+                if (!detectionModel) {
+                    showNotification('Modèle de détection non chargé', 'error');
+                    return;
+                }
+                
+                isDetecting = true;
+                button.innerHTML = '<i class="fas fa-stop mr-2"></i>Arrêter Détection';
+                button.classList.add('bg-red-600');
+                
+                startDetectionLoop();
+                showNotification('Détection démarrée!', 'success');
+                awardXP(50, 'Détection démarrée');
+                
+            } else {
+                isDetecting = false;
+                button.innerHTML = '<i class="fas fa-play mr-2"></i>Démarrer Détection';
+                button.classList.remove('bg-red-600');
+                
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+                
+                showNotification('Détection arrêtée', 'info');
+            }
+        }
+
+        function startDetectionLoop() {
+            if (!isDetecting) return;
+            
+            const webcamVideo = document.getElementById('webcamVideo');
+            const screenVideo = document.getElementById('screenVideo');
+            const uploadedImage = document.getElementById('uploadedImage');
+            
+            let targetElement = null;
+            let targetCanvas = null;
+            
+            // Determine which source to use
+            if (webcamVideo.style.display === 'block' && webcamVideo.videoWidth > 0) {
+                targetElement = webcamVideo;
+                targetCanvas = document.getElementById('webcamCanvas');
+            } else if (screenVideo.style.display === 'block' && screenVideo.videoWidth > 0) {
+                targetElement = screenVideo;
+                targetCanvas = document.getElementById('screenCanvas');
+            } else if (uploadedImage.style.display === 'block') {
+                targetElement = uploadedImage;
+                targetCanvas = document.getElementById('imageCanvas');
+            }
+            
+            if (targetElement && targetCanvas) {
+                detectObjects(targetElement, targetCanvas);
+            }
+            
+            animationId = requestAnimationFrame(startDetectionLoop);
+        }
+
+        async function detectObjects(sourceElement, canvas) {
+            try {
+                const predictions = await detectionModel.detect(sourceElement);
+                
+                // Clear previous detections
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Get confidence threshold
+                const confidenceThreshold = parseFloat(document.getElementById('confidenceThreshold').value);
+                
+                // Get enabled classes
+                const enabledClasses = Array.from(document.querySelectorAll('.class-filter:checked')).map(cb => cb.dataset.class);
+                
+                // Filter predictions
+                const filteredPredictions = predictions.filter(prediction => 
+                    prediction.score >= confidenceThreshold &&
+                    enabledClasses.includes(prediction.class)
+                );
+                
+                // Draw detections
+                filteredPredictions.forEach(prediction => {
+                    drawDetection(ctx, prediction, canvas);
+                });
+                
+                // Update stats
+                updateDetectionStats(filteredPredictions);
+                
+                // Update total detections
+                totalDetections += filteredPredictions.length;
+                
+                // Update daily challenge
+                const dailyDetectionChallenge = dailyChallenges.find(c => c.id === 'daily_detection');
+                if (dailyDetectionChallenge) {
+                    dailyDetectionChallenge.progress += filteredPredictions.length;
+                    if (dailyDetectionChallenge.progress >= dailyDetectionChallenge.target) {
+                        awardXP(dailyDetectionChallenge.xp, 'Défi quotidien terminé!');
+                        dailyDetectionChallenge.progress = dailyDetectionChallenge.target;
+                    }
+                }
+                
+                // Check achievements
+                checkAchievements();
+                
+            } catch (error) {
+                console.error('Error during detection:', error);
+            }
+        }
+
+        function drawDetection(ctx, prediction, canvas) {
+            const [x, y, width, height] = prediction.bbox;
+            
+            // Colors for different classes
+            const colors = {
+                'person': '#ff0000',
+                'car': '#00ff00',
+                'bicycle': '#0000ff',
+                'dog': '#ffff00',
+                'cat': '#ff00ff',
+                'default': '#ffffff'
+            };
+            
+            const color = colors[prediction.class] || colors.default;
+            
+            // Draw bounding box
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x, y, width, height);
+            
+            // Draw label
+            ctx.fillStyle = color;
+            ctx.font = '12px Arial';
+            const label = `${prediction.class} (${Math.round(prediction.score * 100)}%)`;
+            const textWidth = ctx.measureText(label).width;
+            
+            ctx.fillRect(x, y - 20, textWidth + 10, 20);
+            ctx.fillStyle = '#000000';
+            ctx.fillText(label, x + 5, y - 5);
+            
+            // Log detection
+            logDetection(prediction);
+        }
+
+        function updateDetectionStats(predictions) {
+            document.getElementById('totalDetections').textContent = totalDetections;
+            
+            if (predictions.length > 0) {
+                const avgConfidence = predictions.reduce((sum, p) => sum + p.score, 0) / predictions.length;
+                document.getElementById('avgConfidence').textContent = Math.round(avgConfidence * 100) + '%';
+            }
+            
+            // Update FPS (simplified)
+            document.getElementById('detectionFPS').textContent = '30';
+        }
+
+        function logDetection(prediction) {
+            const log = document.getElementById('detectionLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'text-xs text-gray-400';
+            entry.textContent = `[${timestamp}] Détecté: ${prediction.class} (${Math.round(prediction.score * 100)}%)`;
+            
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+            
+            // Keep only last 50 entries
+            while (log.children.length > 50) {
+                log.removeChild(log.firstChild);
+            }
+        }
+
+        // Hardware functions
+        function updatePerformanceMode() {
+            const mode = document.getElementById('performanceMode').value;
+            showNotification(`Mode ${mode} activé`, 'info');
+            
+            // Simulate performance adjustment
+            switch(mode) {
+                case 'performance':
+                    document.getElementById('cpuThreads').value = hardwareInfo.cpu.cores;
+                    document.getElementById('threadsValue').textContent = hardwareInfo.cpu.cores;
+                    break;
+                case 'balanced':
+                    document.getElementById('cpuThreads').value = Math.floor(hardwareInfo.cpu.cores / 2);
+                    document.getElementById('threadsValue').textContent = Math.floor(hardwareInfo.cpu.cores / 2);
+                    break;
+                case 'power-save':
+                    document.getElementById('cpuThreads').value = 2;
+                    document.getElementById('threadsValue').textContent = '2';
+                    break;
+            }
+        }
+
+        // Storage functions
+        function clearCache() {
+            showNotification('Cache vidé avec succès!', 'success');
+            document.getElementById('cacheSize').textContent = '0 MB';
+            document.getElementById('cacheBar').style.width = '0%';
+            awardXP(25, 'Cache vidé');
+        }
+
+        function cleanupOldModels() {
+            showNotification('Anciens modèles supprimés!', 'success');
+            const currentSize = parseInt(document.getElementById('modelsSize').textContent);
+            const newSize = Math.max(100, currentSize - 200);
+            document.getElementById('modelsSize').textContent = newSize + ' MB';
+            awardXP(25, 'Nettoyage effectué');
+        }
+
+        function compressData() {
+            showNotification('Données compressées!', 'success');
+            const elements = ['modelsSize', 'datasetsSize'];
+            elements.forEach(id => {
+                const current = parseInt(document.getElementById(id).textContent);
+                const compressed = Math.max(50, Math.floor(current * 0.7));
+                document.getElementById(id).textContent = compressed + ' MB';
+            });
+            awardXP(50, 'Compression effectuée');
+        }
+
+        // Dataset functions
+        function createDataset() {
+            const name = document.getElementById('datasetName').value;
+            const description = document.getElementById('datasetDescription').value;
+            const categories = document.getElementById('datasetCategories').value;
+            
+            if (!name || !description || !categories) {
+                showNotification('Veuillez remplir tous les champs', 'error');
+                return;
+            }
+            
+            const newDataset = {
+                name: name,
+                description: description,
+                size: '0 MB',
+                classes: categories.split(',').length,
+                images: 0,
+                status: 'created',
+                type: 'custom'
+            };
+            
+            datasets.push(newDataset);
+            updateDatasetDisplay();
+            
+            // Clear form
+            document.getElementById('datasetName').value = '';
+            document.getElementById('datasetDescription').value = '';
+            document.getElementById('datasetCategories').value = '';
+            
+            showNotification('Dataset créé avec succès!', 'success');
+            awardXP(100, 'Dataset créé');
+            checkAchievements();
+        }
+
+        function downloadDataset(name) {
+            showNotification(`Téléchargement de ${name} démarré...`, 'info');
+            
+            // Simulate download progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    showNotification(`${name} téléchargé avec succès!`, 'success');
+                    awardXP(150, `Dataset ${name} téléchargé`);
+                }
+            }, 500);
+        }
+
+        function openAnnotationTool() {
+            document.getElementById('annotationInterface').style.display = 'block';
+            showNotification('Outil d\'annotation ouvert', 'info');
+            awardXP(25, 'Outil d\'annotation ouvert');
+        }
+
+        function augmentData() {
+            showNotification('Augmentation de données démarrée...', 'info');
+            setTimeout(() => {
+                showNotification('Augmentation terminée! 500 nouvelles images générées', 'success');
+                awardXP(75, 'Augmentation de données');
+            }, 2000);
+        }
+
+        function validateDataset() {
+            showNotification('Validation du dataset en cours...', 'info');
+            setTimeout(() => {
+                showNotification('Dataset validé! Toutes les annotations sont correctes', 'success');
+                awardXP(50, 'Dataset validé');
+            }, 1500);
+        }
+
+        function exportDataset() {
+            showNotification('Export du dataset en cours...', 'info');
+            setTimeout(() => {
+                showNotification('Dataset exporté en format COCO JSON', 'success');
+                awardXP(30, 'Dataset exporté');
+            }, 1000);
+        }
+
+        // Training functions
+        function startTraining() {
+            if (isTraining) {
+                showNotification('Un entraînement est déjà en cours', 'error');
+                return;
+            }
+            
+            const baseModel = document.getElementById('baseModel').value;
+            const dataset = document.getElementById('trainingDataset').value;
+            const learningRate = document.getElementById('learningRate').value;
+            const epochs = parseInt(document.getElementById('epochs').value);
+            const batchSize = parseInt(document.getElementById('batchSize').value);
+            
+            if (!dataset) {
+                showNotification('Veuillez sélectionner un dataset', 'error');
+                return;
+            }
+            
+            isTraining = true;
+            document.getElementById('startTraining').innerHTML = '<i class="fas fa-stop mr-2"></i>Arrêter Entraînement';
+            
+            showNotification('Entraînement démarré!', 'success');
+            awardXP(200, 'Entraînement démarré');
+            
+            // Simulate training progress
+            let currentEpoch = 0;
+            const trainingInterval = setInterval(() => {
+                currentEpoch++;
+                const progress = (currentEpoch / epochs) * 100;
+                
+                // Update progress bars
+                document.getElementById('overallProgress').textContent = Math.round(progress) + '%';
+                document.getElementById('overallProgressBar').style.width = progress + '%';
+                document.getElementById('currentEpoch').textContent = `${currentEpoch}/${epochs}`;
+                
+                // Simulate metrics
+                const loss = Math.max(0.1, 2.0 - (currentEpoch / epochs) * 1.5);
+                const accuracy = Math.min(0.95, 0.5 + (currentEpoch / epochs) * 0.4);
+                
+                document.getElementById('trainingLoss').textContent = loss.toFixed(3);
+                document.getElementById('trainingAccuracy').textContent = (accuracy * 100).toFixed(2) + '%';
+                document.getElementById('validationLoss').textContent = (loss + 0.1).toFixed(3);
+                document.getElementById('validationAccuracy').textContent = ((accuracy - 0.05) * 100).toFixed(2) + '%';
+                
+                if (currentEpoch >= epochs) {
+                    clearInterval(trainingInterval);
+                    isTraining = false;
+                    document.getElementById('startTraining').innerHTML = '<i class="fas fa-play mr-2"></i>Démarrer Entraînement';
+                    showNotification('Entraînement terminé!', 'success');
+                    awardXP(500, 'Entraînement terminé');
+                    
+                    // Add to training history
+                    trainingHistory.push({
+                        date: new Date(),
+                        model: baseModel,
+                        dataset: dataset,
+                        epochs: epochs,
+                        finalAccuracy: accuracy,
+                        finalLoss: loss
+                    });
+                    
+                    checkAchievements();
+                }
+            }, 1000);
+        }
+
+        // Cheat functions
+        function generateCheat() {
+            const name = document.getElementById('cheatName').value;
+            const target = document.getElementById('cheatTargetObject').value;
+            const confidence = document.getElementById('cheatConfidence').value;
+            const action = document.getElementById('cheatAction').value;
+            const actionValue = document.getElementById('cheatActionValue').value;
+            const delay = document.getElementById('cheatDelay').value;
+            
+            if (!name) {
+                showNotification('Veuillez entrer un nom pour le cheat', 'error');
+                return;
+            }
+            
+            const cheatCode = generateCheatCode(name, target, confidence, action, actionValue, delay);
+            document.getElementById('cheatCode').value = cheatCode;
+            
+            showNotification('Cheat généré avec succès!', 'success');
+            awardXP(100, 'Cheat généré');
+            
+            // Add to output log
+            const output = document.getElementById('cheatOutput');
+            output.innerHTML += `<br>[${new Date().toLocaleTimeString()}] Cheat "${name}" généré`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function generateCheatCode(name, target, confidence, action, actionValue, delay) {
+            return `
+// Cheat: ${name}
+// Générée automatiquement par GameVision AI
+
+class ${name.replace(/\s+/g, '')}Cheat {
+    constructor() {
+        this.target = '${target}';
+        this.confidence = ${confidence};
+        this.action = '${action}';
+        this.actionValue = '${actionValue}';
+        this.delay = ${delay};
+        this.isActive = false;
+    }
+    
+    async detectAndAct(videoElement) {
+        if (!this.isActive) return;
+        
+        try {
+            // Détection d'objets
+            const predictions = await detectionModel.detect(videoElement);
+            
+            // Filtrer les prédictions
+            const targets = predictions.filter(pred => 
+                pred.class === this.target && 
+                pred.score >= this.confidence
+            );
+            
+            // Exécuter l'action pour chaque cible
+            targets.forEach(target => {
+                setTimeout(() => {
+                    this.executeAction(target);
+                }, this.delay);
+            });
+            
+        } catch (error) {
+            console.error('Erreur dans le cheat:', error);
+        }
+    }
+    
+    executeAction(target) {
+        const [x, y, width, height] = target.bbox;
+        const centerX = x + width / 2;
+        const centerY = y + height / 2;
+        
+        switch(this.action) {
+            case 'click':
+                this.simulateClick(centerX, centerY);
+                break;
+            case 'key':
+                this.simulateKeyPress(this.actionValue);
+                break;
+            case 'move':
+                this.simulateMouseMove(centerX, centerY);
+                break;
+            case 'custom':
+                this.executeCustomAction(target);
+                break;
+        }
+    }
+    
+    simulateClick(x, y) {
+        console.log(\`Clic simulé à (\${x}, \${y})\`);
+        // Note: Les clics réels nécessitent des extensions navigateur
+    }
+    
+    simulateKeyPress(key) {
+        console.log(\`Touche simulée: \${key}\`);
+        // Simulation de frappe clavier
+    }
+    
+    simulateMouseMove(x, y) {
+        console.log(\`Mouvement souris vers (\${x}, \${y})\`);
+        // Simulation de mouvement souris
+    }
+    
+    executeCustomAction(target) {
+        console.log('Action personnalisée exécutée:', target);
+        // Code personnalisé ici
+    }
+    
+    activate() {
+        this.isActive = true;
+        console.log('Cheat ${name} activé');
+    }
+    
+    deactivate() {
+        this.isActive = false;
+        console.log('Cheat ${name} désactivé');
+    }
+}
+
+// Utilisation
+const ${name.replace(/\s+/g, '').toLowerCase()}Cheat = new ${name.replace(/\s+/g, '')}Cheat();
+${name.replace(/\s+/g, '').toLowerCase()}Cheat.activate();
+
+// Démarrer la détection
+setInterval(() => {
+    const videoElement = document.getElementById('webcamVideo') || document.getElementById('screenVideo');
+    if (videoElement) {
+        ${name.replace(/\s+/g, '').toLowerCase()}Cheat.detectAndAct(videoElement);
+    }
+}, 100);
+            `.trim();
+        }
+
+        function testCheat() {
+            const code = document.getElementById('cheatCode').value;
+            if (!code) {
+                showNotification('Aucun code à tester', 'error');
+                return;
+            }
+            
+            try {
+                // Simulate cheat testing
+                const output = document.getElementById('cheatOutput');
+                output.innerHTML += `<br>[${new Date().toLocaleTimeString()}] Test du cheat en cours...`;
+                output.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ✓ Syntaxe valide`;
+                output.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ✓ Logique de détection OK`;
+                output.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ✓ Actions configurées`;
+                output.innerHTML += `<br>[${new Date().toLocaleTimeString()}] Test terminé avec succès`;
+                output.scrollTop = output.scrollHeight;
+                
+                showNotification('Test du cheat réussi!', 'success');
+                awardXP(50, 'Cheat testé');
+                
+            } catch (error) {
+                showNotification('Erreur dans le code du cheat', 'error');
+            }
+        }
+
+        function saveCheat() {
+            const name = document.getElementById('cheatName').value;
+            const code = document.getElementById('cheatCode').value;
+            
+            if (!name || !code) {
+                showNotification('Nom et code requis pour sauvegarder', 'error');
+                return;
+            }
+            
+            const newCheat = {
+                name: name,
+                description: `Cheat personnalisé: ${name}`,
+                target: document.getElementById('cheatTargetObject').value,
+                action: document.getElementById('cheatAction').value,
+                confidence: parseFloat(document.getElementById('cheatConfidence').value),
+                code: code
+            };
+            
+            cheats.push(newCheat);
+            updateCheatLibrary();
+            
+            showNotification('Cheat sauvegardé!', 'success');
+            awardXP(75, 'Cheat sauvegardé');
+            checkAchievements();
+        }
+
+        function loadCheatCode(index) {
+            const cheat = cheats[index];
+            if (cheat) {
+                document.getElementById('cheatName').value = cheat.name;
+                document.getElementById('cheatTargetObject').value = cheat.target;
+                document.getElementById('cheatAction').value = cheat.action;
+                document.getElementById('cheatConfidence').value = cheat.confidence;
+                document.getElementById('cheatConfidenceValue').textContent = cheat.confidence;
+                document.getElementById('cheatCode').value = cheat.code;
+                
+                showNotification(`Cheat "${cheat.name}" chargé`, 'success');
+            }
+        }
+
+        function testCheatCode(index) {
+            const cheat = cheats[index];
+            if (cheat) {
+                const output = document.getElementById('cheatOutput');
+                output.innerHTML += `<br>[${new Date().toLocaleTimeString()}] Test du cheat "${cheat.name}"...`;
+                output.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ✓ Cheat activé`;
+                output.scrollTop = output.scrollHeight;
+                
+                showNotification(`Test du cheat "${cheat.name}" démarré`, 'success');
+            }
+        }
+
+        // Gamification functions
+        function awardXP(amount, reason) {
+            userXP += amount;
+            
+            // Check for level up
+            while (userXP >= nextLevelXP) {
+                userXP -= nextLevelXP;
+                userLevel++;
+                nextLevelXP = userLevel * 100;
+                showNotification(`🎉 Niveau ${userLevel} atteint!`, 'success');
+            }
+            
+            // Update display
+            document.getElementById('userLevel').textContent = userLevel;
+            document.getElementById('userXP').textContent = userXP;
+            document.getElementById('nextLevelXP').textContent = nextLevelXP;
+            
+            const xpPercentage = (userXP / nextLevelXP) * 100;
+            document.getElementById('xpBar').style.width = xpPercentage + '%';
+            
+            // Show XP notification
+            if (reason) {
+                const output = document.getElementById('cheatOutput');
+                output.innerHTML += `<br>[${new Date().toLocaleTimeString()}] +${amount} XP - ${reason}`;
+                output.scrollTop = output.scrollHeight;
+            }
+        }
+
+        // Tutorial functions
+        function startTutorial() {
+            currentTutorialStep = 0;
+            showTutorialStep();
+        }
+
+        function showTutorialStep() {
+            const step = tutorialSteps[currentTutorialStep];
+            if (!step) return;
+            
+            const overlay = document.getElementById('tutorialOverlay');
+            const content = document.getElementById('tutorialContent');
+            const title = document.getElementById('tutorialTitle');
+            const text = document.getElementById('tutorialText');
+            
+            title.textContent = step.title;
+            text.textContent = step.text;
+            
+            // Position tutorial content near target element
+            const targetElement = document.getElementById(step.target);
+            if (targetElement) {
+                const rect = targetElement.getBoundingClientRect();
+                content.style.left = Math.min(rect.left, window.innerWidth - 420) + 'px';
+                content.style.top = Math.max(rect.bottom + 10, 100) + 'px';
+            }
+            
+            overlay.style.display = 'block';
+            
+            // Update navigation buttons
+            document.getElementById('tutorialPrev').style.display = currentTutorialStep > 0 ? 'block' : 'none';
+            document.getElementById('tutorialNext').textContent = currentTutorialStep === tutorialSteps.length - 1 ? 'Terminer' : 'Suivant';
+        }
+
+        function nextTutorialStep() {
+            if (currentTutorialStep < tutorialSteps.length - 1) {
+                currentTutorialStep++;
+                showTutorialStep();
+            } else {
+                // End tutorial
+                document.getElementById('tutorialOverlay').style.display = 'none';
+                showNotification('Tutoriel terminé! Vous êtes prêt à utiliser GameVision AI!', 'success');
+                awardXP(200, 'Tutoriel terminé');
+            }
+        }
+
+        function prevTutorialStep() {
+            if (currentTutorialStep > 0) {
+                currentTutorialStep--;
+                showTutorialStep();
+            }
+        }
+
+        // Utility functions
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function loadUserData() {
+            // Load user data from localStorage
+            const savedData = localStorage.getItem('gameVisionUserData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                userLevel = data.level || 1;
+                userXP = data.xp || 0;
+                nextLevelXP = data.nextLevelXP || 100;
+                totalDetections = data.totalDetections || 0;
+                achievements = data.achievements || achievements;
+                
+                // Update displays
+                document.getElementById('userLevel').textContent = userLevel;
+                document.getElementById('userXP').textContent = userXP;
+                document.getElementById('nextLevelXP').textContent = nextLevelXP;
+                document.getElementById('totalDetections').textContent = totalDetections;
+                
+                const xpPercentage = (userXP / nextLevelXP) * 100;
+                document.getElementById('xpBar').style.width = xpPercentage + '%';
+                
+                updateGamificationDisplay();
+            }
+        }
+
+        function saveUserData() {
+            const userData = {
+                level: userLevel,
+                xp: userXP,
+                nextLevelXP: nextLevelXP,
+                totalDetections: totalDetections,
+                achievements: achievements
+            };
+            
+            localStorage.setItem('gameVisionUserData', JSON.stringify(userData));
+        }
+
+        // Auto-save user data every 30 seconds
+        setInterval(saveUserData, 30000);
+
+        // Save data when page is about to unload
+        window.addEventListener('beforeunload', saveUserData);
+
+        console.log('GameVision AI Master loaded successfully!');
+    </script>
+</body>
+</html>

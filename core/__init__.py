@@ -1,30 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Core Module - Modules centraux du système YOLO intelligent
-Contient les composants fondamentaux pour le profiling, l'adaptation et la gestion
+AIMER PRO - Core Module
+© 2025 - Licence Apache 2.0
+
+Module principal contenant le moteur Detectron2 et les utilitaires
 """
 
-from .smart_system_profiler import SmartSystemProfiler, SystemCapabilities, SmartLogger
-from .adaptive_engine import ContextualAdaptationEngine, AdaptationConfig
-from .intelligent_storage_manager import IntelligentStorageManager, StorageRecommendation, DriveInfo
-from .professional_dataset_manager import ProfessionalDatasetManager, DatasetInfo, ImageAnalysis
-from .project_cleaner import ProjectCleaner
+from .detector import UniversalDetector
+from .config import ConfigManager
+from .logger import Logger
 
-__version__ = "2.0.0"
-__author__ = "YOLO Ultimate System"
-
-__all__ = [
-    "SmartSystemProfiler",
-    "SystemCapabilities", 
-    "SmartLogger",
-    "ContextualAdaptationEngine",
-    "AdaptationConfig",
-    "IntelligentStorageManager",
-    "StorageRecommendation",
-    "DriveInfo",
-    "ProfessionalDatasetManager",
-    "DatasetInfo",
-    "ImageAnalysis",
-    "ProjectCleaner"
-]
+__version__ = "1.0.0"
+__all__ = ["UniversalDetector", "ConfigManager", "Logger"]

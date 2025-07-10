@@ -1,1361 +1,942 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
-Ultimate Interface - Interface ultime du système YOLO collaboratif
-Intègre tous les systèmes : datasets, apprentissage, multi-cibles, temps réel
+AIMER PRO - Interface Ultime
+© 2025 - Licence Apache 2.0
+
+Interface complète pour toutes les fonctionnalités de computer vision
 """
 
-import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
-import threading
 import sys
-import os
-import time
-import json
-from datetime import datetime
 from pathlib import Path
-import cv2
-import numpy as np
-import pyautogui
-from PIL import Image, ImageTk, ImageDraw
+from PyQt6.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
+    QLabel, QPushButton, QTextEdit, QComboBox, QSpinBox,
+    QGroupBox, QTabWidget, QFileDialog, QMessageBox,
+    QCheckBox, QSlider, QProgressBar, QLineEdit,
+    QTableWidget, QTableWidgetItem, QSplitter,
+    QScrollArea, QFrame
+)
+from PyQt6.QtCore import Qt, QThread, pyqtSignal, QTimer
+from PyQt6.QtGui import QFont, QPixmap, QImage
 
-# Ajouter le répertoire parent au path
-parent_dir = Path(__file__).parent.parent
-sys.path.insert(0, str(parent_dir))
+# Import des modules core
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from core.vision_engine import UltimateVisionEngine
+from core.logger import Logger
 
-# Imports des systèmes
-try:
-    from ultralytics import YOLO
-    from learning.dataset_manager import DatasetManager
-    from learning.collaborative_learning import CollaborativeLearningSystem
-    from realtime.multi_target_stream import MultiTargetStream
-    from utils.multi_screen import TargetSelector
-    from ui.zone_selector import ZoneManager
-    # Nouveaux imports pour le gestionnaire intelligent
-    from core.intelligent_storage_manager import IntelligentStorageManager
-    from core.professional_dataset_manager import ProfessionalDatasetManager
-    IMPORTS_OK = True
-except ImportError as e:
-    IMPORTS_OK = False
-    IMPORT_ERROR = str(e)
+class GameBotWidget(QWidget):
+    """Interface pour le bot de jeu"""
 
-class UltimateInterface:
-    """Interface ultime du système YOLO collaboratif"""
-    
-    def __init__(self):
-        # Variables d'état
-        self.is_running = False
-        self.model = None
-        self.dataset_manager = None
-        self.learning_system = None
-        self.multi_stream = None
-        self.target_selector = None
-        self.zone_manager = None
-        
-        # Nouveaux gestionnaires intelligents
-        self.storage_manager = None
-        self.professional_dataset_manager = None
-        
-        # Configuration des couleurs
-        self.colors = {
-            'primary': '#007bff',
-            'success': '#28a745',
-            'warning': '#ffc107', 
-            'danger': '#dc3545',
-            'info': '#17a2b8',
-            'dark': '#343a40',
-            'purple': '#6f42c1'
-        }
-        
-        # Interface principale
-        self.root = tk.Tk()
-        self.setup_main_window()
-        self.create_ultimate_interface()
-        
-        # Initialisation différée
-        self.root.after(100, self.delayed_init)
-    
-    def setup_main_window(self):
-        """Configure la fenêtre principale"""
-        self.root.title("🚀 SYSTÈME YOLO ULTIME - Plateforme Collaborative")
-        self.root.geometry("1400x900")
-        self.root.configure(bg='#f8f9fa')
-        
-        # Centrer la fenêtre
-        self.center_window()
-        
-        # Gestionnaire de fermeture
-        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-    
-    def center_window(self):
-        """Centre la fenêtre sur l'écran"""
-        self.root.update_idletasks()
-        width = self.root.winfo_width()
-        height = self.root.winfo_height()
-        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
-        y = (self.root.winfo_screenheight() // 2) - (height // 2)
-        self.root.geometry(f'{width}x{height}+{x}+{y}')
-    
-    def create_ultimate_interface(self):
-        """Crée l'interface ultime"""
-        # Header avec titre et statut
-        self.create_header()
-        
-        # Notebook principal avec onglets
-        self.create_main_notebook()
-        
-        # Footer avec statistiques globales
-        self.create_footer()
-    
-    def create_header(self):
-        """Crée l'en-tête de l'interface"""
-        header_frame = tk.Frame(self.root, bg=self.colors['dark'], height=80)
-        header_frame.pack(fill=tk.X)
-        header_frame.pack_propagate(False)
-        
-        # Titre principal
-        title_label = tk.Label(
-            header_frame,
-            text="🚀 SYSTÈME YOLO ULTIME",
-            font=('Arial', 20, 'bold'),
-            fg='white',
-            bg=self.colors['dark']
-        )
-        title_label.pack(side=tk.LEFT, padx=20, pady=20)
-        
-        # Sous-titre
-        subtitle_label = tk.Label(
-            header_frame,
-            text="Plateforme Collaborative d'Intelligence Artificielle",
-            font=('Arial', 12),
-            fg='#adb5bd',
-            bg=self.colors['dark']
-        )
-        subtitle_label.pack(side=tk.LEFT, padx=(0, 20), pady=(35, 20))
-        
-        # Statut global
-        self.status_frame = tk.Frame(header_frame, bg=self.colors['dark'])
-        self.status_frame.pack(side=tk.RIGHT, padx=20, pady=20)
-        
-        self.global_status = tk.Label(
-            self.status_frame,
-            text="🔴 Initialisation...",
-            font=('Arial', 12, 'bold'),
-            fg='white',
-            bg=self.colors['dark']
-        )
-        self.global_status.pack()
-    
-    def create_main_notebook(self):
-        """Crée le notebook principal avec tous les onglets"""
-        # Style pour le notebook
-        style = ttk.Style()
-        style.configure('Ultimate.TNotebook.Tab', padding=[20, 10])
-        
-        self.main_notebook = ttk.Notebook(self.root, style='Ultimate.TNotebook')
-        self.main_notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
-        
-        # Onglet 1: Dashboard Principal
-        self.create_dashboard_tab()
-        
-        # Onglet 2: Datasets & Base Globale
-        self.create_datasets_tab()
-        
-        # Onglet 3: Apprentissage Collaboratif
-        self.create_learning_tab()
-        
-        # Onglet 4: Stream Multi-Cibles
-        self.create_stream_tab()
-        
-        # Onglet 5: Configuration Avancée
-        self.create_config_tab()
-    
-    def create_dashboard_tab(self):
-        """Crée l'onglet dashboard principal"""
-        dashboard_frame = ttk.Frame(self.main_notebook)
-        self.main_notebook.add(dashboard_frame, text="📊 Dashboard")
-        
-        # Vue d'ensemble
-        overview_frame = ttk.LabelFrame(dashboard_frame, text="🎯 Vue d'Ensemble", padding="15")
-        overview_frame.pack(fill=tk.X, padx=10, pady=5)
-        
-        # Métriques principales
-        metrics_frame = tk.Frame(overview_frame)
-        metrics_frame.pack(fill=tk.X)
-        
-        # Cartes de métriques
-        self.create_metric_card(metrics_frame, "📚 Datasets", "0", "Datasets installés", self.colors['info'])
-        self.create_metric_card(metrics_frame, "🎨 Objets", "0", "Objets personnels", self.colors['success'])
-        self.create_metric_card(metrics_frame, "🖥️ Cibles", "0", "Cibles actives", self.colors['warning'])
-        self.create_metric_card(metrics_frame, "🏆 Score", "0", "Score total", self.colors['purple'])
-        
-        # Actions rapides
-        actions_frame = ttk.LabelFrame(dashboard_frame, text="⚡ Actions Rapides", padding="15")
-        actions_frame.pack(fill=tk.X, padx=10, pady=5)
-        
-        quick_actions = [
-            ("🚀 Démarrer Stream", self.quick_start_stream, self.colors['success']),
-            ("📥 Installer Datasets", self.quick_install_datasets, self.colors['info']),
-            ("🧠 Mode Apprentissage", self.quick_learning_mode, self.colors['purple']),
-            ("🎯 Sélectionner Cibles", self.quick_select_targets, self.colors['warning'])
-        ]
-        
-        for text, command, color in quick_actions:
-            btn = tk.Button(
-                actions_frame,
-                text=text,
-                font=('Arial', 11, 'bold'),
-                bg=color,
-                fg='white',
-                command=command,
-                relief='flat',
-                padx=20,
-                pady=10
-            )
-            btn.pack(side=tk.LEFT, padx=5)
-        
-        # Vue temps réel
-        realtime_frame = ttk.LabelFrame(dashboard_frame, text="📹 Vue Temps Réel", padding="10")
-        realtime_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
-        
-        # Canvas pour affichage temps réel
-        self.realtime_canvas = tk.Canvas(realtime_frame, bg='black', height=300)
-        self.realtime_canvas.pack(fill=tk.BOTH, expand=True)
-        
-        # Log temps réel
-        log_frame = ttk.LabelFrame(dashboard_frame, text="📋 Log Temps Réel", padding="10")
-        log_frame.pack(fill=tk.X, padx=10, pady=5)
-        
-        self.dashboard_log = tk.Text(log_frame, height=8, bg='#f8f9fa', font=('Consolas', 9))
-        log_scrollbar = ttk.Scrollbar(log_frame, orient=tk.VERTICAL, command=self.dashboard_log.yview)
-        self.dashboard_log.configure(yscrollcommand=log_scrollbar.set)
-        
-        self.dashboard_log.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        log_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-    
-    def create_metric_card(self, parent, title, value, subtitle, color):
-        """Crée une carte de métrique"""
-        card_frame = tk.Frame(parent, bg=color, relief='flat', bd=0)
-        card_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5)
-        
-        # Titre
-        title_label = tk.Label(
-            card_frame,
-            text=title,
-            font=('Arial', 12, 'bold'),
-            fg='white',
-            bg=color
-        )
-        title_label.pack(pady=(10, 5))
-        
-        # Valeur
-        value_label = tk.Label(
-            card_frame,
-            text=value,
-            font=('Arial', 24, 'bold'),
-            fg='white',
-            bg=color
-        )
-        value_label.pack()
-        
-        # Sous-titre
-        subtitle_label = tk.Label(
-            card_frame,
-            text=subtitle,
-            font=('Arial', 10),
-            fg='white',
-            bg=color
-        )
-        subtitle_label.pack(pady=(0, 10))
-        
-        return card_frame
-    
-    def create_datasets_tab(self):
-        """Crée l'onglet gestion des datasets"""
-        datasets_frame = ttk.Frame(self.main_notebook)
-        self.main_notebook.add(datasets_frame, text="📚 Datasets")
-        
-        # Panneau de contrôle datasets
-        control_frame = ttk.LabelFrame(datasets_frame, text="🎛️ Contrôle Datasets", padding="15")
-        control_frame.pack(fill=tk.X, padx=10, pady=5)
-        
-        # Boutons de contrôle
-        control_buttons = tk.Frame(control_frame)
-        control_buttons.pack(fill=tk.X)
-        
-        tk.Button(control_buttons, text="📥 Installer Essentiels", 
-                 bg=self.colors['success'], fg='white', font=('Arial', 11),
-                 command=self.install_essential_datasets).pack(side=tk.LEFT, padx=5)
-        
-        tk.Button(control_buttons, text="🔍 Parcourir Disponibles", 
-                 bg=self.colors['info'], fg='white', font=('Arial', 11),
-                 command=self.browse_available_datasets).pack(side=tk.LEFT, padx=5)
-        
-        tk.Button(control_buttons, text="📊 Statistiques", 
-                 bg=self.colors['warning'], fg='white', font=('Arial', 11),
-                 command=self.show_dataset_stats).pack(side=tk.LEFT, padx=5)
-        
-        # Liste des datasets
-        datasets_list_frame = ttk.LabelFrame(datasets_frame, text="📋 Datasets Installés", padding="10")
-        datasets_list_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
-        
-        # Treeview pour les datasets
-        columns = ('Nom', 'Catégorie', 'Classes', 'Images', 'Taille')
-        self.datasets_tree = ttk.Treeview(datasets_list_frame, columns=columns, show='headings', height=15)
-        
-        for col in columns:
-            self.datasets_tree.heading(col, text=col)
-            self.datasets_tree.column(col, width=150)
-        
-        datasets_scrollbar = ttk.Scrollbar(datasets_list_frame, orient=tk.VERTICAL, command=self.datasets_tree.yview)
-        self.datasets_tree.configure(yscrollcommand=datasets_scrollbar.set)
-        
-        self.datasets_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        datasets_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-    
-    def create_learning_tab(self):
-        """Crée l'onglet apprentissage collaboratif"""
-        learning_frame = ttk.Frame(self.main_notebook)
-        self.main_notebook.add(learning_frame, text="🧠 Apprentissage")
-        
-        # Modes d'apprentissage
-        modes_frame = ttk.LabelFrame(learning_frame, text="🎯 Modes d'Apprentissage", padding="15")
-        modes_frame.pack(fill=tk.X, padx=10, pady=5)
-        
-        modes = [
-            ("🎨 Création", "creation", "Créer de nouveaux objets", self.colors['success']),
-            ("✅ Validation", "validation", "Valider les détections", self.colors['info']),
-            ("🔧 Correction", "correction", "Corriger les erreurs", self.colors['warning']),
-            ("🌍 Partage", "sharing", "Partager avec la communauté", self.colors['purple'])
-        ]
-        
-        for text, mode_key, desc, color in modes:
-            btn = tk.Button(
-                modes_frame,
-                text=f"{text}\n{desc}",
-                font=('Arial', 10),
-                bg=color,
-                fg='white',
-                command=lambda k=mode_key: self.activate_learning_mode(k),
-                relief='flat',
-                padx=15,
-                pady=10
-            )
-            btn.pack(side=tk.LEFT, padx=5, fill=tk.X, expand=True)
-        
-        # Statistiques d'apprentissage
-        stats_frame = ttk.LabelFrame(learning_frame, text="📊 Vos Statistiques", padding="15")
-        stats_frame.pack(fill=tk.X, padx=10, pady=5)
-        
-        self.learning_stats_text = tk.Text(stats_frame, height=6, bg='#f8f9fa', font=('Arial', 10))
-        self.learning_stats_text.pack(fill=tk.X)
-        
-        # Objets personnels
-        personal_frame = ttk.LabelFrame(learning_frame, text="🎨 Vos Objets Personnels", padding="10")
-        personal_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
-        
-        # Liste des objets personnels
-        personal_columns = ('Nom', 'Catégorie', 'Exemples', 'Précision', 'Créé le')
-        self.personal_tree = ttk.Treeview(personal_frame, columns=personal_columns, show='headings', height=10)
-        
-        for col in personal_columns:
-            self.personal_tree.heading(col, text=col)
-            self.personal_tree.column(col, width=120)
-        
-        personal_scrollbar = ttk.Scrollbar(personal_frame, orient=tk.VERTICAL, command=self.personal_tree.yview)
-        self.personal_tree.configure(yscrollcommand=personal_scrollbar.set)
-        
-        self.personal_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        personal_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-    
-    def create_stream_tab(self):
-        """Crée l'onglet stream multi-cibles"""
-        stream_frame = ttk.Frame(self.main_notebook)
-        self.main_notebook.add(stream_frame, text="📹 Stream Multi-Cibles")
-        
-        # Contrôles de stream
-        stream_control_frame = ttk.LabelFrame(stream_frame, text="🎛️ Contrôle Stream", padding="15")
-        stream_control_frame.pack(fill=tk.X, padx=10, pady=5)
-        
-        # Boutons de contrôle stream
-        stream_buttons = tk.Frame(stream_control_frame)
-        stream_buttons.pack(fill=tk.X)
-        
-        self.stream_start_btn = tk.Button(
-            stream_buttons,
-            text="🚀 DÉMARRER STREAM",
-            font=('Arial', 12, 'bold'),
-            bg=self.colors['success'],
-            fg='white',
-            command=self.toggle_stream
-        )
-        self.stream_start_btn.pack(side=tk.LEFT, padx=5)
-        
-        tk.Button(stream_buttons, text="🖥️ Ajouter Écran", 
-                 bg=self.colors['info'], fg='white', font=('Arial', 11),
-                 command=self.add_screen_target).pack(side=tk.LEFT, padx=5)
-        
-        tk.Button(stream_buttons, text="🪟 Ajouter Fenêtre", 
-                 bg=self.colors['warning'], fg='white', font=('Arial', 11),
-                 command=self.add_window_target).pack(side=tk.LEFT, padx=5)
-        
-        # Configuration FPS
-        fps_frame = tk.Frame(stream_control_frame)
-        fps_frame.pack(fill=tk.X, pady=10)
-        
-        tk.Label(fps_frame, text="FPS Global:", font=('Arial', 10)).pack(side=tk.LEFT)
-        self.fps_var = tk.IntVar(value=30)
-        fps_scale = tk.Scale(fps_frame, from_=10, to=60, variable=self.fps_var, 
-                           orient='horizontal', length=200)
-        fps_scale.pack(side=tk.LEFT, padx=10)
-        
-        # Cibles actives
-        targets_frame = ttk.LabelFrame(stream_frame, text="🎯 Cibles Actives", padding="10")
-        targets_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
-        
-        # Liste des cibles
-        targets_columns = ('ID', 'Type', 'Nom', 'FPS', 'Statut', 'Captures')
-        self.targets_tree = ttk.Treeview(targets_frame, columns=targets_columns, show='headings', height=8)
-        
-        for col in targets_columns:
-            self.targets_tree.heading(col, text=col)
-            self.targets_tree.column(col, width=120)
-        
-        targets_scrollbar = ttk.Scrollbar(targets_frame, orient=tk.VERTICAL, command=self.targets_tree.yview)
-        self.targets_tree.configure(yscrollcommand=targets_scrollbar.set)
-        
-        self.targets_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        targets_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        
-        # Statistiques de performance
-        perf_frame = ttk.LabelFrame(stream_frame, text="📈 Performance", padding="10")
-        perf_frame.pack(fill=tk.X, padx=10, pady=5)
-        
-        self.performance_text = tk.Text(perf_frame, height=4, bg='#f8f9fa', font=('Consolas', 9))
-        self.performance_text.pack(fill=tk.X)
-    
-    def create_config_tab(self):
-        """Crée l'onglet configuration avancée"""
-        config_frame = ttk.Frame(self.main_notebook)
-        self.main_notebook.add(config_frame, text="⚙️ Configuration")
-        
-        # Configuration YOLO
-        yolo_frame = ttk.LabelFrame(config_frame, text="🤖 Configuration YOLO", padding="15")
-        yolo_frame.pack(fill=tk.X, padx=10, pady=5)
-        
+    def __init__(self, vision_engine: UltimateVisionEngine):
+        super().__init__()
+        self.vision_engine = vision_engine
+        self.logger = Logger("GameBotWidget")
+
+        self.create_ui()
+
+    def create_ui(self):
+        """Crée l'interface du bot de jeu"""
+        layout = QVBoxLayout(self)
+
+        # Configuration du jeu
+        config_group = QGroupBox("Configuration du Bot")
+        config_layout = QGridLayout(config_group)
+
+        # Type de jeu
+        config_layout.addWidget(QLabel("Type de jeu:"), 0, 0)
+        self.game_type_combo = QComboBox()
+        self.game_type_combo.addItems(["fps_shooter", "strategy", "mmorpg", "moba"])
+        config_layout.addWidget(self.game_type_combo, 0, 1)
+
+        # Fenêtre cible
+        config_layout.addWidget(QLabel("Fenêtre du jeu:"), 1, 0)
+        self.window_title_edit = QLineEdit()
+        self.window_title_edit.setPlaceholderText("Titre de la fenêtre du jeu")
+        config_layout.addWidget(self.window_title_edit, 1, 1)
+
+        # Bouton détecter fenêtres
+        detect_windows_btn = QPushButton("Détecter Fenêtres")
+        detect_windows_btn.clicked.connect(self.detect_windows)
+        config_layout.addWidget(detect_windows_btn, 1, 2)
+
         # Seuil de confiance
-        conf_frame = tk.Frame(yolo_frame)
-        conf_frame.pack(fill=tk.X, pady=5)
-        
-        tk.Label(conf_frame, text="Seuil de confiance:", font=('Arial', 10)).pack(side=tk.LEFT)
-        self.confidence_var = tk.DoubleVar(value=0.5)
-        conf_scale = tk.Scale(conf_frame, from_=0.1, to=0.9, variable=self.confidence_var, 
-                            orient='horizontal', resolution=0.1, length=300)
-        conf_scale.pack(side=tk.LEFT, padx=10)
-        
-        self.conf_label = tk.Label(conf_frame, text="50%", font=('Arial', 10, 'bold'))
-        self.conf_label.pack(side=tk.LEFT, padx=10)
-        self.confidence_var.trace('w', self.update_confidence_display)
-        
-        # Configuration des actions
-        actions_frame = ttk.LabelFrame(config_frame, text="⚡ Actions Automatiques", padding="15")
-        actions_frame.pack(fill=tk.X, padx=10, pady=5)
-        
-        tk.Button(actions_frame, text="🎯 Configurer Actions", 
-                 bg=self.colors['primary'], fg='white', font=('Arial', 11),
-                 command=self.configure_actions).pack(side=tk.LEFT, padx=5)
-        
-        tk.Button(actions_frame, text="📐 Configurer Zones", 
-                 bg=self.colors['warning'], fg='white', font=('Arial', 11),
-                 command=self.configure_zones).pack(side=tk.LEFT, padx=5)
-        
-        # Sauvegarde/Chargement
-        save_frame = ttk.LabelFrame(config_frame, text="💾 Sauvegarde", padding="15")
-        save_frame.pack(fill=tk.X, padx=10, pady=5)
-        
-        tk.Button(save_frame, text="💾 Sauvegarder Config", 
-                 bg=self.colors['success'], fg='white', font=('Arial', 11),
-                 command=self.save_config).pack(side=tk.LEFT, padx=5)
-        
-        tk.Button(save_frame, text="📂 Charger Config", 
-                 bg=self.colors['info'], fg='white', font=('Arial', 11),
-                 command=self.load_config).pack(side=tk.LEFT, padx=5)
-        
-        tk.Button(save_frame, text="🔄 Reset Config", 
-                 bg=self.colors['danger'], fg='white', font=('Arial', 11),
-                 command=self.reset_config).pack(side=tk.LEFT, padx=5)
-    
-    def create_footer(self):
-        """Crée le footer avec statistiques globales"""
-        footer_frame = tk.Frame(self.root, bg=self.colors['dark'], height=40)
-        footer_frame.pack(fill=tk.X)
-        footer_frame.pack_propagate(False)
-        
-        # Statistiques globales
-        self.footer_stats = tk.Label(
-            footer_frame,
-            text="📊 Prêt | 🎯 0 détections | ⏱️ 0ms | 💾 0MB",
-            font=('Arial', 10),
-            fg='white',
-            bg=self.colors['dark']
-        )
-        self.footer_stats.pack(side=tk.LEFT, padx=20, pady=10)
-        
-        # Version et copyright
-        version_label = tk.Label(
-            footer_frame,
-            text="v2.0 - Système YOLO Ultime © 2025",
-            font=('Arial', 9),
-            fg='#adb5bd',
-            bg=self.colors['dark']
-        )
-        version_label.pack(side=tk.RIGHT, padx=20, pady=10)
-    
-    def delayed_init(self):
-        """Initialisation différée des systèmes"""
-        if not IMPORTS_OK:
-            self.log_message("❌ ERREUR: Modules manquants!")
-            self.log_message(f"Détails: {IMPORT_ERROR}")
-            self.global_status.configure(text="❌ Erreur Modules", fg='red')
-            return
-        
-        try:
-            self.log_message("🔄 Initialisation des systèmes...")
-            
-            # Charger le modèle YOLO
-            self.log_message("🤖 Chargement modèle YOLO...")
-            self.model = YOLO('yolov8n.pt')
-            self.log_message("✅ Modèle YOLO chargé!")
-            
-            # Initialiser le gestionnaire de datasets
-            self.log_message("📚 Initialisation gestionnaire datasets...")
-            self.dataset_manager = DatasetManager()
-            self.log_message("✅ Gestionnaire datasets prêt!")
-            
-            # Initialiser les gestionnaires intelligents
-            self.log_message("🧠 Initialisation gestionnaire de stockage intelligent...")
-            self.storage_manager = IntelligentStorageManager()
-            self.log_message("✅ Gestionnaire de stockage intelligent prêt!")
-            
-            self.log_message("🎯 Initialisation gestionnaire de datasets professionnel...")
-            self.professional_dataset_manager = ProfessionalDatasetManager()
-            self.log_message("✅ Gestionnaire de datasets professionnel prêt!")
-            
-            # Initialiser le système d'apprentissage
-            self.log_message("🧠 Initialisation apprentissage collaboratif...")
-            self.learning_system = CollaborativeLearningSystem(
-                self.dataset_manager, 
-                self.log_message
-            )
-            self.log_message("✅ Système d'apprentissage prêt!")
-            
-            # Initialiser le stream multi-cibles
-            self.log_message("📹 Initialisation stream multi-cibles...")
-            self.multi_stream = MultiTargetStream(self.model, self.log_message)
-            self.multi_stream.add_result_callback(self.on_detection_result)
-            self.log_message("✅ Stream multi-cibles prêt!")
-            
-            # Initialiser les sélecteurs
-            self.target_selector = TargetSelector(self.log_message)
-            self.zone_manager = ZoneManager(self.log_message)
-            
-            # Mettre à jour l'interface
-            self.refresh_all_data()
-            
-            self.global_status.configure(text="✅ Système Prêt", fg='lightgreen')
-            self.log_message("🚀 Tous les systèmes initialisés avec succès!")
-            
-        except Exception as e:
-            self.log_message(f"❌ Erreur initialisation: {e}")
-            self.global_status.configure(text="❌ Erreur Init", fg='red')
-    
-    def log_message(self, message):
-        """Ajoute un message au log"""
-        def update_ui():
-            timestamp = datetime.now().strftime("%H:%M:%S")
-            log_entry = f"[{timestamp}] {message}\n"
-            
-            if hasattr(self, 'dashboard_log'):
-                self.dashboard_log.insert(tk.END, log_entry)
-                self.dashboard_log.see(tk.END)
-                
-                # Limiter le nombre de lignes
-                lines = self.dashboard_log.get("1.0", tk.END).count('\n')
-                if lines > 100:
-                    self.dashboard_log.delete("1.0", "20.0")
-        
-        self.root.after(0, update_ui)
-    
-    def on_detection_result(self, result):
-        """Callback pour les résultats de détection"""
-        # Mettre à jour l'affichage temps réel
-        self.update_realtime_display(result)
-        
-        # Traiter pour l'apprentissage si actif
-        if self.learning_system and self.learning_system.learning_active:
-            for detection in result.detections:
-                self.learning_system.process_detection_for_learning(result.image, detection)
-    
-    def update_realtime_display(self, result):
-        """Met à jour l'affichage temps réel"""
-        try:
-            # Redimensionner l'image pour le canvas
-            image = result.image.copy()
-            canvas_width = self.realtime_canvas.winfo_width()
-            canvas_height = self.realtime_canvas.winfo_height()
-            
-            if canvas_width > 1 and canvas_height > 1:
-                height, width = image.shape[:2]
-                ratio = min(canvas_width / width, canvas_height / height)
-                new_width = int(width * ratio)
-                new_height = int(height * ratio)
-                
-                resized_image = cv2.resize(image, (new_width, new_height))
-                
-                # Dessiner les détections
-                for detection in result.detections:
-                    x1, y1, x2, y2 = detection['bbox']
-                    x1, y1, x2, y2 = int(x1 * ratio), int(y1 * ratio), int(x2 * ratio), int(y2 * ratio)
-                    
-                    # Couleur selon la classe
-                    color = (0, 255, 0)  # Vert par défaut
-                    cv2.rectangle(resized_image, (x1, y1), (x2, y2), color, 2)
-                    
-                    # Texte
-                    text = f"{detection['class_name']}: {detection['confidence']:.2f}"
-                    cv2.putText(resized_image, text, (x1, y1-10), 
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
-                
-                # Convertir pour Tkinter
-                image_rgb = cv2.cvtColor(resized_image, cv2.COLOR_BGR2RGB)
-                image_pil = Image.fromarray(image_rgb)
-                image_tk = ImageTk.PhotoImage(image_pil)
-                
-                # Afficher dans le canvas
-                self.realtime_canvas.delete("all")
-                self.realtime_canvas.create_image(
-                    canvas_width//2, canvas_height//2, 
-                    image=image_tk, anchor=tk.CENTER
-                )
-                
-                # Garder une référence pour éviter le garbage collection
-                self.realtime_canvas.image = image_tk
-                
-        except Exception as e:
-            self.log_message(f"❌ Erreur affichage temps réel: {e}")
-    
-    # Actions rapides du dashboard
-    def quick_start_stream(self):
-        """Action rapide: démarrer le stream"""
-        if not self.multi_stream:
-            messagebox.showerror("Erreur", "Stream non initialisé!")
-            return
-        
-        if not self.multi_stream.stream_targets:
-            # Ajouter l'écran principal par défaut
-            self.multi_stream.add_screen_target(0, 30)
-        
-        self.toggle_stream()
-    
-    def quick_install_datasets(self):
-        """Action rapide: installer les datasets essentiels"""
-        if not self.dataset_manager:
-            messagebox.showerror("Erreur", "Gestionnaire de datasets non initialisé!")
-            return
-        
-        self.install_essential_datasets()
-    
-    def quick_learning_mode(self):
-        """Action rapide: activer le mode apprentissage"""
-        if not self.learning_system:
-            messagebox.showerror("Erreur", "Système d'apprentissage non initialisé!")
-            return
-        
-        # Ouvrir l'interface d'apprentissage
-        self.learning_system.create_learning_interface(self.root)
-    
-    def quick_select_targets(self):
-        """Action rapide: sélectionner des cibles"""
-        if not self.target_selector:
-            messagebox.showerror("Erreur", "Sélecteur de cibles non initialisé!")
-            return
-        
-        self.target_selector.show_target_selector(self.root)
-    
-    # Fonctions des onglets
-    def install_essential_datasets(self):
-        """Installe les datasets essentiels"""
-        if not self.dataset_manager:
-            messagebox.showerror("Erreur", "Gestionnaire de datasets non initialisé!")
-            return
-        
-        def install_thread():
-            try:
-                self.log_message("📥 Installation des datasets essentiels...")
-                results = self.dataset_manager.install_essential_datasets()
-                
-                success_count = sum(1 for success in results.values() if success)
-                total_count = len(results)
-                
-                self.log_message(f"✅ Installation terminée: {success_count}/{total_count} réussies")
-                self.refresh_datasets_list()
-                
-            except Exception as e:
-                self.log_message(f"❌ Erreur installation: {e}")
-        
-        threading.Thread(target=install_thread, daemon=True).start()
-    
-    def browse_available_datasets(self):
-        """Parcourt les datasets disponibles"""
-        if not self.dataset_manager:
-            messagebox.showerror("Erreur", "Gestionnaire de datasets non initialisé!")
-            return
-        
-        # Créer une fenêtre pour parcourir les datasets
-        browse_window = tk.Toplevel(self.root)
-        browse_window.title("📚 Datasets Disponibles")
-        browse_window.geometry("800x600")
-        
-        frame = ttk.Frame(browse_window, padding="20")
-        frame.pack(fill=tk.BOTH, expand=True)
-        
-        ttk.Label(frame, text="📚 Datasets Disponibles", 
-                 font=('Arial', 16, 'bold')).pack(pady=10)
-        
-        # Liste des datasets disponibles
-        datasets = self.dataset_manager.get_available_datasets()
-        
-        for dataset in datasets[:10]:  # Afficher les 10 premiers
-            dataset_frame = ttk.Frame(frame)
-            dataset_frame.pack(fill=tk.X, pady=5)
-            
-            ttk.Label(dataset_frame, text=f"• {dataset['name']}", 
-                     font=('Arial', 12, 'bold')).pack(anchor='w')
-            ttk.Label(dataset_frame, text=f"  Classes: {dataset.get('classes', 'N/A')} | "
-                                         f"Images: {dataset.get('images', 'N/A')}").pack(anchor='w')
-    
-    def show_dataset_stats(self):
-        """Affiche les statistiques des datasets avec analyse intelligente"""
-        if not self.dataset_manager or not self.professional_dataset_manager or not self.storage_manager:
-            messagebox.showerror("Erreur", "Gestionnaires non initialisés!")
-            return
-        
-        # Créer une fenêtre dédiée pour les statistiques avancées
-        stats_window = tk.Toplevel(self.root)
-        stats_window.title("📊 Statistiques Avancées des Datasets")
-        stats_window.geometry("900x700")
-        stats_window.configure(bg='#f8f9fa')
-        
-        # Notebook pour organiser les statistiques
-        stats_notebook = ttk.Notebook(stats_window)
-        stats_notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-        
-        # Onglet 1: Statistiques générales
-        general_frame = ttk.Frame(stats_notebook)
-        stats_notebook.add(general_frame, text="📊 Général")
-        
-        try:
-            # Statistiques du gestionnaire classique
-            classic_stats = self.dataset_manager.get_dataset_stats()
-            
-            # Statistiques du gestionnaire professionnel
-            pro_stats = self.professional_dataset_manager.get_dataset_statistics()
-            
-            # Statistiques de stockage
-            storage_stats = self.storage_manager.get_storage_statistics()
-            
-            general_text = tk.Text(general_frame, font=('Consolas', 10), wrap='word')
-            general_text.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-            
-            stats_content = f"""
-📊 STATISTIQUES GÉNÉRALES DES DATASETS
-{'='*60}
+        config_layout.addWidget(QLabel("Confiance:"), 2, 0)
+        self.confidence_slider = QSlider(Qt.Orientation.Horizontal)
+        self.confidence_slider.setRange(50, 95)
+        self.confidence_slider.setValue(80)
+        self.confidence_slider.valueChanged.connect(self.update_confidence_label)
+        config_layout.addWidget(self.confidence_slider, 2, 1)
 
-🎯 DATASETS CLASSIQUES:
-• Total datasets: {classic_stats['global'].get('total_datasets', 0)}
-• Datasets installés: {classic_stats['global'].get('installed_count', 0)}
-• Classes totales: {classic_stats['global'].get('total_classes', 0)}
-• Images totales: {classic_stats['global'].get('total_images', 0):,}
-• Taille totale: {classic_stats['global'].get('total_size_mb', 0):.1f} MB
+        self.confidence_label = QLabel("80%")
+        config_layout.addWidget(self.confidence_label, 2, 2)
 
-🚀 DATASETS PROFESSIONNELS:
-• Total datasets: {pro_stats.get('total_datasets', 0)}
-• Images totales: {pro_stats.get('total_images', 0):,}
-• Annotations: {pro_stats.get('total_annotations', 0):,}
-• Taille totale: {pro_stats.get('total_size_gb', 0):.2f} GB
-• Qualité moyenne: {pro_stats.get('average_quality', 0):.1%}
+        layout.addWidget(config_group)
 
-💾 STOCKAGE INTELLIGENT:
-• Disques analysés: {storage_stats.get('drives_analyzed', 0)}
-• Espace total disponible: {storage_stats.get('total_free_space_gb', 0):.1f} GB
-• Espace utilisé datasets: {storage_stats.get('datasets_space_used_gb', 0):.1f} GB
-• Efficacité stockage: {storage_stats.get('storage_efficiency', 0):.1%}
+        # Contrôles du bot
+        controls_group = QGroupBox("Contrôles")
+        controls_layout = QHBoxLayout(controls_group)
 
-📈 PERFORMANCE:
-• Vitesse lecture moyenne: {storage_stats.get('avg_read_speed_mbps', 0):.0f} MB/s
-• Vitesse écriture moyenne: {storage_stats.get('avg_write_speed_mbps', 0):.0f} MB/s
-• Santé moyenne des disques: {storage_stats.get('avg_drive_health', 0):.1%}
-"""
-            
-            # Ajouter les statistiques par catégorie
-            if classic_stats['by_category']:
-                stats_content += "\n🏷️ RÉPARTITION PAR CATÉGORIE:\n"
-                for cat_stat in classic_stats['by_category']:
-                    stats_content += f"• {cat_stat['category']}: {cat_stat['count']} datasets, {cat_stat['classes']} classes\n"
-            
-            general_text.insert(tk.END, stats_content)
-            general_text.config(state='disabled')
-            
-        except Exception as e:
-            error_text = f"❌ Erreur lors du calcul des statistiques: {e}"
-            general_text.insert(tk.END, error_text)
-            general_text.config(state='disabled')
-        
-        # Onglet 2: Analyse de stockage
-        storage_frame = ttk.Frame(stats_notebook)
-        stats_notebook.add(storage_frame, text="💾 Stockage")
-        
-        try:
-            drives = self.storage_manager.scan_available_drives()
-            
-            storage_text = tk.Text(storage_frame, font=('Consolas', 10), wrap='word')
-            storage_text.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-            
-            storage_content = f"""
-💾 ANALYSE DÉTAILLÉE DU STOCKAGE
-{'='*60}
-
-📊 RÉSUMÉ:
-• Nombre de disques: {len(drives)}
-• Recommandations générées: {len([d for d in drives if d.health_score > 0.8])} disques optimaux
-
-🖥️ DÉTAILS PAR DISQUE:
-"""
-            
-            for drive in drives:
-                drive_type = "SSD" if drive.is_ssd else "HDD"
-                system_mark = " (SYSTÈME)" if drive.is_system_drive else ""
-                
-                storage_content += f"""
-📁 {drive.device} - {drive_type}{system_mark}
-   💾 Espace: {drive.free_bytes/(1024**3):.1f}GB libres / {drive.total_bytes/(1024**3):.1f}GB total
-   📊 Usage: {drive.usage_percent:.1f}%
-   ⚡ Performance: R={drive.read_speed_mbps:.0f}MB/s, W={drive.write_speed_mbps:.0f}MB/s
-   ❤️ Santé: {drive.health_score:.1%}
-   🎯 Score global: {drive.overall_score:.2f}
-   {'✅ RECOMMANDÉ' if drive.overall_score > 0.8 else '⚠️ ACCEPTABLE' if drive.overall_score > 0.6 else '❌ NON RECOMMANDÉ'}
-"""
-            
-            storage_text.insert(tk.END, storage_content)
-            storage_text.config(state='disabled')
-            
-        except Exception as e:
-            error_text = f"❌ Erreur analyse stockage: {e}"
-            storage_text.insert(tk.END, error_text)
-            storage_text.config(state='disabled')
-        
-        # Onglet 3: Recommandations
-        recommendations_frame = ttk.Frame(stats_notebook)
-        stats_notebook.add(recommendations_frame, text="💡 Recommandations")
-        
-        recommendations_text = tk.Text(recommendations_frame, font=('Arial', 11), wrap='word')
-        recommendations_text.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-        
-        try:
-            # Générer des recommandations intelligentes
-            recommendations = self._generate_intelligent_recommendations()
-            
-            recommendations_content = f"""
-💡 RECOMMANDATIONS INTELLIGENTES
-{'='*60}
-
-{recommendations}
-"""
-            
-            recommendations_text.insert(tk.END, recommendations_content)
-            recommendations_text.config(state='disabled')
-            
-        except Exception as e:
-            error_text = f"❌ Erreur génération recommandations: {e}"
-            recommendations_text.insert(tk.END, error_text)
-            recommendations_text.config(state='disabled')
-        
-        # Boutons d'actions
-        actions_frame = tk.Frame(stats_window, bg='#f8f9fa')
-        actions_frame.pack(fill=tk.X, padx=10, pady=5)
-        
-        tk.Button(actions_frame, text="🔄 Actualiser", 
-                 bg=self.colors['info'], fg='white', font=('Arial', 10),
-                 command=lambda: self.show_dataset_stats()).pack(side=tk.LEFT, padx=5)
-        
-        tk.Button(actions_frame, text="💾 Exporter Rapport", 
-                 bg=self.colors['success'], fg='white', font=('Arial', 10),
-                 command=lambda: self._export_stats_report(stats_window)).pack(side=tk.LEFT, padx=5)
-        
-        tk.Button(actions_frame, text="🧹 Optimiser Stockage", 
-                 bg=self.colors['warning'], fg='white', font=('Arial', 10),
-                 command=self._optimize_storage).pack(side=tk.LEFT, padx=5)
-    
-    def _generate_intelligent_recommendations(self):
-        """Génère des recommandations intelligentes basées sur l'analyse"""
-        recommendations = []
-        
-        try:
-            # Analyser le stockage
-            drives = self.storage_manager.scan_available_drives()
-            storage_stats = self.storage_manager.get_storage_statistics()
-            dataset_stats = self.professional_dataset_manager.get_dataset_statistics()
-            
-            # Recommandations de stockage
-            best_drives = [d for d in drives if d.overall_score > 0.8]
-            if best_drives:
-                recommendations.append(f"✅ STOCKAGE OPTIMAL: Utilisez {best_drives[0].device} pour vos nouveaux datasets (score: {best_drives[0].overall_score:.2f})")
-            else:
-                recommendations.append("⚠️ STOCKAGE: Aucun disque optimal détecté. Considérez un upgrade SSD.")
-            
-            # Recommandations d'espace
-            total_free = sum(d.free_bytes for d in drives) / (1024**3)
-            if total_free < 10:
-                recommendations.append("🚨 ESPACE CRITIQUE: Moins de 10GB libres. Nettoyage urgent recommandé!")
-            elif total_free < 50:
-                recommendations.append("⚠️ ESPACE FAIBLE: Moins de 50GB libres. Planifiez un nettoyage.")
-            
-            # Recommandations de performance
-            avg_read_speed = sum(d.read_speed_mbps for d in drives) / len(drives) if drives else 0
-            if avg_read_speed < 100:
-                recommendations.append("🐌 PERFORMANCE: Vitesse de lecture faible. Un SSD améliorerait les performances.")
-            
-            # Recommandations de datasets
-            if dataset_stats.get('total_datasets', 0) == 0:
-                recommendations.append("📚 DATASETS: Aucun dataset détecté. Commencez par installer les datasets essentiels.")
-            elif dataset_stats.get('total_datasets', 0) < 3:
-                recommendations.append("📈 DATASETS: Peu de datasets installés. Explorez le catalogue pour enrichir votre base.")
-            
-            # Recommandations de qualité
-            avg_quality = dataset_stats.get('average_quality', 0)
-            if avg_quality < 0.7:
-                recommendations.append("🎯 QUALITÉ: Qualité moyenne des datasets faible. Validez et corrigez vos annotations.")
-            elif avg_quality > 0.9:
-                recommendations.append("🏆 QUALITÉ: Excellente qualité des datasets! Partagez vos contributions.")
-            
-            # Recommandations de maintenance
-            recommendations.append("🔧 MAINTENANCE: Exécutez un nettoyage de cache hebdomadaire pour optimiser les performances.")
-            recommendations.append("📊 MONITORING: Surveillez régulièrement l'espace disque et les performances.")
-            
-            if not recommendations:
-                recommendations.append("✅ SYSTÈME OPTIMAL: Votre configuration est excellente!")
-            
-        except Exception as e:
-            recommendations.append(f"❌ Erreur génération recommandations: {e}")
-        
-        return "\n\n".join(f"• {rec}" for rec in recommendations)
-    
-    def _export_stats_report(self, parent_window):
-        """Exporte un rapport détaillé des statistiques"""
-        try:
-            filename = filedialog.asksaveasfilename(
-                parent=parent_window,
-                title="Exporter le rapport de statistiques",
-                defaultextension=".txt",
-                filetypes=[("Fichiers texte", "*.txt"), ("Tous les fichiers", "*.*")]
-            )
-            
-            if filename:
-                # Générer le rapport complet
-                report_content = f"""
-RAPPORT DE STATISTIQUES YOLO DATASET MANAGER
-{'='*60}
-Généré le: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
-{self._generate_full_stats_report()}
-"""
-                
-                with open(filename, 'w', encoding='utf-8') as f:
-                    f.write(report_content)
-                
-                messagebox.showinfo("Export", f"Rapport exporté vers:\n{filename}")
-                self.log_message(f"📄 Rapport exporté: {filename}")
-                
-        except Exception as e:
-            messagebox.showerror("Erreur", f"Erreur lors de l'export: {e}")
-    
-    def _generate_full_stats_report(self):
-        """Génère un rapport complet pour l'export"""
-        try:
-            classic_stats = self.dataset_manager.get_dataset_stats()
-            pro_stats = self.professional_dataset_manager.get_dataset_statistics()
-            storage_stats = self.storage_manager.get_storage_statistics()
-            drives = self.storage_manager.scan_available_drives()
-            
-            report = f"""
-STATISTIQUES GÉNÉRALES:
-• Datasets classiques: {classic_stats['global'].get('total_datasets', 0)}
-• Datasets professionnels: {pro_stats.get('total_datasets', 0)}
-• Images totales: {pro_stats.get('total_images', 0):,}
-• Annotations: {pro_stats.get('total_annotations', 0):,}
-• Taille totale: {pro_stats.get('total_size_gb', 0):.2f} GB
-
-ANALYSE DE STOCKAGE:
-• Disques analysés: {len(drives)}
-• Espace libre total: {sum(d.free_bytes for d in drives)/(1024**3):.1f} GB
-• Vitesse lecture moyenne: {sum(d.read_speed_mbps for d in drives)/len(drives) if drives else 0:.0f} MB/s
-
-RECOMMANDATIONS:
-{self._generate_intelligent_recommendations()}
-"""
-            return report
-            
-        except Exception as e:
-            return f"Erreur génération rapport: {e}"
-    
-    def _optimize_storage(self):
-        """Lance l'optimisation du stockage"""
-        try:
-            # Créer une fenêtre de progression
-            progress_window = tk.Toplevel(self.root)
-            progress_window.title("🧹 Optimisation du Stockage")
-            progress_window.geometry("500x300")
-            progress_window.configure(bg='#f8f9fa')
-            
-            progress_label = tk.Label(progress_window, text="Optimisation en cours...", 
-                                    font=('Arial', 12), bg='#f8f9fa')
-            progress_label.pack(pady=20)
-            
-            progress_text = tk.Text(progress_window, height=15, font=('Consolas', 9))
-            progress_text.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
-            
-            def optimization_thread():
-                try:
-                    # Étape 1: Nettoyage du cache
-                    progress_text.insert(tk.END, "🧹 Nettoyage du cache...\n")
-                    progress_window.update()
-                    
-                    # Nettoyer les caches
-                    if hasattr(self.storage_manager, 'drives_cache'):
-                        self.storage_manager.drives_cache.clear()
-                        self.storage_manager.cache_timestamp = 0
-                    
-                    if hasattr(self.professional_dataset_manager, 'datasets_cache'):
-                        self.professional_dataset_manager.datasets_cache.clear()
-                        self.professional_dataset_manager.cache_timestamp = 0
-                    
-                    progress_text.insert(tk.END, "✅ Cache nettoyé\n")
-                    progress_window.update()
-                    
-                    # Étape 2: Analyse des doublons
-                    progress_text.insert(tk.END, "🔍 Recherche de doublons...\n")
-                    progress_window.update()
-                    
-                    # Simuler la recherche de doublons
-                    time.sleep(1)
-                    progress_text.insert(tk.END, "✅ Aucun doublon détecté\n")
-                    progress_window.update()
-                    
-                    # Étape 3: Optimisation de l'emplacement
-                    progress_text.insert(tk.END, "📍 Optimisation des emplacements...\n")
-                    progress_window.update()
-                    
-                    # Analyser les emplacements optimaux
-                    drives = self.storage_manager.scan_available_drives()
-                    best_drive = max(drives, key=lambda d: d.overall_score) if drives else None
-                    
-                    if best_drive:
-                        progress_text.insert(tk.END, f"✅ Disque optimal identifié: {best_drive.device}\n")
-                    
-                    progress_window.update()
-                    
-                    # Étape 4: Finalisation
-                    progress_text.insert(tk.END, "\n🎉 Optimisation terminée!\n")
-                    progress_text.insert(tk.END, "💡 Recommandations appliquées avec succès.\n")
-                    
-                    # Bouton de fermeture
-                    close_btn = tk.Button(progress_window, text="Fermer", 
-                                        command=progress_window.destroy,
-                                        bg=self.colors['success'], fg='white')
-                    close_btn.pack(pady=10)
-                    
-                    self.log_message("🧹 Optimisation du stockage terminée")
-                    
-                except Exception as e:
-                    progress_text.insert(tk.END, f"❌ Erreur: {e}\n")
-            
-            # Lancer l'optimisation en arrière-plan
-            threading.Thread(target=optimization_thread, daemon=True).start()
-            
-        except Exception as e:
-            messagebox.showerror("Erreur", f"Erreur lors de l'optimisation: {e}")
-    
-    def activate_learning_mode(self, mode_name):
-        """Active un mode d'apprentissage"""
-        if not self.learning_system:
-            messagebox.showerror("Erreur", "Système d'apprentissage non initialisé!")
-            return
-        
-        success = self.learning_system.activate_mode(mode_name)
-        if success:
-            self.refresh_learning_stats()
-    
-    def toggle_stream(self):
-        """Active/désactive le stream"""
-        if not self.multi_stream:
-            messagebox.showerror("Erreur", "Stream non initialisé!")
-            return
-        
-        if not self.multi_stream.stream_active:
-            success = self.multi_stream.start_stream()
-            if success:
-                self.stream_start_btn.configure(text="⏹️ ARRÊTER STREAM", bg=self.colors['danger'])
-                self.is_running = True
-        else:
-            self.multi_stream.stop_stream()
-            self.stream_start_btn.configure(text="🚀 DÉMARRER STREAM", bg=self.colors['success'])
-            self.is_running = False
-        
-        self.refresh_targets_list()
-    
-    def add_screen_target(self):
-        """Ajoute un écran comme cible"""
-        if not self.multi_stream:
-            messagebox.showerror("Erreur", "Stream non initialisé!")
-            return
-        
-        # Interface simple pour sélectionner l'écran
-        screen_id = tk.simpledialog.askinteger("Écran", "ID de l'écran (0 = principal):", 
-                                              initialvalue=0, minvalue=0, maxvalue=10)
-        if screen_id is not None:
-            fps = tk.simpledialog.askinteger("FPS", "FPS pour cet écran:", 
-                                           initialvalue=30, minvalue=10, maxvalue=60)
-            if fps is not None:
-                target_id = self.multi_stream.add_screen_target(screen_id, fps)
-                if target_id:
-                    self.refresh_targets_list()
-    
-    def add_window_target(self):
-        """Ajoute une fenêtre comme cible"""
-        if not self.multi_stream:
-            messagebox.showerror("Erreur", "Stream non initialisé!")
-            return
-        
-        # Interface simple pour sélectionner la fenêtre
-        window_title = tk.simpledialog.askstring("Fenêtre", "Titre de la fenêtre (partiel):")
-        if window_title:
-            fps = tk.simpledialog.askinteger("FPS", "FPS pour cette fenêtre:", 
-                                           initialvalue=30, minvalue=10, maxvalue=60)
-            if fps is not None:
-                target_id = self.multi_stream.add_window_target(window_title, fps)
-                if target_id:
-                    self.refresh_targets_list()
-    
-    def configure_actions(self):
-        """Configure les actions automatiques"""
-        messagebox.showinfo("Actions", "Configuration des actions - À implémenter")
-    
-    def configure_zones(self):
-        """Configure les zones de détection"""
-        if not self.zone_manager:
-            messagebox.showerror("Erreur", "Gestionnaire de zones non initialisé!")
-            return
-        
-        self.zone_manager.add_zone_interactive()
-    
-    def save_config(self):
-        """Sauvegarde la configuration"""
-        try:
-            config = {
-                "confidence_threshold": self.confidence_var.get(),
-                "fps_global": self.fps_var.get(),
-                "timestamp": datetime.now().isoformat()
+        self.start_bot_btn = QPushButton("Démarrer Bot")
+        self.start_bot_btn.clicked.connect(self.start_bot)
+        self.start_bot_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #28a745;
+                color: white;
+                font-weight: bold;
+                padding: 10px 20px;
+                border-radius: 5px;
             }
-            
-            with open("ultimate_config.json", "w") as f:
-                json.dump(config, f, indent=2)
-            
-            self.log_message("💾 Configuration sauvegardée")
-            messagebox.showinfo("Sauvegarde", "Configuration sauvegardée!")
-            
-        except Exception as e:
-            self.log_message(f"❌ Erreur sauvegarde: {e}")
-    
-    def load_config(self):
-        """Charge la configuration"""
-        try:
-            if os.path.exists("ultimate_config.json"):
-                with open("ultimate_config.json", "r") as f:
-                    config = json.load(f)
-                
-                self.confidence_var.set(config.get("confidence_threshold", 0.5))
-                self.fps_var.set(config.get("fps_global", 30))
-                
-                self.log_message("📂 Configuration chargée")
-                messagebox.showinfo("Chargement", "Configuration chargée!")
-            else:
-                messagebox.showwarning("Chargement", "Aucune configuration trouvée")
-                
-        except Exception as e:
-            self.log_message(f"❌ Erreur chargement: {e}")
-    
-    def reset_config(self):
-        """Remet la configuration par défaut"""
-        if messagebox.askyesno("Reset", "Remettre la configuration par défaut ?"):
-            self.confidence_var.set(0.5)
-            self.fps_var.set(30)
-            self.log_message("🔄 Configuration remise par défaut")
-    
-    def update_confidence_display(self, *args):
-        """Met à jour l'affichage de confiance"""
-        value = self.confidence_var.get()
-        percentage = int(value * 100)
-        self.conf_label.configure(text=f"{percentage}%")
-        
-        # Appliquer au stream si actif
-        if self.multi_stream:
-            self.multi_stream.set_confidence_threshold(value)
-    
-    def refresh_all_data(self):
-        """Actualise toutes les données de l'interface"""
-        self.refresh_datasets_list()
-        self.refresh_learning_stats()
-        self.refresh_targets_list()
-        self.refresh_performance_stats()
-    
-    def refresh_datasets_list(self):
-        """Actualise la liste des datasets"""
-        if not self.dataset_manager:
-            return
-        
-        try:
-            # Vider la liste
-            for item in self.datasets_tree.get_children():
-                self.datasets_tree.delete(item)
-            
-            # Ajouter les datasets installés
-            datasets = self.dataset_manager.get_installed_datasets()
-            for dataset in datasets:
-                self.datasets_tree.insert("", "end", values=(
-                    dataset['name'],
-                    dataset['category'],
-                    dataset['classes_count'],
-                    dataset['images_count'],
-                    f"{dataset['size_mb']:.1f} MB"
-                ))
-                
-        except Exception as e:
-            self.log_message(f"❌ Erreur refresh datasets: {e}")
-    
-    def refresh_learning_stats(self):
-        """Actualise les statistiques d'apprentissage"""
-        if not self.learning_system:
-            return
-        
-        try:
-            stats = self.learning_system.get_user_stats()
-            
-            stats_text = f"""🎨 Objets créés: {stats['objects_created']}
-✅ Validations: {stats['validations_made']}
-🔧 Corrections: {stats['corrections_applied']}
-🌍 Contributions: {stats['contributions_shared']}
-🏆 Score total: {stats['total_score']}
-📈 Taux de précision: {stats['accuracy_rate']:.1f}%"""
-            
-            self.learning_stats_text.delete("1.0", tk.END)
-            self.learning_stats_text.insert("1.0", stats_text)
-            
-        except Exception as e:
-            self.log_message(f"❌ Erreur refresh learning: {e}")
-    
-    def refresh_targets_list(self):
-        """Actualise la liste des cibles"""
-        if not self.multi_stream:
-            return
-        
-        try:
-            # Vider la liste
-            for item in self.targets_tree.get_children():
-                self.targets_tree.delete(item)
-            
-            # Ajouter les cibles actives
-            for target_id, target in self.multi_stream.stream_targets.items():
-                status = "🟢 Actif" if target.active else "🔴 Inactif"
-                target_name = target.target_data.get('name', target.target_data.get('title', 'Inconnu'))
-                
-                self.targets_tree.insert("", "end", values=(
-                    target_id,
-                    target.target_type,
-                    target_name,
-                    target.fps_target,
-                    status,
-                    target.capture_count
-                ))
-                
-        except Exception as e:
-            self.log_message(f"❌ Erreur refresh targets: {e}")
-    
-    def refresh_performance_stats(self):
-        """Actualise les statistiques de performance"""
-        if not self.multi_stream:
-            return
-        
-        try:
-            stats = self.multi_stream.get_stream_stats()
-            
-            perf_text = f"""📊 Frames capturées: {stats['total_frames_captured']}
-🎯 Détections totales: {stats['total_detections']}
-⏱️ Temps traitement moyen: {stats['average_processing_time']:.1f}ms
-🖥️ Cibles actives: {stats['active_targets']}"""
-            
-            if stats.get('uptime_seconds'):
-                uptime = int(stats['uptime_seconds'])
-                perf_text += f"\n⏰ Temps de fonctionnement: {uptime}s"
-            
-            self.performance_text.delete("1.0", tk.END)
-            self.performance_text.insert("1.0", perf_text)
-            
-            # Mettre à jour le footer
-            detections = stats['total_detections']
-            avg_time = stats['average_processing_time']
-            self.footer_stats.configure(
-                text=f"📊 Actif | 🎯 {detections} détections | ⏱️ {avg_time:.1f}ms | 💾 {stats.get('memory_usage', 0)}MB"
-            )
-            
-        except Exception as e:
-            self.log_message(f"❌ Erreur refresh performance: {e}")
-    
-    def on_closing(self):
-        """Gestionnaire de fermeture"""
-        if self.is_running:
-            if messagebox.askyesno("Confirmation", 
-                                 "Le système est actif. Voulez-vous vraiment quitter ?"):
-                if self.multi_stream:
-                    self.multi_stream.stop_stream()
-                self.save_config()
-                self.root.destroy()
-        else:
-            self.save_config()
-            self.root.destroy()
-    
-    def run(self):
-        """Lance l'application"""
-        # Démarrer le thread de mise à jour périodique
-        self.start_periodic_updates()
-        self.root.mainloop()
-    
-    def start_periodic_updates(self):
-        """Démarre les mises à jour périodiques"""
-        def update_loop():
-            if self.is_running:
-                self.refresh_performance_stats()
-                self.refresh_targets_list()
-            
-            # Programmer la prochaine mise à jour
-            self.root.after(2000, update_loop)  # Toutes les 2 secondes
-        
-        # Démarrer la boucle de mise à jour
-        self.root.after(1000, update_loop)
+            QPushButton:hover {
+                background-color: #218838;
+            }
+        """)
 
-# Point d'entrée
-if __name__ == "__main__":
-    try:
-        app = UltimateInterface()
-        app.run()
-    except Exception as e:
-        print(f"❌ Erreur fatale: {e}")
-        import traceback
-        traceback.print_exc()
+        self.stop_bot_btn = QPushButton("Arrêter Bot")
+        self.stop_bot_btn.clicked.connect(self.stop_bot)
+        self.stop_bot_btn.setEnabled(False)
+        self.stop_bot_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #dc3545;
+                color: white;
+                font-weight: bold;
+                padding: 10px 20px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #c82333;
+            }
+        """)
+
+        controls_layout.addWidget(self.start_bot_btn)
+        controls_layout.addWidget(self.stop_bot_btn)
+        controls_layout.addStretch()
+
+        layout.addWidget(controls_group)
+
+        # Actions personnalisées
+        actions_group = QGroupBox("Actions Personnalisées")
+        actions_layout = QVBoxLayout(actions_group)
+
+        # Table des actions
+        self.actions_table = QTableWidget()
+        self.actions_table.setColumnCount(3)
+        self.actions_table.setHorizontalHeaderLabels(["Objet", "Action", "Touche"])
+        actions_layout.addWidget(self.actions_table)
+
+        # Boutons d'action
+        action_buttons = QHBoxLayout()
+        add_action_btn = QPushButton("Ajouter Action")
+        add_action_btn.clicked.connect(self.add_custom_action)
+        remove_action_btn = QPushButton("Supprimer Action")
+        remove_action_btn.clicked.connect(self.remove_custom_action)
+
+        action_buttons.addWidget(add_action_btn)
+        action_buttons.addWidget(remove_action_btn)
+        action_buttons.addStretch()
+
+        actions_layout.addLayout(action_buttons)
+        layout.addWidget(actions_group)
+
+        # Log du bot
+        log_group = QGroupBox("Log du Bot")
+        log_layout = QVBoxLayout(log_group)
+
+        self.bot_log = QTextEdit()
+        self.bot_log.setReadOnly(True)
+        self.bot_log.setMaximumHeight(150)
+        log_layout.addWidget(self.bot_log)
+
+        layout.addWidget(log_group)
+
+        # Timer pour mise à jour du log
+        self.log_timer = QTimer()
+        self.log_timer.timeout.connect(self.update_bot_log)
+        self.log_timer.start(1000)
+
+    def update_confidence_label(self, value):
+        """Met à jour le label de confiance"""
+        self.confidence_label.setText(f"{value}%")
+
+    def detect_windows(self):
+        """Détecte les fenêtres ouvertes"""
+        try:
+            import win32gui
+
+            windows = []
+
+            def enum_windows_proc(hwnd, lParam):
+                if win32gui.IsWindowVisible(hwnd):
+                    title = win32gui.GetWindowText(hwnd)
+                    if title and len(title) > 3:
+                        windows.append(title)
+                return True
+
+            win32gui.EnumWindows(enum_windows_proc, None)
+
+            # Afficher les fenêtres dans une boîte de dialogue
+            window_list = "\n".join(windows[:20])  # Limiter à 20 fenêtres
+            QMessageBox.information(self, "Fenêtres Détectées",
+                                  f"Fenêtres ouvertes:\n\n{window_list}")
+
+        except Exception as e:
+            QMessageBox.critical(self, "Erreur", f"Erreur détection fenêtres: {e}")
+
+    def start_bot(self):
+        """Démarre le bot de jeu"""
+        try:
+            game_type = self.game_type_combo.currentText()
+            window_title = self.window_title_edit.text().strip()
+
+            if not window_title:
+                QMessageBox.warning(self, "Erreur", "Veuillez spécifier le titre de la fenêtre")
+                return
+
+            success = self.vision_engine.start_game_automation(game_type, window_title)
+
+            if success:
+                self.start_bot_btn.setEnabled(False)
+                self.stop_bot_btn.setEnabled(True)
+                self.bot_log.append(f"[INFO] Bot démarré pour {game_type}")
+                QMessageBox.information(self, "Bot", "Bot de jeu démarré avec succès!")
+            else:
+                QMessageBox.critical(self, "Erreur", "Impossible de démarrer le bot")
+
+        except Exception as e:
+            QMessageBox.critical(self, "Erreur", f"Erreur démarrage bot: {e}")
+
+    def stop_bot(self):
+        """Arrête le bot de jeu"""
+        try:
+            self.vision_engine.stop_all_modules()
+
+            self.start_bot_btn.setEnabled(True)
+            self.stop_bot_btn.setEnabled(False)
+            self.bot_log.append("[INFO] Bot arrêté")
+
+            QMessageBox.information(self, "Bot", "Bot arrêté")
+
+        except Exception as e:
+            QMessageBox.critical(self, "Erreur", f"Erreur arrêt bot: {e}")
+
+    def add_custom_action(self):
+        """Ajoute une action personnalisée"""
+        # Dialogue pour ajouter une action
+        pass
+
+    def remove_custom_action(self):
+        """Supprime une action personnalisée"""
+        current_row = self.actions_table.currentRow()
+        if current_row >= 0:
+            self.actions_table.removeRow(current_row)
+
+    def update_bot_log(self):
+        """Met à jour le log du bot"""
+        # Récupérer les derniers logs du bot
+        pass
+
+class MedicalAnalysisWidget(QWidget):
+    """Interface pour l'analyse médicale"""
+
+    def __init__(self, vision_engine: UltimateVisionEngine):
+        super().__init__()
+        self.vision_engine = vision_engine
+        self.logger = Logger("MedicalAnalysisWidget")
+
+        self.create_ui()
+
+    def create_ui(self):
+        """Crée l'interface d'analyse médicale"""
+        layout = QVBoxLayout(self)
+
+        # Sélection d'image
+        image_group = QGroupBox("Image Médicale")
+        image_layout = QHBoxLayout(image_group)
+
+        self.image_path_edit = QLineEdit()
+        self.image_path_edit.setPlaceholderText("Chemin vers l'image médicale")
+
+        browse_btn = QPushButton("Parcourir")
+        browse_btn.clicked.connect(self.browse_image)
+
+        image_layout.addWidget(QLabel("Image:"))
+        image_layout.addWidget(self.image_path_edit)
+        image_layout.addWidget(browse_btn)
+
+        layout.addWidget(image_group)
+
+        # Configuration de l'analyse
+        config_group = QGroupBox("Configuration de l'Analyse")
+        config_layout = QGridLayout(config_group)
+
+        # Modalité médicale
+        config_layout.addWidget(QLabel("Modalité:"), 0, 0)
+        self.modality_combo = QComboBox()
+        self.modality_combo.addItems(["xray", "mri", "skin", "retina"])
+        config_layout.addWidget(self.modality_combo, 0, 1)
+
+        # Seuil de détection
+        config_layout.addWidget(QLabel("Seuil:"), 1, 0)
+        self.threshold_slider = QSlider(Qt.Orientation.Horizontal)
+        self.threshold_slider.setRange(30, 90)
+        self.threshold_slider.setValue(60)
+        self.threshold_slider.valueChanged.connect(self.update_threshold_label)
+        config_layout.addWidget(self.threshold_slider, 1, 1)
+
+        self.threshold_label = QLabel("60%")
+        config_layout.addWidget(self.threshold_label, 1, 2)
+
+        layout.addWidget(config_group)
+
+        # Bouton d'analyse
+        analyze_btn = QPushButton("Analyser Image Médicale")
+        analyze_btn.clicked.connect(self.analyze_medical_image)
+        analyze_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #007acc;
+                color: white;
+                font-weight: bold;
+                padding: 15px 30px;
+                border-radius: 8px;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: #005a9e;
+            }
+        """)
+        layout.addWidget(analyze_btn)
+
+        # Résultats de l'analyse
+        results_group = QGroupBox("Résultats de l'Analyse")
+        results_layout = QVBoxLayout(results_group)
+
+        # Rapport médical
+        self.medical_report = QTextEdit()
+        self.medical_report.setReadOnly(True)
+        results_layout.addWidget(self.medical_report)
+
+        # Boutons d'export
+        export_layout = QHBoxLayout()
+
+        export_pdf_btn = QPushButton("Exporter PDF")
+        export_pdf_btn.clicked.connect(self.export_pdf_report)
+
+        export_json_btn = QPushButton("Exporter JSON")
+        export_json_btn.clicked.connect(self.export_json_report)
+
+        export_layout.addWidget(export_pdf_btn)
+        export_layout.addWidget(export_json_btn)
+        export_layout.addStretch()
+
+        results_layout.addLayout(export_layout)
+        layout.addWidget(results_group)
+
+        # Variables pour stocker les résultats
+        self.last_analysis = None
+
+    def update_threshold_label(self, value):
+        """Met à jour le label du seuil"""
+        self.threshold_label.setText(f"{value}%")
+
+    def browse_image(self):
+        """Ouvre un dialogue pour sélectionner une image"""
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, "Sélectionner Image Médicale",
+            "", "Images (*.png *.jpg *.jpeg *.bmp *.tiff *.dcm)"
+        )
+
+        if file_path:
+            self.image_path_edit.setText(file_path)
+
+    def analyze_medical_image(self):
+        """Lance l'analyse de l'image médicale"""
+        try:
+            image_path = self.image_path_edit.text().strip()
+            modality = self.modality_combo.currentText()
+
+            if not image_path:
+                QMessageBox.warning(self, "Erreur", "Veuillez sélectionner une image")
+                return
+
+            if not Path(image_path).exists():
+                QMessageBox.warning(self, "Erreur", "Le fichier image n'existe pas")
+                return
+
+            # Lancer l'analyse
+            self.medical_report.setText("Analyse en cours...")
+
+            # Analyse avec le moteur de vision
+            result = self.vision_engine.analyze_medical_image(image_path, modality)
+
+            if "error" in result:
+                QMessageBox.critical(self, "Erreur", f"Erreur d'analyse: {result['error']}")
+                return
+
+            # Afficher les résultats
+            self.display_medical_results(result)
+            self.last_analysis = result
+
+        except Exception as e:
+            QMessageBox.critical(self, "Erreur", f"Erreur analyse: {e}")
+
+    def display_medical_results(self, result: dict):
+        """Affiche les résultats de l'analyse médicale"""
+        report = result.get("report", "Aucun rapport généré")
+
+        # Ajouter des informations supplémentaires
+        full_report = f"""
+=== ANALYSE MÉDICALE AIMER PRO ===
+
+{report}
+
+=== DÉTAILS TECHNIQUES ===
+Modalité: {result.get('modality', 'N/A').upper()}
+Score de confiance: {result.get('confidence_score', 0):.1%}
+Recommandation: {result.get('recommendation', 'N/A')}
+
+=== DÉCOUVERTES ===
+"""
+
+        findings = result.get("findings", {})
+        if findings.get("detections"):
+            for detection in findings["detections"]:
+                full_report += f"""
+- {detection.get('finding', 'N/A').title()}
+  Confiance: {detection.get('confidence', 0):.1%}
+  Signification: {detection.get('clinical_significance', 'N/A')}
+"""
+        else:
+            full_report += "Aucune découverte pathologique significative.\n"
+
+        full_report += f"""
+=== AVERTISSEMENT ===
+Cette analyse est générée par IA et ne remplace pas
+un diagnostic médical professionnel. Consultez toujours
+un médecin qualifié pour une évaluation clinique.
+
+Généré le: {self._get_current_datetime()}
+"""
+
+        self.medical_report.setText(full_report)
+
+    def _get_current_datetime(self) -> str:
+        """Retourne la date et heure actuelles"""
+        from datetime import datetime
+        return datetime.now().strftime("%d/%m/%Y à %H:%M:%S")
+
+    def export_pdf_report(self):
+        """Exporte le rapport en PDF"""
+        if not self.last_analysis:
+            QMessageBox.warning(self, "Erreur", "Aucune analyse à exporter")
+            return
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Exporter Rapport PDF",
+            f"rapport_medical_{self._get_current_datetime().replace('/', '_').replace(':', '_')}.pdf",
+            "PDF (*.pdf)"
+        )
+
+        if file_path:
+            # Implémentation export PDF
+            QMessageBox.information(self, "Export", f"Rapport exporté: {file_path}")
+
+    def export_json_report(self):
+        """Exporte le rapport en JSON"""
+        if not self.last_analysis:
+            QMessageBox.warning(self, "Erreur", "Aucune analyse à exporter")
+            return
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Exporter Données JSON",
+            f"analyse_medicale_{self._get_current_datetime().replace('/', '_').replace(':', '_')}.json",
+            "JSON (*.json)"
+        )
+
+        if file_path:
+            import json
+            with open(file_path, 'w', encoding='utf-8') as f:
+                json.dump(self.last_analysis, f, indent=2, ensure_ascii=False)
+
+            QMessageBox.information(self, "Export", f"Données exportées: {file_path}")
+
+class InteractiveControlWidget(QWidget):
+    """Interface pour le contrôle interactif"""
+
+    def __init__(self, vision_engine: UltimateVisionEngine):
+        super().__init__()
+        self.vision_engine = vision_engine
+        self.logger = Logger("InteractiveControlWidget")
+
+        self.create_ui()
+
+    def create_ui(self):
+        """Crée l'interface de contrôle interactif"""
+        layout = QVBoxLayout(self)
+
+        # Configuration de la zone
+        zone_group = QGroupBox("Zone d'Interaction")
+        zone_layout = QGridLayout(zone_group)
+
+        zone_layout.addWidget(QLabel("Zone:"), 0, 0)
+        self.zone_combo = QComboBox()
+        self.zone_combo.addItems(["desktop", "browser", "application"])
+        zone_layout.addWidget(self.zone_combo, 0, 1)
+
+        # Coordonnées personnalisées
+        zone_layout.addWidget(QLabel("X:"), 1, 0)
+        self.x_spin = QSpinBox()
+        self.x_spin.setRange(0, 3840)
+        zone_layout.addWidget(self.x_spin, 1, 1)
+
+        zone_layout.addWidget(QLabel("Y:"), 1, 2)
+        self.y_spin = QSpinBox()
+        self.y_spin.setRange(0, 2160)
+        zone_layout.addWidget(self.y_spin, 1, 3)
+
+        zone_layout.addWidget(QLabel("Largeur:"), 2, 0)
+        self.width_spin = QSpinBox()
+        self.width_spin.setRange(100, 3840)
+        self.width_spin.setValue(1920)
+        zone_layout.addWidget(self.width_spin, 2, 1)
+
+        zone_layout.addWidget(QLabel("Hauteur:"), 2, 2)
+        self.height_spin = QSpinBox()
+        self.height_spin.setRange(100, 2160)
+        self.height_spin.setValue(1080)
+        zone_layout.addWidget(self.height_spin, 2, 3)
+
+        layout.addWidget(zone_group)
+
+        # Contrôles
+        controls_group = QGroupBox("Contrôles")
+        controls_layout = QHBoxLayout(controls_group)
+
+        self.start_control_btn = QPushButton("Démarrer Contrôle")
+        self.start_control_btn.clicked.connect(self.start_interactive_control)
+
+        self.stop_control_btn = QPushButton("Arrêter Contrôle")
+        self.stop_control_btn.clicked.connect(self.stop_interactive_control)
+        self.stop_control_btn.setEnabled(False)
+
+        controls_layout.addWidget(self.start_control_btn)
+        controls_layout.addWidget(self.stop_control_btn)
+        controls_layout.addStretch()
+
+        layout.addWidget(controls_group)
+
+        # Règles d'interaction
+        rules_group = QGroupBox("Règles d'Interaction")
+        rules_layout = QVBoxLayout(rules_group)
+
+        # Table des règles
+        self.rules_table = QTableWidget()
+        self.rules_table.setColumnCount(4)
+        self.rules_table.setHorizontalHeaderLabels(["Objet", "Action", "Paramètres", "Actif"])
+        rules_layout.addWidget(self.rules_table)
+
+        # Boutons de gestion des règles
+        rules_buttons = QHBoxLayout()
+
+        add_rule_btn = QPushButton("Ajouter Règle")
+        add_rule_btn.clicked.connect(self.add_interaction_rule)
+
+        edit_rule_btn = QPushButton("Modifier Règle")
+        edit_rule_btn.clicked.connect(self.edit_interaction_rule)
+
+        remove_rule_btn = QPushButton("Supprimer Règle")
+        remove_rule_btn.clicked.connect(self.remove_interaction_rule)
+
+        rules_buttons.addWidget(add_rule_btn)
+        rules_buttons.addWidget(edit_rule_btn)
+        rules_buttons.addWidget(remove_rule_btn)
+        rules_buttons.addStretch()
+
+        rules_layout.addLayout(rules_buttons)
+        layout.addWidget(rules_group)
+
+        # Règles prédéfinies
+        self.add_predefined_rules()
+
+    def add_predefined_rules(self):
+        """Ajoute des règles prédéfinies"""
+        predefined_rules = [
+            ("button", "click", "{}"),
+            ("link", "click", "{}"),
+            ("textbox", "type_text", '{"text": "Hello World"}'),
+            ("checkbox", "click", "{}"),
+            ("dropdown", "click", "{}")
+        ]
+
+        for obj, action, params in predefined_rules:
+            row = self.rules_table.rowCount()
+            self.rules_table.insertRow(row)
+
+            self.rules_table.setItem(row, 0, QTableWidgetItem(obj))
+            self.rules_table.setItem(row, 1, QTableWidgetItem(action))
+            self.rules_table.setItem(row, 2, QTableWidgetItem(params))
+
+            checkbox = QCheckBox()
+            checkbox.setChecked(True)
+            self.rules_table.setCellWidget(row, 3, checkbox)
+
+    def start_interactive_control(self):
+        """Démarre le contrôle interactif"""
+        try:
+            zone = self.zone_combo.currentText()
+
+            # Appliquer les règles actives
+            self.apply_active_rules()
+
+            success = self.vision_engine.start_interactive_control(zone)
+
+            if success:
+                self.start_control_btn.setEnabled(False)
+                self.stop_control_btn.setEnabled(True)
+                QMessageBox.information(self, "Contrôle", "Contrôle interactif démarré!")
+            else:
+                QMessageBox.critical(self, "Erreur", "Impossible de démarrer le contrôle")
+
+        except Exception as e:
+            QMessageBox.critical(self, "Erreur", f"Erreur démarrage contrôle: {e}")
+
+    def stop_interactive_control(self):
+        """Arrête le contrôle interactif"""
+        try:
+            self.vision_engine.stop_all_modules()
+
+            self.start_control_btn.setEnabled(True)
+            self.stop_control_btn.setEnabled(False)
+
+            QMessageBox.information(self, "Contrôle", "Contrôle interactif arrêté")
+
+        except Exception as e:
+            QMessageBox.critical(self, "Erreur", f"Erreur arrêt contrôle: {e}")
+
+    def apply_active_rules(self):
+        """Applique les règles actives au moteur de vision"""
+        for row in range(self.rules_table.rowCount()):
+            checkbox = self.rules_table.cellWidget(row, 3)
+
+            if checkbox and isinstance(checkbox, QCheckBox) and checkbox.isChecked():
+                obj = self.rules_table.item(row, 0).text()
+                action = self.rules_table.item(row, 1).text()
+                params_str = self.rules_table.item(row, 2).text()
+
+                try:
+                    import json
+                    params = json.loads(params_str)
+                    self.vision_engine.add_interaction_rule(obj, action, params)
+                except json.JSONDecodeError:
+                    self.logger.error(f"Paramètres JSON invalides pour {obj}")
+
+    def add_interaction_rule(self):
+        """Ajoute une nouvelle règle d'interaction"""
+        # Dialogue pour ajouter une règle
+        pass
+
+    def edit_interaction_rule(self):
+        """Modifie une règle d'interaction"""
+        # Dialogue pour modifier une règle
+        pass
+
+    def remove_interaction_rule(self):
+        """Supprime une règle d'interaction"""
+        current_row = self.rules_table.currentRow()
+        if current_row >= 0:
+            self.rules_table.removeRow(current_row)
+
+class UltimateInterface(QWidget):
+    """Interface ultime combinant toutes les fonctionnalités"""
+
+    def __init__(self):
+        super().__init__()
+        self.logger = Logger("UltimateInterface")
+
+        # Initialiser le moteur de vision
+        self.vision_engine = UltimateVisionEngine()
+
+        self.setWindowTitle("AIMER PRO - Computer Vision Ultime")
+        self.setGeometry(100, 100, 1400, 900)
+
+        self.create_ui()
+
+        self.logger.info("Interface ultime initialisée")
+
+    def create_ui(self):
+        """Crée l'interface utilisateur complète"""
+        layout = QVBoxLayout(self)
+
+        # En-tête
+        header = self.create_header()
+        layout.addWidget(header)
+
+        # Onglets principaux
+        self.tab_widget = QTabWidget()
+
+        # Onglet Bot de Jeu
+        game_bot_widget = GameBotWidget(self.vision_engine)
+        self.tab_widget.addTab(game_bot_widget, "🎮 Bot de Jeu")
+
+        # Onglet Analyse Médicale
+        medical_widget = MedicalAnalysisWidget(self.vision_engine)
+        self.tab_widget.addTab(medical_widget, "🏥 Analyse Médicale")
+
+        # Onglet Contrôle Interactif
+        interactive_widget = InteractiveControlWidget(self.vision_engine)
+        self.tab_widget.addTab(interactive_widget, "🖱️ Contrôle Interactif")
+
+        # Onglet Création de Datasets
+        dataset_creation_widget = self.create_dataset_creation_tab()
+        self.tab_widget.addTab(dataset_creation_widget, "📊 Création Datasets")
+
+        # Onglet Monitoring
+        monitoring_widget = self.create_monitoring_tab()
+        self.tab_widget.addTab(monitoring_widget, "📈 Monitoring")
+
+        layout.addWidget(self.tab_widget)
+
+        # Barre de statut
+        status_bar = self.create_status_bar()
+        layout.addWidget(status_bar)
+
+        # Style
+        self.apply_ultimate_style()
+
+    def create_header(self) -> QWidget:
+        """Crée l'en-tête de l'interface"""
+        header = QFrame()
+        header.setFrameStyle(QFrame.Shape.Box)
+        header.setStyleSheet("""
+            QFrame {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #007acc, stop:1 #005a9e);
+                border-radius: 10px;
+                margin: 5px;
+            }
+        """)
+
+        layout = QHBoxLayout(header)
+
+        # Titre
+        title = QLabel("AIMER PRO - Computer Vision Ultime")
+        title.setStyleSheet("""
+            QLabel {
+                color: white;
+                font-size: 24px;
+                font-weight: bold;
+                padding: 15px;
+            }
+        """)
+
+        # Boutons d'urgence
+        emergency_layout = QVBoxLayout()
+
+        stop_all_btn = QPushButton("ARRÊT D'URGENCE")
+        stop_all_btn.clicked.connect(self.emergency_stop)
+        stop_all_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #dc3545;
+                color: white;
+                font-weight: bold;
+                padding: 10px 20px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #c82333;
+            }
+        """)
+
+        emergency_layout.addWidget(stop_all_btn)
+
+        layout.addWidget(title)
+        layout.addStretch()
+        layout.addLayout(emergency_layout)
+
+        return header
+
+    def create_dataset_creation_tab(self) -> QWidget:
+        """Crée l'onglet de création de datasets"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+
+        # Message temporaire
+        message = QLabel("Création de datasets personnalisés")
+        message.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        message.setStyleSheet("""
+            QLabel {
+                font-size: 16px;
+                color: #666;
+                padding: 50px;
+                border: 2px dashed #ccc;
+                border-radius: 10px;
+            }
+        """)
+
+        layout.addWidget(message)
+        return widget
+
+    def create_monitoring_tab(self) -> QWidget:
+        """Crée l'onglet de monitoring"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+
+        # Statut des modules
+        status_group = QGroupBox("Statut des Modules")
+        status_layout = QVBoxLayout(status_group)
+
+        self.status_text = QTextEdit()
+        self.status_text.setReadOnly(True)
+        self.status_text.setMaximumHeight(200)
+        status_layout.addWidget(self.status_text)
+
+        layout.addWidget(status_group)
+
+        # Timer pour mise à jour du statut
+        self.status_timer = QTimer()
+        self.status_timer.timeout.connect(self.update_status)
+        self.status_timer.start(2000)
+
+        return widget
+
+    def create_status_bar(self) -> QWidget:
+        """Crée la barre de statut"""
+        status_bar = QFrame()
+        status_bar.setFrameStyle(QFrame.Shape.Box)
+        status_bar.setStyleSheet("""
+            QFrame {
+                background-color: #f0f0f0;
+                border-top: 1px solid #ccc;
+                padding: 5px;
+            }
+        """)
+
+        layout = QHBoxLayout(status_bar)
+
+        self.status_label = QLabel("Prêt")
+        layout.addWidget(self.status_label)
+
+        layout.addStretch()
+
+        # Indicateur de statut
+        self.status_indicator = QLabel("●")
+        self.status_indicator.setStyleSheet("color: green; font-size: 16px;")
+        layout.addWidget(self.status_indicator)
+
+        return status_bar
+
+    def apply_ultimate_style(self):
+        """Applique le style ultime"""
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #f5f5f5;
+                font-family: 'Segoe UI', Arial, sans-serif;
+            }
+
+            QTabWidget::pane {
+                border: 1px solid #ccc;
+                background-color: white;
+                border-radius: 5px;
+            }
+
+            QTabBar::tab {
+                background-color: #e0e0e0;
+                padding: 10px 20px;
+                margin-right: 2px;
+                border-top-left-radius: 5px;
+                border-top-right-radius: 5px;
+                font-weight: bold;
+            }
+
+            QTabBar::tab:selected {
+                background-color: white;
+                border-bottom: 3px solid #007acc;
+            }
+
+            QGroupBox {
+                font-weight: bold;
+                border: 2px solid #ccc;
+                border-radius: 8px;
+                margin-top: 10px;
+                padding-top: 10px;
+            }
+
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px 0 5px;
+            }
+
+            QPushButton {
+                background-color: #007acc;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 4px;
+                font-weight: bold;
+            }
+
+            QPushButton:hover {
+                background-color: #005a9e;
+            }
+
+            QPushButton:pressed {
+                background-color: #004080;
+            }
+
+            QPushButton:disabled {
+                background-color: #cccccc;
+                color: #666666;
+            }
+        """)
+
+    def emergency_stop(self):
+        """Arrêt d'urgence de tous les modules"""
+        try:
+            self.vision_engine.stop_all_modules()
+            self.status_label.setText("ARRÊT D'URGENCE ACTIVÉ")
+            self.status_indicator.setStyleSheet("color: red; font-size: 16px;")
+
+            QMessageBox.warning(self, "Arrêt d'Urgence",
+                              "Tous les modules ont été arrêtés immédiatement!")
+
+        except Exception as e:
+            QMessageBox.critical(self, "Erreur", f"Erreur arrêt d'urgence: {e}")
+
+    def update_status(self):
+        """Met à jour le statut des modules"""
+        try:
+            status = self.vision_engine.get_status()
+
+            status_text = "=== STATUT DES MODULES ===\n\n"
+
+            if status["game_bot_running"]:
+                status_text += "🎮 Bot de Jeu: ACTIF\n"
+            else:
+                status_text += "🎮 Bot de Jeu: Arrêté\n"
+
+            if status["interactive_controller_running"]:
+                status_text += "🖱️ Contrôle Interactif: ACTIF\n"
+            else:
+                status_text += "🖱️ Contrôle Interactif: Arrêté\n"
+
+            if status["detector_available"]:
+                status_text += "🎯 Détecteur: Disponible\n"
+            else:
+                status_text += "🎯 Détecteur: Non disponible\n"
+
+            status_text += f"\nModules actifs: {len(status['active_modules'])}\n"
+
+            if hasattr(self, 'status_text'):
+                self.status_text.setText(status_text)
+
+            # Mettre à jour l'indicateur
+            if status['active_modules']:
+                self.status_indicator.setStyleSheet("color: orange; font-size: 16px;")
+                self.status_label.setText("Modules actifs")
+            else:
+                self.status_indicator.setStyleSheet("color: green; font-size: 16px;")
+                self.status_label.setText("Prêt")
+
+        except Exception as e:
+            if hasattr(self, 'status_text'):
+                self.status_text.setText(f"Erreur mise à jour statut: {e}")

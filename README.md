@@ -1,141 +1,134 @@
-# 🎯 Système de Visée Intelligent
+AIMER PRO — Détection universelle (Windows / CPU stable)
 
-Un système de détection d'objets en temps réel utilisant YOLO v8 avec interface interactive pour l'automatisation d'actions basées sur la vision par ordinateur.
+      
 
-## 📋 Fonctionnalités
+Important : ce README décrit l’environnement stable Windows sans GPU validé le 10 juillet 2025 (Torch 2.0.1 CPU + Detectron 0.6 + NumPy 1.26).
 
-- **Détection d'objets en temps réel** sur l'écran avec YOLO v8
-- **Interface graphique interactive** avec vue en temps réel des détections
-- **Configuration de zones de surveillance** personnalisées
-- **Actions automatiques** (clic, double-clic, évitement) basées sur les détections
-- **Système de logs** en temps réel
-- **Configuration sauvegardable** (seuils de confiance, classes ciblées, etc.)
+Si vous disposez d’un GPU CUDA ou d’une autre plate‑forme, consultez la section « Versions alternatives » plus loin.
 
-## 🚀 Installation
+🎯 Présentation rapide
 
-### Prérequis
-- Python 3.8 ou supérieur
-- Windows 10/11 (testé)
+AIMER PRO est une application de vision par ordinateur basée sur Detectron2 qui offre :
 
-### Installation des dépendances
+Détection d’objets, instance & panoptic segmentation,
 
-1. Clonez le projet :
-```bash
-git clone <votre-repo>
-cd Aimer
-```
+Interface PyQt6 moderne et réactive,
 
-2. Créez un environnement virtuel :
-```bash
-python -m venv .venv
-.venv\Scripts\activate  # Windows
-```
+Gestionnaire de datasets (COCO, VOC, Open Images…),
 
-3. Installez les dépendances :
-```bash
-pip install -r requirements.txt
-```
+Tableaux de bord et métriques temps réel.
 
-## 🎮 Utilisation
+🆕 Quoi de neuf dans ce patch ?
 
-### Lancement de l'application
+Avant
 
-```bash
-# Activez l'environnement virtuel
-.venv\Scripts\activate
+Maintenant
 
-# Lancez l'interface interactive
-python launcher_interactive.py
-```
+Python ≥ 3.8
 
-### Interface principale
+Python 3.10.x épinglé (roues Detectron 0.6)
 
-L'application offre plusieurs fonctionnalités :
+Torch 2.7 CPU (incompatible)
 
-1. **🎯 DÉMARRER LA DÉTECTION** - Lance la détection continue
-2. **📷 CAPTURE & ANALYSE** - Analyse ponctuelle de l'écran
-3. **🎯 CONFIGURER ZONES** - Définit des zones de surveillance
-4. **⚡ CONFIGURER ACTIONS** - Configure les actions automatiques
+Torch 2.0.1 + cpu + wheels officielles [PyTorch archive] (pytorch.org)
 
-### Configuration
+NumPy 2.x cassait l’ABI Torch / Detectron (ARRAY_API) (github.com)
 
-- **Seuil de confiance** : Ajustez la sensibilité de détection (10-90%)
-- **Classes ciblées** : Spécifiez les objets à détecter (person, head, body, etc.)
-- **Actions automatiques** : Configurez les réponses aux détections
+NumPy 1.26.4 épinglé
 
-## 📁 Structure du projet
+OpenCV ≥ 4.11 ramenait NumPy 2 (github.com)
 
-```
-Aimer/
-├── launcher_interactive.py    # Point d'entrée principal
-├── requirements.txt          # Dépendances Python
-├── aiming_config.json       # Configuration utilisateur
-├── yolov8n.pt              # Modèle YOLO
-├── ui/                     # Interface utilisateur
-│   ├── main_interactive.py # Interface principale
-│   ├── annotation_ui.py    # Interface d'annotation
-│   └── overlay.py          # Overlay graphique
-├── detection/              # Système de détection
-│   └── yolo_detector.py    # Détecteur YOLO
-├── utils/                  # Utilitaires
-│   └── screen_capture.py   # Capture d'écran
-└── database/              # Gestion des données
-    └── db_manager.py       # Gestionnaire de base de données
-```
+OpenCV 4.8.1.78 (--no‑deps)
 
-## ⚙️ Configuration avancée
+Detectron2 à compiler
 
-### Classes d'objets supportées
+Wheel binaire detectron2‑0.6‑cp310‑win_amd64.whl (github.com)
 
-Le système peut détecter 80+ classes d'objets COCO, incluant :
-- `person` - Personnes
-- `head` - Têtes (avec modèles personnalisés)
-- `body` - Corps
-- `bottle`, `cup` - Objets du quotidien
-- Et bien d'autres...
+Tout est regroupé dans requirements_stable.txt ; l’installeur a été réécrit pour appliquer automatiquement ces verrous.
 
-### Actions automatiques
+⚙️ Installation rapide (stable‑CPU)
 
-- **click_center** : Clic au centre de l'objet détecté
-- **double_click** : Double-clic sur l'objet
-- **right_click** : Clic droit sur l'objet
-- **move_away** : Déplace la souris loin de l'objet
+# 1) Cloner le dépôt
+$ git clone https://github.com/Duperopope/Aimer.git
+$ cd Aimer
 
-## 🔧 Développement
+# 2) Créer & activer le venv Python 3.10
+$ "C:\Users\<YOU>\AppData\Local\Microsoft\WindowsApps\python3.10.exe" -m venv .venv310
+$ .\.venv310\Scripts\Activate.ps1       # PowerShell
 
-### Architecture technique
+# 3) Installer les dépendances épinglées
+(.venv310) $ python -m pip install -U pip
+(.venv310) $ pip install -r requirements_stable.txt
 
-- **Frontend** : Tkinter (interface graphique)
-- **Détection** : YOLO v8 (Ultralytics)
-- **Vision** : OpenCV
-- **Automatisation** : PyAutoGUI
-- **Threading** : Détection non-bloquante
+# 4) Installer Detectron2 0.6 (wheel pré‑compilée)
+(.venv310) $ pip install "https://cdn.jsdelivr.net/gh/myhloli/wheels@main/assets/whl/detectron2/detectron2-0.6-cp310-cp310-win_amd64.whl"
 
-### Contribution
+# 5) Vérification
+(.venv310) $ python main.py --cli --check
 
-1. Forkez le projet
-2. Créez une branche feature (`git checkout -b feature/nouvelle-fonctionnalite`)
-3. Committez vos changements (`git commit -am 'Ajout nouvelle fonctionnalité'`)
-4. Poussez vers la branche (`git push origin feature/nouvelle-fonctionnalite`)
-5. Ouvrez une Pull Request
+Script automatisé
 
-## ⚠️ Avertissements
+Un nouveau script install_aimer.py est fourni ; il :
 
-- **Usage responsable** : Ce logiciel est destiné à des fins éducatives et de développement
-- **Respect des ToS** : Assurez-vous de respecter les conditions d'utilisation des applications tierces
-- **Sécurité** : Les actions automatiques peuvent affecter votre système
+détecte l’interpréteur 3.10 ;
 
-## 📄 Licence
+crée le venv .venv310 ;
 
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+applique requirements_stable.txt ;
 
-## 🆘 Support
+télécharge et installe la wheel Detectron ;
 
-Pour toute question ou problème :
-1. Vérifiez que toutes les dépendances sont installées
-2. Consultez les logs en temps réel dans l'interface
-3. Ouvrez une issue sur GitHub
+lance main.py --cli --check et affiche le rapport.
 
----
+📦 Contenu de requirements_stable.txt
 
-**Développé avec ❤️ pour la communauté de vision par ordinateur**
+# Core PyTorch  (CPU)
+torch==2.0.1+cpu        --index-url https://download.pytorch.org/whl/cpu
+torchvision==0.15.2+cpu --index-url https://download.pytorch.org/whl/cpu
+torchaudio==2.0.2+cpu   --index-url https://download.pytorch.org/whl/cpu
+
+# ABI compatible libs
+numpy==1.26.4   # < 2 pour éviter _ARRAY_API_  ([github.com](https://github.com/spyder-ide/spyder/issues/22187?utm_source=chatgpt.com))
+
+# Vision
+opencv-python==4.8.1.78 --no-deps         # dernières roues NumPy<2  ([pypi.org](https://pypi.org/project/opencv-python/?utm_source=chatgpt.com), [detectron2.readthedocs.io](https://detectron2.readthedocs.io/tutorials/install.html?utm_source=chatgpt.com))
+Pillow>=11.0.0
+
+# UI
+PyQt6==6.9.1                     # wheels 2025‑05  ([pypi.org](https://pypi.org/project/PyQt6/?utm_source=chatgpt.com), [pypi.org](https://pypi.org/project/PyQt6-Qt6/?utm_source=chatgpt.com))
+
+# Web / utilitaires / logging
+Flask>=2.3.0
+Flask-CORS>=4.0.0
+requests>=2.31.0
+structlog>=23.2.0
+colorlog>=6.7.0
+psutil>=5.9.0
+tqdm>=4.66.0
+pyyaml>=6.0.1
+click>=8.1.7
+rich>=13.6.0
+cryptography>=41.0.0
+
+🚀 Utilisation
+
+# Détection rapide en CLI
+git pull              # récupérer la dernière version
+.\.venv310\Scripts\Activate.ps1
+python main.py --cli --detect path\to\image.jpg
+
+# Interface graphique PyQt
+python main.py
+
+📚 Versions alternatives
+
+GPU / CUDA 11+ : passez à Torch 2.2+ & NumPy 2, puis compilez Detectron2 depuis les sources (detectron2.readthedocs.io, stackoverflow.com).
+
+Linux / macOS : la même table de versions fonctionne ; supprimez simplement le flag --no-deps pour OpenCV.
+
+🤝 Contribuer
+
+Merci de tester les wheels plus récentes (Detectron 0.8, Torch 2.2, NumPy 2) et d’ouvrir un issue si vous trouvez une combinaison stable !
+
+© 2025 Duperopope – Licence Apache 2.0
+

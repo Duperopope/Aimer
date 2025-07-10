@@ -1,0 +1,134 @@
+Voici les mêmes scénarios, mais avec des noms qui te parlent :
+
+* **Nom du dépôt GitHub** : `detectron2`
+* **Branche de travail** (ta version 0.2) : `v0.2-dev`
+* **Branche officielle** : `main`
+* **Ancien tag (version stable 0.1)** : `v0.1`
+
+---
+
+## 1. Sauvegarder ton travail sur la branche `v0.2-dev`
+
+```bash
+# 1) Crée la branche (si ce n’est pas déjà fait)
+git checkout -b v0.2-dev
+
+# 2) Sélectionne les fichiers à sauvegarder
+git add .
+
+# 3) Fais un commit (un “jalon”)
+git commit -m "Avancement version 0.2"
+
+# 4) Envoie la branche sur GitHub
+git push -u origin v0.2-dev
+```
+
+* `-u` indique à Git : « à l’avenir, pousse cette branche sur le même nom distant ».
+
+---
+
+## 2. Promouvoir `v0.2-dev` → `main` (en faire la version officielle)
+
+```bash
+# Mets d’abord ta branche à jour si quelqu’un a touché main
+git checkout v0.2-dev
+git pull --rebase origin main     # intègre les éventuels derniers commits de main
+
+# Basculons sur main
+git checkout main
+git pull                          # assure-toi d’avoir la dernière version GitHub
+
+# Fusionne la 0.2 dans main
+git merge v0.2-dev                # --no-ff si tu veux garder un commit de merge
+git push origin main              # envoie la nouvelle main sur GitHub
+```
+
+> Rien n’est supprimé : l’historique complet reste dans Git.
+
+---
+
+## 3. Revenir à la version 0.1 **sans perdre** la 0.2
+
+### 3-A. Marquer les versions
+
+```bash
+# Depuis v0.2-dev, crée un tag de sauvegarde
+git checkout v0.2-dev
+git tag sauvegarde-v0.2
+git push origin sauvegarde-v0.2
+```
+
+*(Tu as maintenant une « photo » de la 0.2)*
+
+### 3-B. Fixer la 0.1 comme référence
+
+1. Assure-toi qu’un tag `v0.1` existe (ou crée-le sur l’ancien commit) :
+
+   ```bash
+   git tag v0.1 <id_du_commit_0.1>   # si besoin
+   git push origin v0.1
+   ```
+
+2. Replace `main` exactement au tag `v0.1` **(force push)** :
+
+   ```bash
+   git checkout main
+   git reset --hard v0.1            # main pointe maintenant sur l'ancien commit
+   git push --force origin main     # avertit GitHub : "main = v0.1"
+   ```
+
+* La 0.2 n’est pas perdue : elle reste dans `sauvegarde-v0.2` **et** dans la branche `v0.2-dev`.
+
+### 3-C. Ou bien créer une branche de correctifs depuis 0.1
+
+```bash
+git checkout -b correctifs-0.1 v0.1
+# travaille dessus, commit, push origin correctifs-0.1
+```
+
+Ainsi :
+
+```
+main            -> 0.1 (stable)
+v0.2-dev        -> travail 0.2
+sauvegarde-v0.2 -> tag de la 0.2
+correctifs-0.1  -> évolutions sur l’ancienne base
+```
+
+---
+
+## 4. Re-télécharger entièrement le dépôt (si besoin de repartir propre)
+
+```bash
+# Dans un dossier vide
+git clone https://github.com/TON_USER/detectron2.git
+cd detectron2
+```
+
+Tu récupères toutes les branches et tags, donc `main`, `v0.2-dev`, `v0.1`, etc.
+
+---
+
+## 5. Mini antisèche
+
+| Que veux-tu faire ?               | Commande                                                  |
+| --------------------------------- | --------------------------------------------------------- |
+| Enregistrer le travail en cours   | `git add . && git commit -m "…" && git push`              |
+| Créer une branche de travail      | `git checkout -b ma-branche`                              |
+| Promouvoir la branche dans `main` | `git checkout main` → `git merge ma-branche` → `git push` |
+| Tagger une version                | `git tag v0.3 && git push origin v0.3`                    |
+| Télécharger la version officielle | `git clone …` ou `git pull`                               |
+| Annuler **localement**            | `git reset --hard <commit>`                               |
+| Annuler **à distance** (forcer)   | `git push --force origin main` *(à faire prudemment)*     |
+
+---
+
+### Moral :
+
+Utilise :
+
+* **Branches** pour travailler sans toucher `main`
+* **Tags** pour numéroter tes versions (v0.1, v0.2…)
+* **Commits** (jalons) fréquents pour retrouver chaque étape
+
+Et souviens-toi : aucune version n’est vraiment perdue tant qu’elle a un tag ou une branche quelque part !

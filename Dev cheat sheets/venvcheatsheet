@@ -1,0 +1,143 @@
+## 🗂️ Cheat-sheet VS Code (Windows 11) – Python & environnements virtuels
+
+> **Objectif express** : retrouver, (ré)activer et utiliser ton venv proprement dans VS Code, puis quelques raccourcis indispensables.
+
+---
+
+### 1. Où se trouve mon venv ?
+
+| Situation courante                                                | Dossier / script d’activation                                                                                                  |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| venv créé via `python -m venv venv`                               | `.\venv\Scripts\activate.bat` (Cmd)<br>`.\venv\Scripts\Activate.ps1` (PowerShell)<br>`source venv/Scripts/activate` (Git Bash) |
+| venv nommé `.venv` à la racine du projet (conseillé pour VS Code) | mêmes scripts, dans `.venv\Scripts\…`                                                                                          |
+| Pipenv                                                            | pas de dossier, VS Code détecte `pipenv`; active avec **Python : Select Interpreter**                                          |
+| Conda env “myenv”                                                 | activation : `conda activate myenv`                                                                                            |
+
+---
+
+### 2. Sélectionner l’interpréteur Python **dans VS Code**
+
+1. ↩️ **Ouvre** le dossier du projet (**File ▸ Open Folder…**).
+2. **Ctrl + Shift + P** → tape `Python: Select Interpreter`.
+3. Choisis l’entrée qui pointe vers `…\.venv\Scripts\python.exe` (ou ton env Conda).
+
+> *Pas dans la liste ?*
+>
+> * Clique **Enter interpreter path** → **Find…** → navigue jusqu’au `python.exe` du venv.
+> * VS Code crée (ou met à jour) `.vscode/settings.json` avec :
+>
+>   ```json
+>   {
+>     "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe"
+>   }
+>   ```
+
+---
+
+### 3. (Ré)activer le venv dans le terminal intégré
+
+1. Ouvre **Terminal intégré** : **Ctrl + \`** (accent grave).
+2. Vérifie la **coquille** (cmd, PowerShell, Git Bash). Change au besoin :
+
+   * **▶ Terminal ▸ Select Default Profile…**
+3. Exécute le script adéquat :
+
+```powershell
+# PowerShell
+.\.venv\Scripts\Activate.ps1
+```
+
+```cmd
+:: Invite de commandes
+\.venv\Scripts\activate.bat
+```
+
+```bash
+# Git Bash
+source .venv/Scripts/activate
+```
+
+*Astuce* : ajoute cette ligne dans **settings.json** pour que VS Code active automatiquement le venv à l’ouverture du terminal :
+
+```json
+"terminal.integrated.env.windows": {
+    "VIRTUAL_ENV": "${workspaceFolder}\\.venv",
+    "PATH": "${workspaceFolder}\\.venv\\Scripts;${env:PATH}"
+}
+```
+
+---
+
+### 4. Commandes rapides venv
+
+| Action                | Cmd / PowerShell                |
+| --------------------- | ------------------------------- |
+| Créer un venv `.venv` | `python -m venv .venv`          |
+| Activer               | voir §3                         |
+| Désactiver            | `deactivate`                    |
+| Installer un paquet   | `pip install nom_paquet`        |
+| Geler les dépendances | `pip freeze > requirements.txt` |
+
+---
+
+### 5. Raccourcis VS Code essentiels (Windows)
+
+| But                               | Raccourci              |
+| --------------------------------- | ---------------------- |
+| Ouvrir palette de commandes       | **Ctrl + Shift + P**   |
+| Terminal intégré                  | **Ctrl + \`**          |
+| Exécuter le fichier actif         | **Ctrl + F5**          |
+| Déboguer                          | **F5**                 |
+| Commenter / décommenter           | **Ctrl + /**           |
+| Formatage (avec Black / autopep8) | **Shift + Alt + F**    |
+| Rename symbol                     | **F2**                 |
+| Multi-curseurs (ajout ligne)      | **Alt + Shift + clic** |
+
+---
+
+### 6. Scénarios rapides
+
+#### 🔄 “Je veux repartir de zéro mais garder mon code”
+
+```bash
+deactivate           # sort du venv actuel
+rmdir /s /q .venv    # supprime l'ancien environnement (cmd)*
+python -m venv .venv # recrée
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+\* ou `Remove-Item -Recurse -Force .venv` sous PowerShell.
+
+---
+
+#### 💾 “Je veux pousser mon code sur GitHub sans mes dépendances”
+
+1. Ajoute `.venv/` (ou `env/`) dans **.gitignore**.
+2. Commit → `git push origin ma-branche`.
+3. Les autres devs feront : `python -m venv .venv && pip install -r requirements.txt`.
+
+---
+
+### 7. Quand ça coince : check-list
+
+| Question                         | Vérification                                                                                 |
+| -------------------------------- | -------------------------------------------------------------------------------------------- |
+| VS Code voit-il le bon Python ?  | `Python: Select Interpreter`                                                                 |
+| Terminal affiche-t-il `(venv)` ? | Prompt doit changer après activation                                                         |
+| Script d’activation bloqué ?     | exécute `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` puis réessaye |
+| Paquet “manquant” malgré pip ?   | `which python` (Git Bash) / `Get-Command python` (PS) pour vérifier le Python utilisé        |
+| Toujours rien ?                  | Redémarre VS Code (Ctrl + Shift + P → **Reload Window**)                                     |
+
+---
+
+### 8. Ressources éclair
+
+* **Python in VS Code** (doc officielle)
+  `https://code.visualstudio.com/docs/python/python-tutorial`
+* **VS Code Keyboard Shortcuts**
+  `Ctrl + K Ctrl + S` (ouvre le panneau complet et editable)
+
+---
+
+💡 *Garde cette fiche sous la main ; en deux ou trois ouvertures de projet tu n’auras plus à y penser !*
