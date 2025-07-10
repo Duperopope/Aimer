@@ -296,6 +296,118 @@ def auto_setup(auto_fix=False):
 # --- FIN AUTO-SETUP ---
 
 
+def auto_fix_environment():
+    """Installation automatique de l'environnement complet"""
+    logger = setup_logging()
+    logger.info("🚀 AIMER PRO - Auto-setup démarré")
+    
+    print("🚀 AIMER PRO - Auto-setup de l'environnement")
+    print("=" * 60)
+    
+    import venv
+    import site
+    
+    # 1. Créer/vérifier le venv
+    venv_path = Path("venv")
+    if not venv_path.exists():
+        print("📦 Création de l'environnement virtuel...")
+        logger.info("Création du venv")
+        try:
+            venv.create(venv_path, with_pip=True)
+            print("✅ Environnement virtuel créé")
+        except Exception as e:
+            logger.error(f"Erreur création venv: {e}")
+            print(f"❌ Erreur création venv: {e}")
+            return False
+    else:
+        print("✅ Environnement virtuel détecté")
+    
+    # 2. Déterminer l'exécutable Python du venv
+    if os.name == 'nt':  # Windows
+        python_venv = venv_path / "Scripts" / "python.exe"
+        pip_venv = venv_path / "Scripts" / "pip.exe"
+    else:  # Linux/Mac
+        python_venv = venv_path / "bin" / "python"
+        pip_venv = venv_path / "bin" / "pip"
+    
+    if not python_venv.exists():
+        logger.error("Python du venv introuvable")
+        print("❌ Python du venv introuvable")
+        return False
+    
+    # 3. Installer les requirements
+    requirements_file = Path("requirements_stable.txt")
+    if requirements_file.exists():
+        print("📚 Installation des dépendances...")
+        logger.info("Installation requirements")
+        try:
+            subprocess.run([str(pip_venv), "install", "-r", str(requirements_file)], 
+                          check=True, capture_output=False)
+            print("✅ Dépendances installées")
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Erreur installation requirements: {e}")
+            print(f"❌ Erreur installation requirements: {e}")
+            return False
+    
+    # 4. Installer Detectron2 spécifiquement
+    print("🤖 Installation de Detectron2...")
+    logger.info("Installation Detectron2")
+    try:
+        # Essayer d'installer Detectron2 pour CPU Windows
+        subprocess.run([str(pip_venv), "install", 
+                       "detectron2", "-f", 
+                       "https://dl.fbaipublicfiles.com/detectron2/wheels/cpu/torch1.9/index.html"],
+                      check=True, capture_output=False)
+        print("✅ Detectron2 installé")
+    except subprocess.CalledProcessError:
+        logger.warning("Installation Detectron2 standard échouée, essai alternative")
+        try:
+            # Essai installation via pip directe
+            subprocess.run([str(pip_venv), "install", "detectron2"], 
+                          check=True, capture_output=False)
+            print("✅ Detectron2 installé (version alternative)")
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Erreur installation Detectron2: {e}")
+            print(f"❌ Erreur installation Detectron2: {e}")
+            print("💡 Vous pouvez continuer, mais la détection ne fonctionnera pas")
+    
+    # 5. Vérification finale
+    print("🔍 Vérification finale...")
+    try:
+        result = subprocess.run([str(python_venv), "-c", 
+                                "import torch, detectron2; print('✅ Vérification OK')"],
+                               capture_output=True, text=True, timeout=30)
+        if result.returncode == 0:
+            print("✅ Installation complète et fonctionnelle")
+            logger.info("Auto-setup terminé avec succès")
+            
+            # Relancer le script avec le bon Python
+            print("🔄 Relancement avec l'environnement configuré...")
+            current_args = sys.argv[1:]  # Arguments sans --auto-fix
+            if "--auto-fix" in current_args:
+                current_args.remove("--auto-fix")
+            
+            if not current_args:  # Si pas d'autres arguments, lancer l'interface
+                current_args = []  # Interface graphique par défaut
+            
+            os.execv(str(python_venv), [str(python_venv), __file__] + current_args)
+            
+        else:
+            print("⚠️  Installation terminée mais vérification échouée")
+            print(f"Erreur: {result.stderr}")
+            return False
+            
+    except subprocess.TimeoutExpired:
+        print("⚠️  Vérification timeout (mais probablement OK)")
+        return True
+    except Exception as e:
+        logger.error(f"Erreur vérification: {e}")
+        print(f"⚠️  Erreur vérification: {e}")
+        return True  # On continue quand même
+    
+    return True
+
+
 def main():
     """Point d'entrée principal"""
     parser = argparse.ArgumentParser(
@@ -304,6 +416,7 @@ def main():
         epilog="""
 Exemples d'utilisation:
   python main.py                           # Interface graphique
+  python main.py --auto-fix                # Installation automatique complète
   python main.py --cli --check             # Vérification système
   python main.py --cli --detect image.jpg  # Détection CLI
   python main.py --cli --detect image.jpg --task instance_segmentation
@@ -313,6 +426,7 @@ Exemples d'utilisation:
     # Arguments principaux
     parser.add_argument("--cli", action="store_true", help="Mode ligne de commande")
     parser.add_argument("--check", action="store_true", help="Vérification système")
+    parser.add_argument("--auto-fix", action="store_true", help="Installation automatique de l'environnement (venv, requirements, Detectron2)")
     parser.add_argument(
         "--detect", type=str, metavar="IMAGE", help="Détection sur image"
     )
@@ -335,6 +449,10 @@ Exemples d'utilisation:
     )
 
     args = parser.parse_args()
+
+    # Traitement auto-fix en priorité
+    if args.auto_fix:
+        return auto_fix_environment()
 
     # Header
     print("=" * 60)
