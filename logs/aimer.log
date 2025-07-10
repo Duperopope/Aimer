@@ -17,3 +17,20 @@
 2025-07-10 15:44:53,245 | INFO | MainWindow | Fenêtre principale initialisée
 2025-07-10 15:44:59 | INFO | MainWindow | Fermeture de l'application
 2025-07-10 15:44:59,723 | INFO | MainWindow | Fermeture de l'application
+2025-07-10 15:48:43,508 | INFO | AIMER | Démarrage AIMER PRO - Mode GUI
+2025-07-10 15:48:46 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:48:46,474 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:48:46 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 15:48:46,549 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 15:48:46,888 | INFO | detectron2.checkpoint.detection_checkpoint | [DetectionCheckpointer] Loading from https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl ...
+2025-07-10 15:48:46,890 | INFO | iopath.common.file_io | URL https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl cached in C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl
+2025-07-10 15:48:46,890 | INFO | fvcore.common.checkpoint | [Checkpointer] Loading from C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl ...
+2025-07-10 15:48:46,932 | INFO | fvcore.common.checkpoint | Reading a file from 'Detectron2 Model Zoo'
+2025-07-10 15:48:46 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 15:48:46,958 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 15:48:46 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 15:48:46,958 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 15:48:46 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 15:48:46,965 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 15:48:46 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 15:48:46,995 | INFO | MainWindow | Fenêtre principale initialisée

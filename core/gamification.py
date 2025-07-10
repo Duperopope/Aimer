@@ -429,18 +429,14 @@ class GamificationSystem:
             return None
 
     def get_user_by_username(self, username: str) -> Optional[int]:
-        """Récupère l'ID utilisateur par nom"""
+        """Récupère l'ID utilisateur par nom d'utilisateur"""
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
-
             cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
             result = cursor.fetchone()
-
             conn.close()
-
             return result[0] if result else None
-
         except Exception as e:
             self.logger.error(f"Erreur récupération utilisateur: {e}")
             return None
@@ -450,6 +446,11 @@ class GamificationSystem:
         user_id = self.get_user_by_username(username)
         if user_id is None:
             user_id = self.create_user(username)
+        # S'assurer que user_id est bien un int
+        if user_id is None:
+            raise ValueError(
+                f"Impossible de créer ou récupérer l'utilisateur: {username}"
+            )
         return user_id
 
     def add_xp(

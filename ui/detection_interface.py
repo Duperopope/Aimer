@@ -449,6 +449,7 @@ class DetectionWidget(QWidget):
 
     def start_webcam(self):
         """Démarre la capture webcam"""
+        self.logger.info("Appel de la fonctionnalité webcam (non implémentée)")
         QMessageBox.information(
             self, "Webcam", "Fonctionnalité webcam en développement"
         )

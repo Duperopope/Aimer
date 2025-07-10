@@ -209,15 +209,17 @@ class HardwareMonitor:
     def get_cpu_temperature(self) -> Optional[float]:
         """Température CPU (si disponible)"""
         try:
+            # hasattr pour éviter l'erreur Pylance, et type: ignore pour forcer l'accès
             if hasattr(psutil, "sensors_temperatures"):
-                temps = psutil.sensors_temperatures()
+                temps = psutil.sensors_temperatures()  # type: ignore
                 if temps:
                     for name, entries in temps.items():
                         if "cpu" in name.lower() or "core" in name.lower():
                             if entries:
                                 return entries[0].current
             return None
-        except:
+        except Exception as e:
+            self.logger.error(f"Erreur température CPU: {e}")
             return None
 
     def get_complete_info(self) -> Dict[str, Any]:
