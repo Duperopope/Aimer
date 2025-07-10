@@ -87,3 +87,85 @@
 2025-07-10 14:28:31 | INFO | MainWindow | Fermeture de l'application
 2025-07-10 14:28:31,234 | INFO | MainWindow | Fermeture de l'application
 2025-07-10 14:29:12,317 | INFO | AIMER | Démarrage AIMER PRO - Mode CLI
+2025-07-10 15:33:28,223 | INFO | AIMER | Démarrage AIMER PRO - Mode GUI
+2025-07-10 15:33:31 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:33:31,239 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:33:31 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 15:33:31,327 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 15:33:31,726 | INFO | detectron2.checkpoint.detection_checkpoint | [DetectionCheckpointer] Loading from https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl ...
+2025-07-10 15:33:31,727 | INFO | iopath.common.file_io | URL https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl cached in C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl
+2025-07-10 15:33:31,728 | INFO | fvcore.common.checkpoint | [Checkpointer] Loading from C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl ...
+2025-07-10 15:33:31,772 | INFO | fvcore.common.checkpoint | Reading a file from 'Detectron2 Model Zoo'
+2025-07-10 15:33:31 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 15:33:31,798 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 15:33:31 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 15:33:31,799 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 15:33:31 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 15:33:31,806 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 15:33:31 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 15:33:31,852 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 15:33:36 | INFO | DatasetWidget | Téléchargement démarré: coco_2017
+2025-07-10 15:33:36,490 | INFO | DatasetWidget | Téléchargement démarré: coco_2017
+2025-07-10 15:33:36 | INFO | DatasetManager | Début téléchargement: COCO 2017
+2025-07-10 15:33:36,491 | INFO | DatasetManager | Début téléchargement: COCO 2017
+2025-07-10 15:36:27 | INFO | MainWindow | Fermeture de l'application
+2025-07-10 15:36:27,162 | INFO | MainWindow | Fermeture de l'application
+2025-07-10 15:39:06,715 | INFO | AIMER | Démarrage AIMER PRO - Mode GUI
+2025-07-10 15:39:09 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:39:09,687 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:39:09 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 15:39:09,778 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 15:39:10,179 | INFO | detectron2.checkpoint.detection_checkpoint | [DetectionCheckpointer] Loading from https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl ...
+2025-07-10 15:39:10,181 | INFO | iopath.common.file_io | URL https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl cached in C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl
+2025-07-10 15:39:10,181 | INFO | fvcore.common.checkpoint | [Checkpointer] Loading from C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl ...
+2025-07-10 15:39:10,221 | INFO | fvcore.common.checkpoint | Reading a file from 'Detectron2 Model Zoo'
+2025-07-10 15:39:10 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 15:39:10,247 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 15:39:10 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 15:39:10,247 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 15:39:10 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 15:39:10,254 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 15:39:10 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 15:39:10,302 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 15:39:12 | INFO | DetectionWidget | Capture webcam démarrée
+2025-07-10 15:39:12,536 | INFO | DetectionWidget | Capture webcam démarrée
+2025-07-10 15:39:12 | ERROR | DetectionWidget | Erreur dans la boucle de capture: No module named 'mss'
+2025-07-10 15:39:12,538 | ERROR | DetectionWidget | Erreur dans la boucle de capture: No module named 'mss'
+2025-07-10 15:40:48,569 | INFO | AIMER | Démarrage AIMER PRO - Mode GUI
+2025-07-10 15:40:51 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:40:51,481 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:40:51 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 15:40:51,569 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 15:40:51,972 | INFO | detectron2.checkpoint.detection_checkpoint | [DetectionCheckpointer] Loading from https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl ...
+2025-07-10 15:40:51,973 | INFO | iopath.common.file_io | URL https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl cached in C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl
+2025-07-10 15:40:51,973 | INFO | fvcore.common.checkpoint | [Checkpointer] Loading from C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl ...
+2025-07-10 15:40:52,014 | INFO | fvcore.common.checkpoint | Reading a file from 'Detectron2 Model Zoo'
+2025-07-10 15:40:52 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 15:40:52,040 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 15:40:52 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 15:40:52,041 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 15:40:52 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 15:40:52,048 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 15:40:52 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 15:40:52,089 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 15:41:00 | INFO | MainWindow | Fermeture de l'application
+2025-07-10 15:41:00,224 | INFO | MainWindow | Fermeture de l'application
+2025-07-10 15:42:25,424 | INFO | AIMER | Démarrage AIMER PRO - Mode GUI
+2025-07-10 15:42:28 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:42:28,359 | INFO | DatasetManager | DatasetManager initialisé - Base: datasets
+2025-07-10 15:42:28 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 15:42:28,432 | INFO | UniversalDetector | Initialisation détecteur - Tâche: detection
+2025-07-10 15:42:28,831 | INFO | detectron2.checkpoint.detection_checkpoint | [DetectionCheckpointer] Loading from https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl ...
+2025-07-10 15:42:28,832 | INFO | iopath.common.file_io | URL https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl cached in C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl
+2025-07-10 15:42:28,832 | INFO | fvcore.common.checkpoint | [Checkpointer] Loading from C:\Users\Smedj/.torch/iopath_cache\detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458\model_final_280758.pkl ...
+2025-07-10 15:42:28,874 | INFO | fvcore.common.checkpoint | Reading a file from 'Detectron2 Model Zoo'
+2025-07-10 15:42:28 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 15:42:28,901 | INFO | UniversalDetector | Détecteur initialisé avec succès
+2025-07-10 15:42:28 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 15:42:28,901 | INFO | DetectionWidget | Détecteur initialisé
+2025-07-10 15:42:28 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 15:42:28,907 | INFO | SettingsWidget | Paramètres chargés
+2025-07-10 15:42:28 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 15:42:28,935 | INFO | MainWindow | Fenêtre principale initialisée
+2025-07-10 15:42:48 | INFO | MainWindow | Fermeture de l'application
+2025-07-10 15:42:48,754 | INFO | MainWindow | Fermeture de l'application

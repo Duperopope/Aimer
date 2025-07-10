@@ -77,7 +77,7 @@ class DatasetCard(QFrame):
             }
             QFrame:hover {
                 border-color: #007acc;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                /* box-shadow retiré car non supporté par Qt */
             }
         """
         )
