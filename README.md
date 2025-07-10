@@ -1,6 +1,50 @@
-# AIMER PRO v0.1.1 — Détection universelle (Windows / CPU stable)
+# AIMER PRO v0.1.1 — Détection universelle (Windows / CPU stab- Activer la webcam depuis l'onglet Détection (bouton Webcam, bouton Arrêter Webcam pour stopper)
+
+## 🌐 Interface Web
+
+AIMER inclut une interface web moderne accessible via navigateur :
+
+### Lancement rapide de l'interface web :
+```bash
+python launch_web.py
+```
+
+### Fonctionnalités web :
+- 🎯 Détection d'objets en temps réel
+- 📊 Monitoring hardware en direct
+- 🎮 Système de gamification
+- 📈 Métriques et tableaux de bord
+- 🌙 Interface moderne avec thème cyber
+
+### Accès depuis GitHub :
+- **GitHub Codespaces** : Interface complète dans le navigateur
+- **GitHub Pages** : Version statique de démonstration
+- **Port par défaut** : `http://localhost:5000`
+
+## Debug & logs
 
 ![Version](https://img.shields.io/badge/version-0.1.1-blue)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Duperopope/Aimer)
+[![Launch Web Interface](https://img.shields.io/badge/🌐%20Launch-Web%20Interface-brightgreen)](https://duperopope.github.io/Aimer)
+
+## 🚀 Lancement rapide
+
+### Option 1: GitHub Codespaces (Recommandé)
+Cliquez sur le badge "Open in GitHub Codespaces" ci-dessus pour lancer AIMER dans votre navigateur en un clic !
+
+### Option 2: Interface Web Locale
+```bash
+git clone https://github.com/Duperopope/Aimer.git
+cd Aimer
+python launch_web.py
+```
+
+### Option 3: Installation Classique
+```bash
+git clone https://github.com/Duperopope/Aimer.git
+cd Aimer
+python main.py --auto-fix
+```
 
 ---
 
