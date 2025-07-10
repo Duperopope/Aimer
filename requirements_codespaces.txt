@@ -1,0 +1,36 @@
+# AIMER PRO - Requirements pour GitHub Codespaces (Web seulement)
+# ================================================================
+
+# --- Cœur PyTorch (versions compatibles Codespaces) ------------
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+
+# --- Vision par ordinateur ---------------------------------------
+opencv-python>=4.8.0
+Pillow>=10.0.0
+numpy>=1.24.0
+
+# --- Web / API (priorité pour Codespaces) -----------------------
+Flask>=2.3.0
+Flask-SocketIO>=5.3.0
+Flask-CORS>=4.0.0
+requests>=2.31.0
+
+# --- Logging / Monitoring ----------------------------------------
+structlog>=23.2.0
+colorlog>=6.7.0
+psutil>=5.9.0
+tqdm>=4.66.0
+
+# --- Utilitaires --------------------------------------------------
+pyyaml>=6.0.1
+click>=8.1.7
+rich>=13.6.0
+
+# --- Base de données ---------------------------------------------
+sqlite3; python_version >= "3.7"
+
+# --- Packaging ---------------------------------------------------
+wheel>=0.41.0
+setuptools>=68.0.0

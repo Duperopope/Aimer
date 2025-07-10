@@ -4,19 +4,19 @@
 #     https://cdn.jsdelivr.net/gh/myhloli/wheels@main/assets/whl/detectron2/detectron2-0.6-cp310-cp310-win_amd64.whl
 
 # --- Cœur PyTorch -------------------------------------------------
-torch==2.0.1+cpu         --index-url https://download.pytorch.org/whl/cpu
-torchvision==0.15.2+cpu  --index-url https://download.pytorch.org/whl/cpu
-torchaudio==2.0.2+cpu    --index-url https://download.pytorch.org/whl/cpu
+torch==2.0.1
+torchvision==0.15.2
+torchaudio==2.0.2
 
 # --- Compatibilité NumPy -----------------------------------------
 numpy==1.26.4            # Torch 2.0 et Detectron 0.6 sont compilés avec l’ABI 1.x
 
 # --- Vision par ordinateur ---------------------------------------
-opencv-python==4.8.1.78  --no-deps   # dernières roues avant le passage forcé à NumPy 2 :contentReference[oaicite:0]{index=0}
+opencv-python==4.8.1.78  # dernières roues avant le passage forcé à NumPy 2
 Pillow>=11.0.0
 
 # --- UI PyQt ------------------------------------------------------
-PyQt6==6.9.1             # wheel Windows 64 bits :contentReference[oaicite:1]{index=1}
+PyQt6==6.9.1             # wheel Windows 64 bits
 
 # --- Web / API ----------------------------------------------------
 Flask>=2.3.0

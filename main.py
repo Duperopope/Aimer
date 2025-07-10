@@ -336,10 +336,19 @@ def auto_fix_environment():
         return False
     
     # 3. Installer les requirements
-    requirements_file = Path("requirements_stable.txt")
+    # Détecter l'environnement et choisir le bon fichier requirements
+    is_codespaces = os.getenv('CODESPACES') == 'true'
+    
+    if is_codespaces:
+        requirements_file = Path("requirements_codespaces.txt")
+        print("🌐 Détection: GitHub Codespaces - utilisation du profil web")
+    else:
+        requirements_file = Path("requirements_stable.txt")
+        print("🖥️  Environnement local détecté")
+    
     if requirements_file.exists():
-        print("📚 Installation des dépendances...")
-        logger.info("Installation requirements")
+        print(f"📚 Installation des dépendances depuis {requirements_file.name}...")
+        logger.info(f"Installation requirements depuis {requirements_file.name}")
         try:
             subprocess.run([str(pip_venv), "install", "-r", str(requirements_file)], 
                           check=True, capture_output=False)
@@ -347,7 +356,17 @@ def auto_fix_environment():
         except subprocess.CalledProcessError as e:
             logger.error(f"Erreur installation requirements: {e}")
             print(f"❌ Erreur installation requirements: {e}")
-            return False
+            # En cas d'erreur, essayer l'installation basique
+            print("🔄 Tentative d'installation des packages essentiels...")
+            essential_packages = ["flask", "flask-socketio", "opencv-python", "pillow", "numpy", "torch", "torchvision"]
+            for package in essential_packages:
+                try:
+                    subprocess.run([str(pip_venv), "install", package], check=True, capture_output=True)
+                    print(f"  ✅ {package}")
+                except:
+                    print(f"  ❌ {package}")
+    else:
+        print(f"⚠️  Fichier {requirements_file.name} introuvable")
     
     # 4. Installer Detectron2 spécifiquement
     print("🤖 Installation de Detectron2...")
@@ -406,6 +425,11 @@ def auto_fix_environment():
         return True  # On continue quand même
     
     return True
+
+
+def is_codespaces():
+    """Détecte si on est dans GitHub Codespaces"""
+    return os.getenv('CODESPACES') == 'true'
 
 
 def main():
