@@ -110,3 +110,21 @@ detections/
 .sync_pid
 *realtime_sync*
 *sync_controller*
+sync.log
+*sync_daemon*
+*sync_manager*
+*start_sync*
+*stop_sync*
+*status_sync*
+
+# === MONITORING ET DEBUGGING ===
+# Fichiers de monitoring
+.error_monitor.pid
+.error_monitor_status.json
+.vscode_error_status.json
+error_monitor.log
+.monitor_config.py
+
+# Fichiers de dashboard et correction automatique
+AUTO_FIX_REPORT.md
+MONITORING_SYSTEM_GUIDE.md
