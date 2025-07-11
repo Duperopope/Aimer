@@ -5,7 +5,10 @@ AIMER PRO – Installateur Windows CPU (Py 3.10)
 © 2025 – Licence Apache 2.0
 """
 
-import subprocess, sys, platform, textwrap, shutil, os
+import platform
+import subprocess
+import sys
+import textwrap
 from pathlib import Path
 
 PY_REQUIRED = (3, 10)  # 3.10 +
