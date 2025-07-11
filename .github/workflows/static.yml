@@ -1,0 +1,81 @@
+name: "AIMER - Static Site Deploy"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "*.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: "🏗️ Build Documentation"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name:  Checkout
+        uses: actions/checkout@v4
+
+      - name:  Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name:  Build documentation
+        run: |
+          mkdir -p docs/_site
+
+          # Copier les fichiers markdown
+          cp README.md docs/_site/index.md || echo "No README.md"
+          cp MAINTENANCE_GUIDE.md docs/_site/maintenance.md || echo "No MAINTENANCE_GUIDE.md"
+
+          # Créer une page d'index HTML simple
+          cat > docs/_site/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="fr">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>AIMER - Documentation</title>
+              <style>
+                  body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+                  h1 { color: #2c3e50; }
+                  .emoji { font-size: 1.2em; }
+              </style>
+          </head>
+          <body>
+              <h1> AIMER Project</h1>
+              <p>Système de détection IA avec maintenance intelligente</p>
+              <ul>
+                  <li><a href="maintenance.html">📚 Guide de Maintenance</a></li>
+                  <li><a href="https://github.com/Duperopope/Aimer">🔗 Repository GitHub</a></li>
+              </ul>
+          </body>
+          </html>
+          EOF
+
+      - name: 📤 Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: docs/_site
+
+  deploy:
+    name: "Deploy to GitHub Pages"
+    environment:
+      name: "github-pages"
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: 🌐 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
