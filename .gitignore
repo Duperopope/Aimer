@@ -1,0 +1,101 @@
+# AIMER Project - Git Ignore
+# Cybersécurité et protection des données sensibles
+
+# === SÉCURITÉ SSH ===
+# Fichiers de récupération SSH (contiennent des infos sensibles)
+*recovery*
+*SSH*
+*.ssh/
+ssh_*
+*_recovery_*
+*RECOVERY*
+
+# Clés et certificats
+*.pem
+*.key
+*.p12
+*.pfx
+id_*
+known_hosts
+
+# === DONNÉES SENSIBLES ===
+# Mots de passe et tokens
+*.env
+.env.*
+config.json
+secrets.json
+credentials.*
+auth.*
+
+# Logs avec possibles infos sensibles
+*.log
+logs/
+debug.log
+
+# === ENVIRONNEMENTS PYTHON ===
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+
+# === IDE ET OS ===
+# Visual Studio Code
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# === BASES DE DONNÉES ===
+*.db
+*.sqlite3
+*.sqlite
+database.db
+
+# === FICHIERS TEMPORAIRES ===
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
+
+# === AIMER SPÉCIFIQUE ===
+# Modèles ML (peuvent être lourds)
+models/
+*.pth
+*.onnx
+*.h5
+
+# Données d'entraînement
+datasets/
+data/
+training_data/
+
+# Résultats et outputs
+results/
+outputs/
+detections/

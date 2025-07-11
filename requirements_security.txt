@@ -1,0 +1,20 @@
+# AIMER Project - Requirements
+# Dépendances pour le système de récupération sécurisé
+
+# Cryptographie pour le chiffrement
+cryptography>=41.0.0
+
+# Interface utilisateur
+rich>=13.0.0
+
+# Utilitaires système
+psutil>=5.9.0
+
+# CLI améliorée
+click>=8.0.0
+
+# Configuration sécurisée
+python-dotenv>=1.0.0
+
+# Validation
+pydantic>=2.0.0
