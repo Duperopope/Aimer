@@ -27,6 +27,11 @@ secrets.json
 credentials.*
 auth.*
 
+# Tokens GitHub spécifiques
+*ghp_*
+*github_token*
+*genspark*
+
 # Logs avec possibles infos sensibles
 *.log
 logs/
@@ -99,3 +104,9 @@ training_data/
 results/
 outputs/
 detections/
+
+# Fichiers de synchronisation
+.sync_status.json
+.sync_pid
+*realtime_sync*
+*sync_controller*
