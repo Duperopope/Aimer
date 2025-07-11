@@ -5,12 +5,13 @@ Installation automatique complète d'AIMER PRO
 Version: 1.0
 """
 
-import os
-import sys
-import subprocess
-import shutil
 import json
+import os
+import shutil
+import subprocess
+import sys
 from pathlib import Path
+
 
 class AimerProInstaller:
     def __init__(self):
@@ -21,10 +22,10 @@ class AimerProInstaller:
         """Affichage des logs avec couleurs"""
         colors = {
             "INFO": "\033[94m",
-            "SUCCESS": "\033[92m", 
+            "SUCCESS": "\033[92m",
             "WARNING": "\033[93m",
             "ERROR": "\033[91m",
-            "RESET": "\033[0m"
+            "RESET": "\033[0m",
         }
         print(f"{colors.get(level, '')}{level}: {message}{colors['RESET']}")
 
@@ -47,7 +48,7 @@ class AimerProInstaller:
             self.project_dir,
             self.project_dir / "static",
             self.project_dir / "templates",
-            self.project_dir / "data"
+            self.project_dir / "data",
         ]
 
         for directory in directories:
@@ -60,8 +61,11 @@ class AimerProInstaller:
         self.log("🐍 Création de l'environnement virtuel...")
 
         try:
-            subprocess.run([sys.executable, "-m", "venv", str(self.venv_dir)], 
-                         check=True, capture_output=True)
+            subprocess.run(
+                [sys.executable, "-m", "venv", str(self.venv_dir)],
+                check=True,
+                capture_output=True,
+            )
             self.log("Environnement virtuel créé", "SUCCESS")
         except subprocess.CalledProcessError as e:
             self.log(f"Erreur création venv: {e}", "ERROR")
@@ -70,7 +74,7 @@ class AimerProInstaller:
 
     def get_pip_command(self):
         """Retourne la commande pip selon l'OS"""
-        if os.name == 'nt':  # Windows
+        if os.name == "nt":  # Windows
             return str(self.venv_dir / "Scripts" / "pip")
         else:  # Unix/Linux/Mac
             return str(self.venv_dir / "bin" / "pip")
@@ -81,7 +85,7 @@ class AimerProInstaller:
 
         packages = [
             "flask",
-            "flask-cors", 
+            "flask-cors",
             "requests",
             "beautifulsoup4",
             "lxml",
@@ -94,7 +98,7 @@ class AimerProInstaller:
             "nltk",
             "textblob",
             "wordcloud",
-            "Pillow"
+            "Pillow",
         ]
 
         pip_cmd = self.get_pip_command()
@@ -102,8 +106,7 @@ class AimerProInstaller:
         for package in packages:
             try:
                 self.log(f"Installation de {package}...")
-                subprocess.run([pip_cmd, "install", package], 
-                             check=True, capture_output=True)
+                subprocess.run([pip_cmd, "install", package], check=True, capture_output=True)
                 self.log(f"✅ {package} installé", "SUCCESS")
             except subprocess.CalledProcessError as e:
                 self.log(f"❌ Erreur installation {package}: {e}", "ERROR")
@@ -525,8 +528,8 @@ if __name__ == '__main__':
         """Crée le script de lancement"""
         self.log("🚀 Création du launcher...")
 
-        if os.name == 'nt':  # Windows
-            launcher_content = f"""@echo off
+        if os.name == "nt":  # Windows
+            launcher_content = """@echo off
 echo 🚀 Lancement d'AIMER PRO...
 cd /d "{self.project_dir}"
 "{self.venv_dir}\Scripts\python.exe" app.py
@@ -534,7 +537,7 @@ pause
 """
             launcher_path = self.project_dir / "launch_aimer_pro.bat"
         else:  # Unix/Linux/Mac
-            launcher_content = f"""#!/bin/bash
+            launcher_content = """#!/bin/bash
 echo "🚀 Lancement d'AIMER PRO..."
 cd "{self.project_dir}"
 "{self.venv_dir}/bin/python" app.py
@@ -544,7 +547,7 @@ cd "{self.project_dir}"
         with open(launcher_path, "w", encoding="utf-8") as f:
             f.write(launcher_content)
 
-        if os.name != 'nt':
+        if os.name != "nt":
             os.chmod(launcher_path, 0o755)
 
         self.log("Launcher créé", "SUCCESS")
@@ -593,7 +596,7 @@ Pillow==10.0.1
             self.log("✅ Installation terminée avec succès!", "SUCCESS")
             self.log(f"📁 Projet installé dans: {self.project_dir}", "INFO")
 
-            if os.name == 'nt':
+            if os.name == "nt":
                 launcher_file = "launch_aimer_pro.bat"
             else:
                 launcher_file = "launch_aimer_pro.sh"
@@ -608,6 +611,7 @@ Pillow==10.0.1
         except Exception as e:
             self.log(f"❌ Erreur lors de l'installation: {e}", "ERROR")
             return False
+
 
 def main():
     """Fonction principale"""
@@ -627,6 +631,7 @@ def main():
         print("Vérifiez les logs ci-dessus pour plus de détails.")
 
     input("\nAppuyez sur Entrée pour quitter...")
+
 
 if __name__ == "__main__":
     main()
