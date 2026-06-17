@@ -1,6 +1,7 @@
 name: AIMER PRO - Tests et Validation
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main, develop ]
   pull_request:
