@@ -1,6 +1,7 @@
 # AIMER PRO - Requirements pour déploiement web
 # Version minimale pour serveur de production
 
+torch==2.0.1  # required by core/detector.py (SmartDetector) imported by server.py
 Flask==3.0.0
 flask-socketio==5.3.6
 opencv-python-headless==4.8.1.78
