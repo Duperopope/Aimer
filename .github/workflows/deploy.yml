@@ -1,6 +1,7 @@
 name: Deploy AIMER PRO - Interface Web Unifiée
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
   pull_request:
